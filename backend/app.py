@@ -6,7 +6,12 @@ from api.calculator import calculate_fire_projection
 from api.tax import calculate_tax
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=[
+    "http://localhost:5173",  # Local development
+    "https://www.derricklin.net",  # Production domain
+    "https://derricklin.net",  # Also allow root domain
+    "https://nw.derricklin.net"  # Also allow root domain
+])
 
 # MongoDB connection
 client = MongoClient('mongodb://localhost:27017/')

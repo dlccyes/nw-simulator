@@ -33,7 +33,7 @@ import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as F
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface Inputs {
   currentAge: number;
