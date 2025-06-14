@@ -34,6 +34,9 @@ import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Resp
 import type { SelectChangeEvent } from '@mui/material/Select';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// only enable save/load profile feature when in local
+// TODO: enable in prod once we have a production db
+const enableProfile = API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1');
 
 interface Inputs {
   currentAge: number;
@@ -217,8 +220,10 @@ const FireCalculator: React.FC = () => {
   const [stopAtFire, setStopAtFire] = useState(false);
 
   useEffect(() => {
-    loadProfiles();
-  }, []);
+    if (enableProfile) {
+      loadProfiles();
+    }
+  }, [enableProfile]);
 
   const loadProfiles = async () => {
     try {
@@ -404,20 +409,24 @@ const FireCalculator: React.FC = () => {
       <Grid container spacing={3}>
         <Grid item component="div" xs={12}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mb: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<SaveIcon />}
-              onClick={() => setSaveDialogOpen(true)}
-            >
-              Save Profile
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<FolderOpenIcon />}
-              onClick={() => setLoadDialogOpen(true)}
-            >
-              Load Profile
-            </Button>
+            {enableProfile && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<SaveIcon />}
+                  onClick={() => setSaveDialogOpen(true)}
+                >
+                  Save Profile
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<FolderOpenIcon />}
+                  onClick={() => setLoadDialogOpen(true)}
+                >
+                  Load Profile
+                </Button>
+              </>
+            )}
           </Box>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Enter the money in today's dollars.
