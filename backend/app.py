@@ -13,10 +13,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, origins=[
-    "http://localhost:5173",  # Local development
-    "https://www.derricklin.net",  # Production domain
-    "https://derricklin.net",  # Root domain
-    "https://nw.derricklin.net"  # Subdomain
+    "http://localhost:5173",
+    "https://nw.derricklin.net",
+    "https://fire.derricklin.net"
 ], max_age=3600)
 
 # MongoDB connection
