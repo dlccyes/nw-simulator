@@ -188,6 +188,32 @@ const NetWorthChart: React.FC<{ data: Omit<ChartData, 'id'>[]; fireAge: number }
   );
 };
 
+const fireAnimation = `
+  @keyframes fire {
+    0% {
+      color: #ff4500;
+      text-shadow: 0 0 2px #fff,
+                   0 0 3px #ff4500;
+    }
+    50% {
+      color: #ff8c00;
+      text-shadow: 0 0 2px #fff,
+                   0 0 3px #ff8c00;
+    }
+    100% {
+      color: #ff4500;
+      text-shadow: 0 0 2px #fff,
+                   0 0 3px #ff4500;
+    }
+  }
+
+  .fire-text {
+    animation: fire 0.8s ease-in-out infinite;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+`;
+
 const FireCalculator: React.FC = () => {
   const [inputs, setInputs] = useState<Inputs>({
     currentAge: 23,
@@ -401,14 +427,37 @@ const FireCalculator: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        FIRE Calculator
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+      <style>{fireAnimation}</style>
+      <Typography variant="h4" gutterBottom sx={{ 
+        fontWeight: 600,
+        mb: 4,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1
+      }}>
+        <span className="fire-text">FIRE</span>
+        <span style={{
+          background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          Calculator
+        </span>
       </Typography>
       
       <Grid container spacing={3}>
         <Grid item component="div" xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mb: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            gap: 2, 
+            mb: 3,
+            '& .MuiButton-root': {
+              minWidth: 120
+            }
+          }}>
             {enableProfile && (
               <>
                 <Button
@@ -428,14 +477,14 @@ const FireCalculator: React.FC = () => {
               </>
             )}
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
             Enter the money in today's dollars.
           </Typography>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               Basic Information
             </Typography>
             <Grid container spacing={2}>
@@ -527,7 +576,7 @@ const FireCalculator: React.FC = () => {
                 />
               </Grid>
             </Grid>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
               Real return rate: {(((1 + inputs.annualReturn / 100) / (1 + inputs.inflationRate / 100) - 1) * 100).toFixed(1)}%
               (nominal {inputs.annualReturn}% ÷ inflation {inputs.inflationRate}%)
             </Typography>
@@ -535,8 +584,8 @@ const FireCalculator: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               Retirement Accounts
             </Typography>
             <Grid container spacing={2}>
@@ -572,8 +621,8 @@ const FireCalculator: React.FC = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               Yearly Spending
             </Typography>
             {yearlySpending.map((item) => (
@@ -614,7 +663,16 @@ const FireCalculator: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={1}>
-                  <IconButton onClick={() => removeSpending(yearlySpending.indexOf(item))} color="error">
+                  <IconButton 
+                    onClick={() => removeSpending(yearlySpending.indexOf(item))} 
+                    color="error"
+                    sx={{ 
+                      '&:hover': { 
+                        backgroundColor: 'error.light',
+                        color: 'white'
+                      }
+                    }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Grid>
@@ -623,7 +681,7 @@ const FireCalculator: React.FC = () => {
             <Button
               startIcon={<AddIcon />}
               onClick={() => addYearlyData('spending')}
-              sx={{ mt: 1 }}
+              sx={{ mt: 2 }}
             >
               Add Spending
             </Button>
@@ -631,11 +689,11 @@ const FireCalculator: React.FC = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               Yearly Income
             </Typography>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <InputLabel>State</InputLabel>
@@ -689,7 +747,16 @@ const FireCalculator: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={1}>
-                  <IconButton onClick={() => removeIncome(yearlyIncome.indexOf(item))} color="error">
+                  <IconButton 
+                    onClick={() => removeIncome(yearlyIncome.indexOf(item))} 
+                    color="error"
+                    sx={{ 
+                      '&:hover': { 
+                        backgroundColor: 'error.light',
+                        color: 'white'
+                      }
+                    }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Grid>
@@ -698,7 +765,7 @@ const FireCalculator: React.FC = () => {
             <Button
               startIcon={<AddIcon />}
               onClick={() => addYearlyData('income')}
-              sx={{ mt: 1 }}
+              sx={{ mt: 2 }}
             >
               Add Income
             </Button>
@@ -725,6 +792,15 @@ const FireCalculator: React.FC = () => {
             onClick={handleCalculate}
             fullWidth
             size="large"
+            sx={{ 
+              py: 1.5,
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
+              }
+            }}
           >
             Calculate
           </Button>
@@ -733,18 +809,18 @@ const FireCalculator: React.FC = () => {
         {results && (
           <>
             <Box sx={{ width: '100%' }}>
-              <Paper sx={{ p: 2, mt: 2 }}>
-                <Typography variant="h6" gutterBottom>
+              <Paper sx={{ p: 3, mt: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                   Results
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                   <Box sx={{ flex: '1 1 300px' }}>
-                    <Typography variant="subtitle1">
+                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                       FIRE Age: {results.fireAge ? results.fireAge : 'Not Possible'}
                     </Typography>
                   </Box>
                   <Box sx={{ flex: '1 1 300px' }}>
-                    <Typography variant="subtitle1">
+                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                       Required Savings: {results.requiredSavings ? `$${results.requiredSavings.toLocaleString()}` : 'Not Possible'}
                     </Typography>
                   </Box>
@@ -757,9 +833,9 @@ const FireCalculator: React.FC = () => {
               </Paper>
             </Box>
 
-            <Box sx={{ width: '100%', mt: 2 }}>
+            <Box sx={{ width: '100%', mt: 3 }}>
               <Paper sx={{ 
-                p: 2,
+                p: 3,
                 width: '100%',
                 height: { xs: '300px', sm: '400px', md: '500px' }
               }}>
@@ -780,12 +856,12 @@ const FireCalculator: React.FC = () => {
               </Paper>
             </Box>
 
-            <Box sx={{ width: '100%', mt: 2 }}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
+            <Box sx={{ width: '100%', mt: 3 }}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                   Yearly Financial Breakdown
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   All values shown in today's money.
                   Real return rate: {(((1 + inputs.annualReturn / 100) / (1 + inputs.inflationRate / 100) - 1) * 100).toFixed(1)}%
                   (nominal {inputs.annualReturn}% ÷ inflation {inputs.inflationRate}%)
@@ -821,13 +897,14 @@ const FireCalculator: React.FC = () => {
                                   results.yearlySavings[index] + results.yearlyRealInterest[index],
                                   results.realNetWorth[index]
                                 ),
-                                '&:hover': { backgroundColor: '#f5f5f5' }
+                                '&:hover': { backgroundColor: '#f5f5f5' },
+                                transition: 'background-color 0.2s ease-in-out'
                               }}
                             >
                               <TableCell component="th" scope="row">
                                 <strong>{year}</strong>
                                 {results.fireAge === year && (
-                                  <Box component="span" sx={{ ml: 1, color: 'red', fontWeight: 'bold' }}>
+                                  <Box component="span" sx={{ ml: 1, color: 'error.main', fontWeight: 'bold' }}>
                                     🔥 FIRE
                                   </Box>
                                 )}
@@ -893,8 +970,17 @@ const FireCalculator: React.FC = () => {
         )}
 
         {/* Save Profile Dialog */}
-        <Dialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)}>
-          <DialogTitle>Save Profile</DialogTitle>
+        <Dialog 
+          open={saveDialogOpen} 
+          onClose={() => setSaveDialogOpen(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              minWidth: { xs: '90%', sm: 400 }
+            }
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 600 }}>Save Profile</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
@@ -903,11 +989,18 @@ const FireCalculator: React.FC = () => {
               fullWidth
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
+              sx={{ mt: 2 }}
             />
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2 }}>
             <Button onClick={() => setSaveDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveProfile} disabled={!profileName}>Save</Button>
+            <Button 
+              onClick={handleSaveProfile} 
+              disabled={!profileName}
+              variant="contained"
+            >
+              Save
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -917,8 +1010,13 @@ const FireCalculator: React.FC = () => {
           onClose={() => setLoadDialogOpen(false)}
           maxWidth="sm"
           fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 2
+            }
+          }}
         >
-          <DialogTitle>Load Profile</DialogTitle>
+          <DialogTitle sx={{ fontWeight: 600 }}>Load Profile</DialogTitle>
           <DialogContent>
             {profiles.length === 0 ? (
               <Typography color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
@@ -934,7 +1032,13 @@ const FireCalculator: React.FC = () => {
                       borderColor: 'divider',
                       borderRadius: 1,
                       mb: 1,
-                      '&:last-child': { mb: 0 }
+                      '&:last-child': { mb: 0 },
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 2px 4px -1px rgb(0 0 0 / 0.1)'
+                      }
                     }}
                   >
                     <ListItemText
@@ -954,6 +1058,12 @@ const FireCalculator: React.FC = () => {
                         aria-label="delete"
                         onClick={() => handleDeleteProfile(profile._id)}
                         color="error"
+                        sx={{ 
+                          '&:hover': { 
+                            backgroundColor: 'error.light',
+                            color: 'white'
+                          }
+                        }}
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -963,7 +1073,7 @@ const FireCalculator: React.FC = () => {
               </List>
             )}
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ p: 2 }}>
             <Button onClick={() => setLoadDialogOpen(false)}>Close</Button>
           </DialogActions>
         </Dialog>
