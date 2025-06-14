@@ -4,4 +4,4 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY backend/ ./
 RUN pip install -r requirements.txt
-CMD ["gunicorn", "app:app"]
+CMD ["gunicorn", "app:app", "--workers", "2", "--threads", "4"]
