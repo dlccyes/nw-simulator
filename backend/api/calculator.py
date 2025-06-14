@@ -1,11 +1,11 @@
 from .tax import calculate_tax
 
 
-def calculate_yearly_data(year, yearly_income, yearly_spending, stop_at_fire, retirement_spending, end_age):
+def calculate_yearly_data(year, yearly_income, yearly_spending, stop_at_fire, retirement_spending, end_age, fire_age=None):
     gross_income = sum(inc['amount'] for inc in yearly_income if inc['startAge'] <= year <= inc['endAge'])
     spending = sum(exp['amount'] for exp in yearly_spending if exp['startAge'] <= year <= exp['endAge'])
     
-    if stop_at_fire and gross_income > 0:  # Only check if we have income
+    if stop_at_fire and fire_age is not None and year >= fire_age:  # Only stop after FIRE age
         return 0, retirement_spending, [], [{'startAge': year, 'endAge': end_age, 'amount': retirement_spending}]
     return gross_income, spending, yearly_income, yearly_spending
 
@@ -66,10 +66,37 @@ def calculate_fire_projection(data):
     yearly_spending = data.get('yearlySpending', [])
     yearly_income = data.get('yearlyIncome', [])
     
-    # Calculate year-by-year projection
+    # First pass to calculate FIRE age
+    fire_age = None
+    for i, year in enumerate(years):
+        gross_income, spending, _, _ = calculate_yearly_data(
+            year, yearly_income, yearly_spending, False, retirement_spending, end_age
+        )
+        
+        total_available_income, effective_tax_rate, _ = calculate_income_tax(
+            gross_income, state, pre_tax_401k, employer_match
+        )
+        
+        real_balance, real_interest_earned = calculate_net_worth(
+            current_net_worth,
+            arrays['real_net_worth'][i-1] if i > 0 else current_net_worth,
+            real_return_rate,
+            i
+        )
+        
+        savings = total_available_income - spending
+        
+        # Update arrays
+        arrays['real_net_worth'][i] = current_net_worth if i == 0 else arrays['real_net_worth'][i-1] + savings + real_interest_earned
+        
+        # Check if we've reached FIRE
+        if fire_age is None and arrays['real_net_worth'][i] >= required_savings:
+            fire_age = year
+    
+    # Second pass to calculate final values with stop_at_fire if needed
     for i, year in enumerate(years):
         gross_income, spending, yearly_income, yearly_spending = calculate_yearly_data(
-            year, yearly_income, yearly_spending, stop_at_fire, retirement_spending, end_age
+            year, yearly_income, yearly_spending, stop_at_fire, retirement_spending, end_age, fire_age
         )
         
         total_available_income, effective_tax_rate, _ = calculate_income_tax(
@@ -96,9 +123,6 @@ def calculate_fire_projection(data):
     
     # Calculate nominal values from real values
     nominal_net_worth = [real * ((1 + inflation_rate) ** i) for i, real in enumerate(arrays['real_net_worth'])]
-    
-    # Find FIRE age
-    fire_age = next((years[i] for i, worth in enumerate(arrays['real_net_worth']) if worth >= required_savings), None)
     
     result = {
         'years': list(years),
