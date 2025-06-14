@@ -98,7 +98,7 @@ const STATES = [
   'AK',  // Alaska
   'FL',  // Florida
   'NV',  // Nevada
-  'NH',  // New Hampshire (only taxes interest and dividends)
+  'NH',  // New Hampshire
   'SD',  // South Dakota
   'TN',  // Tennessee
   'TX',  // Texas
