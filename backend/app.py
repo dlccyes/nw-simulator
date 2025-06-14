@@ -11,7 +11,7 @@ CORS(app, origins=[
     "https://www.derricklin.net",  # Production domain
     "https://derricklin.net",  # Also allow root domain
     "https://nw.derricklin.net"  # Also allow root domain
-])
+], max_age=3600)
 
 # MongoDB connection
 client = MongoClient('mongodb://localhost:27017/')
