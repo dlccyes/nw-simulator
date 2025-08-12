@@ -1204,6 +1204,33 @@ const FireCalculator: React.FC = () => {
             </DialogActions>
           </Dialog>
         </Grid>
+        
+        {/* GitHub Link */}
+        <Box sx={{ 
+          mt: 6, 
+          pt: 4, 
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          textAlign: 'center'
+        }}>
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            component="a"
+            href="https://github.com/dlccyes/nw-simulator"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              fontFamily: 'monospace',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            GitHub
+          </Typography>
+        </Box>
       </Box>
     </ThemeProvider>
   );
