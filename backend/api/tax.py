@@ -2,23 +2,23 @@ import json
 import os
 
 # Load state tax rates from JSON file
-def load_state_tax_rates():
+def load_us_tax_rates():
     try:
         # Get the directory where this file is located
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Go up one level to backend directory, then into data
         data_dir = os.path.join(current_dir, '..', 'data')
-        json_path = os.path.join(data_dir, 'state_tax_rates.json')
+        json_path = os.path.join(data_dir, 'us_tax_rates.json')
         
         with open(json_path, 'r') as f:
             return json.load(f)
     except Exception as e:
-        print(f"Warning: Could not load state tax rates from JSON: {e}")
+        print(f"Warning: Could not load US tax rates from JSON: {e}")
         # Fallback to empty rates if JSON loading fails
         return {}
 
 # Load state tax rates
-STATE_TAX_RATES = load_state_tax_rates()
+US_TAX_RATES = load_us_tax_rates()
 
 # FICA constants for 2024
 SOCIAL_SECURITY_WAGE_BASE = 168600
@@ -65,10 +65,10 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match):
     state_taxable_income = max(0, income - pre_tax_401k - CA_STANDARD_DEDUCTION)
     
     # Calculate federal tax
-    federal_tax = calculate_tax_for_bracket(federal_taxable_income, STATE_TAX_RATES.get('federal', []))
+    federal_tax = calculate_tax_for_bracket(federal_taxable_income, US_TAX_RATES.get('federal', []))
     
     # Calculate state tax
-    state_tax = calculate_tax_for_bracket(state_taxable_income, STATE_TAX_RATES.get(state, []))
+    state_tax = calculate_tax_for_bracket(state_taxable_income, US_TAX_RATES.get(state, []))
     
     # Calculate FICA taxes
     social_security_tax = min(income * SOCIAL_SECURITY_RATE, SOCIAL_SECURITY_WAGE_BASE * SOCIAL_SECURITY_RATE)
