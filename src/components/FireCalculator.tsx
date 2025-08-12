@@ -672,7 +672,7 @@ const FireCalculator: React.FC = () => {
                       </Grid>
                       <Grid item xs={6}>
                         <TextField
-                          fullWidth
+                          sx={{ width: '100%', minWidth: '200px' }}
                           label="Withdrawal Rate (%)"
                           name="withdrawalRate"
                           type="number"

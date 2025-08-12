@@ -10,7 +10,7 @@ In a terminal, run the backend server
 
 ```
 cd backend
-pythone app.py
+python3 app.py
 ```
 
 In another terminal, run the frontend server
