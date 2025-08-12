@@ -30,7 +30,8 @@ import {
   Switch,
   ThemeProvider,
   createTheme,
-  CssBaseline
+  CssBaseline,
+  CircularProgress
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon } from '@mui/icons-material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -310,6 +311,7 @@ const FireCalculator: React.FC = () => {
   const [profileName, setProfileName] = useState('');
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [stopAtFire, setStopAtFire] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (enableProfile) {
@@ -444,6 +446,7 @@ const FireCalculator: React.FC = () => {
   };
 
   const handleCalculate = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/calculate`, {
         method: 'POST',
@@ -475,6 +478,8 @@ const FireCalculator: React.FC = () => {
       setResults(result);
     } catch (error) {
       console.error('Error calculating FIRE projection:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -903,10 +908,27 @@ const FireCalculator: React.FC = () => {
                 background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
                 '&:hover': {
                   background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
+                },
+                minHeight: '48px',
+                '& .MuiCircularProgress-root': {
+                  color: 'white'
                 }
               }}
+              disabled={loading}
             >
-              Calculate
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                width: '100%',
+                minWidth: '120px'
+              }}>
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  'Calculate'
+                )}
+              </Box>
             </Button>
           </Grid>
 
