@@ -1,4 +1,7 @@
-from .tax import calculate_tax
+try:
+    from .tax import calculate_income_tax
+except ImportError:
+    from tax import calculate_income_tax
 
 
 def calculate_yearly_data(year, yearly_income, yearly_spending, stop_at_fire, retirement_spending, end_age, fire_age=None):
@@ -8,21 +11,6 @@ def calculate_yearly_data(year, yearly_income, yearly_spending, stop_at_fire, re
     if stop_at_fire and fire_age is not None and year >= fire_age:  # Only stop after FIRE age
         return 0, retirement_spending, [], [{'startAge': year, 'endAge': end_age, 'amount': retirement_spending}]
     return gross_income, spending, yearly_income, yearly_spending
-
-def calculate_income_tax(gross_income, state, pre_tax_401k, employer_match):
-    if gross_income <= 0:
-        return 0, 0, 0
-    
-    tax_data = {
-        'income': gross_income,
-        'state': state,
-        'preTax401k': pre_tax_401k
-    }
-    tax_result = calculate_tax(tax_data)
-    after_tax_income = tax_result['afterTaxIncome']
-    effective_tax_rate = (tax_result['totalTax'] / gross_income) * 100
-    employer_contribution = gross_income * employer_match
-    return after_tax_income + employer_contribution, effective_tax_rate, after_tax_income
 
 def calculate_net_worth(current_net_worth, previous_real_balance, real_return_rate, i):
     if i == 0:
@@ -54,13 +42,13 @@ def calculate_fire_projection(data):
     # Initialize arrays
     years = range(current_age, end_age + 1)
     arrays = {
-        'real_net_worth': [0] * len(years),
-        'yearly_after_tax_income': [0] * len(years),
-        'yearly_spending_amounts': [0] * len(years),
-        'yearly_pre_tax_income': [0] * len(years),
-        'yearly_tax_rates': [0] * len(years),
-        'yearly_savings': [0] * len(years),
-        'yearly_real_interest': [0] * len(years)
+        'real_net_worth': [0.0] * len(years),
+        'yearly_after_tax_income': [0.0] * len(years),
+        'yearly_spending_amounts': [0.0] * len(years),
+        'yearly_pre_tax_income': [0.0] * len(years),
+        'yearly_tax_rates': [0.0] * len(years),
+        'yearly_savings': [0.0] * len(years),
+        'yearly_real_interest': [0.0] * len(years)
     }
     
     yearly_spending = data.get('yearlySpending', [])
@@ -77,7 +65,7 @@ def calculate_fire_projection(data):
             gross_income, state, pre_tax_401k, employer_match
         )
         
-        real_balance, real_interest_earned = calculate_net_worth(
+        _, real_interest_earned = calculate_net_worth(
             current_net_worth,
             arrays['real_net_worth'][i-1] if i > 0 else current_net_worth,
             real_return_rate,
@@ -103,7 +91,7 @@ def calculate_fire_projection(data):
             gross_income, state, pre_tax_401k, employer_match
         )
         
-        real_balance, real_interest_earned = calculate_net_worth(
+        _, real_interest_earned = calculate_net_worth(
             current_net_worth,
             arrays['real_net_worth'][i-1] if i > 0 else current_net_worth,
             real_return_rate,
