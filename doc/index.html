@@ -52,42 +52,263 @@
     </style>
 </head>
 <body>
-<h1>FIRE Calculator + NW Simulator</h1>
-<p>A Financial Independence, Retire Early (FIRE) calculator with net worth projection. Supports US and Taiwan with country-specific tax calculations, retirement accounts, and payroll deductions.</p>
-<p><strong>🌐 Website: <a href="https://nw.derricklin.net/">https://nw.derricklin.net/</a></strong></p>
+<h1>NW Simulator + FIRE Calculator Usage Manual</h1>
+<p>A comprehensive guide to using the net worth simulator with multi-country support.</p>
 <p><strong>⚠️ Disclaimer: This is 95% vibe-coded. Accuracy not guaranteed.</strong></p>
-<h2>Features</h2>
+<p><strong>Links: <a href="https://github.com/dlccyes/nw-simulator">GitHub</a> | <a href="https://nw.derricklin.net/doc">Doc</a></strong></p>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#basic-information">Basic Information</a></li>
+<li><a href="#income-planning">Income Planning</a></li>
+<li><a href="#spending-planning">Spending Planning</a></li>
+<li><a href="#retirement-accounts-us-only">Retirement Accounts (US Only)</a></li>
+<li><a href="#country-specific-features">Country-Specific Features</a></li>
+<li><a href="#understanding-results">Understanding Results</a></li>
+<li><a href="#advanced-scenarios">Advanced Scenarios</a></li>
+<li><a href="#profile-management">Profile Management</a></li>
+<li><a href="#tips--best-practices">Tips &amp; Best Practices</a></li>
+</ol>
+<h2>Getting Started</h2>
+<h3>Website Access</h3>
+<h3>First Steps</h3>
+<ol>
+<li><strong>Select Your Country</strong>: Choose between US or Taiwan for country-specific tax calculations</li>
+<li><strong>Enter Basic Info</strong>: Set your current age, target retirement age, and current net worth</li>
+<li><strong>Configure Income</strong>: Add your income phases with different amounts and age ranges</li>
+<li><strong>Set Spending</strong>: Define your spending patterns throughout different life stages</li>
+<li><strong>Calculate</strong>: Hit the calculate button to see your FIRE projection</li>
+</ol>
+<h2>Basic Information</h2>
+<h3>Current Age &amp; End Age</h3>
 <ul>
-<li>🇺🇸 <strong>US Support</strong>: Federal/state taxes, 401k, Social Security, Medicare</li>
-<li>🇹🇼 <strong>Taiwan Support</strong>: Income tax, labor insurance, health insurance  </li>
-<li>📊 <strong>Projections</strong>: Real vs nominal net worth, tax breakdowns, FIRE timeline</li>
-<li>💼 <strong>Flexible Income &amp; Spending</strong>: Multiple income and spending phases</li>
-<li>🎯 <strong>Scenarios</strong>: Stop at FIRE vs continue working options</li>
+<li><strong>Current Age</strong>: Your age today (used as starting point for projections)</li>
+<li><strong>End Age</strong>: The age until which you want to run projections (typically 50-65)</li>
 </ul>
-<h2>Tech Stack</h2>
+<h3>Financial Assumptions</h3>
 <ul>
-<li><strong>Backend</strong>: Flask (Python) deployed on GCP Cloud Run</li>
-<li><strong>Frontend</strong>: React (TypeScript) deployed on GitHub Pages</li>
-<li><strong>Tax Data</strong>: JSON configuration files for easy updates</li>
-<li><strong>Database</strong>: MongoDB for profile storage</li>
-<li><strong>CI/CD</strong>: GitHub Actions for automated testing and deployment</li>
+<li><strong>Current Net Worth</strong>: Your total assets minus liabilities today</li>
+<li><strong>Annual Return</strong>: Expected annual investment return (typically 6-10%)</li>
+<li><strong>Inflation Rate</strong>: Expected annual inflation (typically 2-4%)</li>
 </ul>
-<h2>Quick Start</h2>
-<p>Start local mongodb server:</p>
-<pre><code class="language-bash">brew services start mongodb-community
+<h3>FIRE Target</h3>
+<ul>
+<li><strong>Retirement Spending</strong>: Annual spending needed in retirement (today&#39;s dollars)</li>
+<li><strong>Withdrawal Rate</strong>: Safe withdrawal rate from your portfolio (typically 3-4%)</li>
+</ul>
+<h2>Income Planning</h2>
+<h3>Multiple Income Phases</h3>
+<p>You can define different income levels for different periods of your life:</p>
+<h4>Examples:</h4>
+<pre><code>Phase 1: Age 25-30, $80,000/year (Early career)
+Phase 2: Age 31-40, $120,000/year (Mid career)
+Phase 3: Age 41-50, $150,000/year (Senior level)
 </code></pre>
-<p>Run backend server:</p>
-<pre><code class="language-bash">cd backend
-python3 app.py
+<h3>Adding Income Phases</h3>
+<ol>
+<li>Click <strong>&quot;Add Income&quot;</strong> button</li>
+<li>Set <strong>Start Age</strong> and <strong>End Age</strong> for the income period</li>
+<li>Enter <strong>Annual Income</strong> amount</li>
+<li>Repeat for different career phases</li>
+</ol>
+<h3>Income Tips</h3>
+<ul>
+<li>Include salary increases and promotions</li>
+<li>Consider career changes or sabbaticals</li>
+<li>Account for part-time work in later years</li>
+<li>Use today&#39;s dollars (inflation adjusted automatically)</li>
+</ul>
+<h2>Spending Planning</h2>
+<h3>Flexible Spending Phases</h3>
+<p>Like income, you can set different spending levels for different life periods:</p>
+<h4>Examples:</h4>
+<pre><code>Phase 1: Age 25-35, $50,000/year (Frugal living)
+Phase 2: Age 36-45, $70,000/year (Family expenses)
+Phase 3: Age 46+, $60,000/year (Empty nest)
 </code></pre>
-<p>Run frontend server:</p>
-<pre><code class="language-bash">npm run dev
+<h3>Adding Spending Phases</h3>
+<ol>
+<li>Click <strong>&quot;Add Spending&quot;</strong> button</li>
+<li>Set <strong>Start Age</strong> and <strong>End Age</strong> for the spending period</li>
+<li>Enter <strong>Annual Spending</strong> amount</li>
+<li>Repeat for different life stages</li>
+</ol>
+<h3>Spending Considerations</h3>
+<ul>
+<li>Include all living expenses (housing, food, transportation, etc.)</li>
+<li>Account for family changes (marriage, children)</li>
+<li>Consider healthcare costs increases with age</li>
+<li>Plan for major expenses (home purchases, education)</li>
+</ul>
+<h2>Retirement Accounts (US Only)</h2>
+<h3>401(k) Contributions</h3>
+<ul>
+<li><strong>Pre-tax 401(k)</strong>: Annual contribution amount (reduces taxable income)</li>
+<li><strong>Employer Match</strong>: Percentage of salary your employer matches</li>
+<li><strong>Tax Benefits</strong>: Contributions reduce current year taxes</li>
+</ul>
+<h3>How It Works</h3>
+<ol>
+<li><strong>Tax Reduction</strong>: 401(k) contributions lower your taxable income</li>
+<li><strong>Employer Match</strong>: Free money added to your retirement savings</li>
+<li><strong>Compound Growth</strong>: Tax-deferred growth until retirement</li>
+</ol>
+<h3>Example</h3>
+<pre><code>Salary: $100,000
+401(k) Contribution: $20,000
+Employer Match: 5%
+
+Result:
+- Taxable Income: $80,000 (reduced by $20,000)
+- Employer Match: $5,000 (5% of $100,000)
+- Total Retirement Savings: $25,000/year
 </code></pre>
-<h2>Testing</h2>
-<p>Run all tests:</p>
-<pre><code class="language-bash">cd backend/api
-python3 -m pytest -v
-</code></pre>
+<h2>Country-Specific Features</h2>
+<h3>United States 🇺🇸</h3>
+<h4>Tax System</h4>
+<ul>
+<li><strong>Federal Taxes</strong>: Progressive tax brackets (10%-37%)</li>
+<li><strong>State Taxes</strong>: Varies by state (0%-13.3%)</li>
+<li><strong>Standard Deduction</strong>: $14,600 for single filers</li>
+<li><strong>Payroll Taxes</strong>: Social Security (6.2%) + Medicare (1.45%)</li>
+</ul>
+<h4>Supported States</h4>
+<p>All 50 states with accurate tax brackets and deductions.</p>
+<h4>Special Features</h4>
+<ul>
+<li>401(k) tax benefits</li>
+<li>Employer matching calculations</li>
+<li>Social Security wage base caps</li>
+<li>Medicare additional tax on high earners</li>
+</ul>
+<h3>Taiwan 🇹🇼</h3>
+<h4>Tax System</h4>
+<ul>
+<li><strong>Income Tax</strong>: Progressive brackets (5%-40%)</li>
+<li><strong>Standard Deduction</strong>: NT$446,000 for unmarried, non-disabled under 70</li>
+<li><strong>Labor Insurance</strong>: 2.5% of income</li>
+<li><strong>Health Insurance</strong>: 1.55% of income (capped at NT$56,364/year)</li>
+</ul>
+<h4>Currency</h4>
+<p>All amounts in Taiwan dollars (TWD/NT$).</p>
+<h4>Default Values</h4>
+<p>Taiwan defaults are 10x US monetary values to reflect currency differences.</p>
+<h2>Understanding Results</h2>
+<h3>Key Metrics</h3>
+<h4>FIRE Age</h4>
+<p>The age at which your net worth reaches your FIRE target (retirement spending ÷ withdrawal rate).</p>
+<h4>Required Savings</h4>
+<p>Total amount needed for FIRE based on your withdrawal rate and spending goals.</p>
+<h4>Net Worth Projection</h4>
+<ul>
+<li><strong>Nominal</strong>: Future dollars (includes inflation)</li>
+<li><strong>Real</strong>: Today&#39;s purchasing power (inflation-adjusted)</li>
+</ul>
+<h3>Charts &amp; Graphs</h3>
+<h4>Net Worth Over Time</h4>
+<p>Shows how your wealth grows from current age to end age.</p>
+<h4>Income vs Spending</h4>
+<p>Displays your earnings and expenses across different life phases.</p>
+<h4>Tax Analysis</h4>
+<p>Breakdown of federal, state, and payroll taxes by year.</p>
+<h3>Tax Information</h3>
+<p>Click the <strong>&quot;Info&quot;</strong> section to see:</p>
+<ul>
+<li>Tax brackets for your country/state</li>
+<li>Standard deductions</li>
+<li>Payroll tax rates and caps</li>
+</ul>
+<h2>Advanced Scenarios</h2>
+<h3>Stop at FIRE vs Continue Working</h3>
+<h4>Stop at FIRE (Default)</h4>
+<ul>
+<li>Income stops when you reach FIRE number</li>
+<li>Spending continues from portfolio withdrawals</li>
+<li>Conservative approach</li>
+</ul>
+<h4>Continue Working</h4>
+<ul>
+<li>Keep earning income even after reaching FIRE</li>
+<li>Build additional wealth beyond FIRE target</li>
+<li>Provides extra security and higher final net worth</li>
+</ul>
+<h3>Scenario Planning</h3>
+<h4>Conservative Scenario</h4>
+<ul>
+<li>Lower investment returns (6-7%)</li>
+<li>Higher inflation (3-4%)</li>
+<li>Higher withdrawal rate (4%)</li>
+</ul>
+<h4>Aggressive Scenario</h4>
+<ul>
+<li>Higher investment returns (8-10%)</li>
+<li>Lower inflation (2%)</li>
+<li>Lower withdrawal rate (3%)</li>
+</ul>
+<h4>Realistic Scenario</h4>
+<ul>
+<li>Moderate returns (7-8%)</li>
+<li>Moderate inflation (2.5-3%)</li>
+<li>Standard withdrawal rate (3.5-4%)</li>
+</ul>
+<h2>Tips &amp; Best Practices</h2>
+<h3>Investment Returns</h3>
+<ul>
+<li><strong>Historical Average</strong>: US stock market ~10% nominal, ~7% real</li>
+<li><strong>Conservative Estimate</strong>: Use 6-7% for planning</li>
+<li><strong>Diversification</strong>: Don&#39;t assume 100% stocks</li>
+</ul>
+<h3>Withdrawal Rates</h3>
+<ul>
+<li><strong>4% Rule</strong>: Traditional safe withdrawal rate</li>
+<li><strong>3.5% Rule</strong>: More conservative for early retirement</li>
+<li><strong>Sequence Risk</strong>: Consider market timing at retirement</li>
+</ul>
+<h3>Tax Planning</h3>
+<ul>
+<li><strong>Location</strong>: Consider state taxes when choosing where to live</li>
+<li><strong>Account Types</strong>: Mix of taxable, tax-deferred, and tax-free accounts</li>
+<li><strong>Roth Conversions</strong>: Consider tax optimization strategies</li>
+</ul>
+<h3>Income Planning</h3>
+<ul>
+<li><strong>Raises</strong>: Account for career progression</li>
+<li><strong>Side Income</strong>: Include rental properties, consulting, etc.</li>
+<li><strong>Geographic Arbitrage</strong>: Consider cost of living differences</li>
+</ul>
+<h3>Spending Planning</h3>
+<ul>
+<li><strong>Lifestyle Inflation</strong>: Avoid increasing spending with income</li>
+<li><strong>Geographic Arbitrage</strong>: Lower costs in retirement locations</li>
+<li><strong>Healthcare</strong>: Plan for increasing medical expenses</li>
+</ul>
+<h3>Common Mistakes to Avoid</h3>
+<ol>
+<li><strong>Overly Optimistic Returns</strong>: Don&#39;t assume 10%+ forever</li>
+<li><strong>Ignoring Taxes</strong>: Taxes significantly impact net worth</li>
+<li><strong>Static Planning</strong>: Update projections regularly</li>
+<li><strong>Lifestyle Inflation</strong>: Control spending growth</li>
+<li><strong>Sequence Risk</strong>: Consider poor market timing</li>
+</ol>
+<h3>Regular Reviews</h3>
+<ul>
+<li><strong>Annual Check</strong>: Review and update projections yearly</li>
+<li><strong>Life Changes</strong>: Update for marriage, children, job changes</li>
+<li><strong>Market Changes</strong>: Adjust assumptions based on economic conditions</li>
+</ul>
+<h2>Frequently Asked Questions</h2>
+<h3>Q: How accurate are the tax calculations?</h3>
+<p>A: The calculator uses current tax brackets and rates but is &quot;95% vibe-coded.&quot; Consult a tax professional for precise calculations.</p>
+<h3>Q: Should I include home equity in net worth?</h3>
+<p>A: Yes, but consider that your primary residence isn&#39;t a liquid investment.</p>
+<h3>Q: What if I live in multiple states/countries?</h3>
+<p>A: Use the location where you&#39;ll spend most of your earning years.</p>
+<h3>Q: How often should I update my projections?</h3>
+<p>A: At least annually, or when major life changes occur.</p>
+<h3>Q: What&#39;s a safe withdrawal rate?</h3>
+<p>A: 3.5-4% is commonly cited, but consider your specific situation and risk tolerance.</p>
+<hr>
+<p><strong>Remember</strong>: This calculator provides estimates for planning purposes. Consult financial professionals for personalized advice. </p>
 
 </body>
 </html> 
