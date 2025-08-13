@@ -284,7 +284,8 @@ const FireCalculator: React.FC = () => {
     },
   });
 
-  const [inputs, setInputs] = useState<Inputs>({
+  // Default values for US
+  const US_DEFAULTS = {
     currentAge: 23,
     endAge: 50,
     currentNetWorth: 70000,
@@ -292,21 +293,52 @@ const FireCalculator: React.FC = () => {
     inflationRate: 3,
     retirementSpending: 100000,
     withdrawalRate: 4,
-    country: 'US',
+    country: 'US' as const,
     state: 'CA',
     preTax401k: 23000,
     employerMatch: 5
-  });
+  };
 
-  const [yearlySpending, setYearlySpending] = useState<YearlyDataItem[]>([
+  // Default values for Taiwan (10x monetary values)
+  const TW_DEFAULTS = {
+    currentAge: 23,
+    endAge: 50,
+    currentNetWorth: 700000,
+    annualReturn: 8,
+    inflationRate: 3,
+    retirementSpending: 1000000,
+    withdrawalRate: 4,
+    country: 'TW' as const,
+    state: '',
+    preTax401k: 0,
+    employerMatch: 0
+  };
+
+  const US_SPENDING_DEFAULTS = [
     { id: 'spending-1', startAge: 23, endAge: 50, spending: 100000 }
-  ]);
+  ];
 
-  const [yearlyIncome, setYearlyIncome] = useState<YearlyDataItem[]>([
+  const TW_SPENDING_DEFAULTS = [
+    { id: 'spending-1', startAge: 23, endAge: 50, spending: 1000000 }
+  ];
+
+  const US_INCOME_DEFAULTS = [
     { id: 'income-1', startAge: 23, endAge: 25, income: 230000 },
     { id: 'income-2', startAge: 26, endAge: 30, income: 300000 },
     { id: 'income-3', startAge: 31, endAge: 40, income: 400000 }
-  ]);
+  ];
+
+  const TW_INCOME_DEFAULTS = [
+    { id: 'income-1', startAge: 23, endAge: 25, income: 2300000 },
+    { id: 'income-2', startAge: 26, endAge: 30, income: 3000000 },
+    { id: 'income-3', startAge: 31, endAge: 40, income: 4000000 }
+  ];
+
+  const [inputs, setInputs] = useState<Inputs>(US_DEFAULTS);
+
+  const [yearlySpending, setYearlySpending] = useState<YearlyDataItem[]>(US_SPENDING_DEFAULTS);
+
+  const [yearlyIncome, setYearlyIncome] = useState<YearlyDataItem[]>(US_INCOME_DEFAULTS);
 
   const [results, setResults] = useState<Results | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -427,11 +459,26 @@ const FireCalculator: React.FC = () => {
   };
 
   const handleCountryChange = (event: SelectChangeEvent<string>) => {
-    setInputs({
-      ...inputs,
-      country: event.target.value,
-      state: event.target.value === 'US' ? (inputs.state || 'CA') : ''
-    });
+    const newCountry = event.target.value;
+    
+    if (newCountry === 'TW') {
+      // Switch to Taiwan defaults
+      setInputs(TW_DEFAULTS);
+      setYearlySpending(TW_SPENDING_DEFAULTS);
+      setYearlyIncome(TW_INCOME_DEFAULTS);
+    } else if (newCountry === 'US') {
+      // Switch to US defaults
+      setInputs(US_DEFAULTS);
+      setYearlySpending(US_SPENDING_DEFAULTS);
+      setYearlyIncome(US_INCOME_DEFAULTS);
+    } else {
+      // For other countries, just update country and clear state
+      setInputs({
+        ...inputs,
+        country: newCountry,
+        state: newCountry === 'US' ? (inputs.state || 'CA') : ''
+      });
+    }
   };
 
   const handleStateChange = (event: SelectChangeEvent<string>) => {
