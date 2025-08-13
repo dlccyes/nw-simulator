@@ -50,6 +50,7 @@ interface Inputs {
   inflationRate: number;
   retirementSpending: number;
   withdrawalRate: number;
+  country: string;
   state: string;
   preTax401k: number;
   employerMatch: number;
@@ -290,6 +291,7 @@ const FireCalculator: React.FC = () => {
     inflationRate: 3,
     retirementSpending: 100000,
     withdrawalRate: 4,
+    country: 'US',
     state: 'CA',
     preTax401k: 23000,
     employerMatch: 5
@@ -362,6 +364,7 @@ const FireCalculator: React.FC = () => {
         inflationRate: config.inflationRate,
         retirementSpending: config.retirementSpending,
         withdrawalRate: config.withdrawalRate,
+        country: config.country || 'US',
         state: config.state,
         preTax401k: config.preTax401k,
         employerMatch: config.employerMatch
@@ -400,8 +403,16 @@ const FireCalculator: React.FC = () => {
     const { name, value } = e.target;
     setInputs(prev => ({
       ...prev,
-      [name]: name === 'state' ? value : Number(value)
+      [name]: (name === 'state' || name === 'country') ? value : Number(value)
     }));
+  };
+
+  const handleCountryChange = (event: SelectChangeEvent<string>) => {
+    setInputs({
+      ...inputs,
+      country: event.target.value,
+      state: event.target.value === 'US' ? (inputs.state || 'CA') : ''
+    });
   };
 
   const handleStateChange = (event: SelectChangeEvent<string>) => {
@@ -456,6 +467,8 @@ const FireCalculator: React.FC = () => {
         body: JSON.stringify({
           ...inputs,
           endAge: inputs.endAge,  // Keep API compatibility
+          preTax401k: inputs.country === 'US' ? inputs.preTax401k : 0,
+          employerMatch: inputs.country === 'US' ? inputs.employerMatch : 0,
           yearlySpending: yearlySpending.map(d => ({
             startAge: d.startAge,
             endAge: d.endAge,
@@ -572,15 +585,67 @@ const FireCalculator: React.FC = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12}>
+                    <Grid item xs={12} sx={{ width: '100%' }}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={inputs.country === 'US' ? 6 : 12}>
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                     Basic Information
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {/* Row 1: Age */}
+                    {/* Row 1: Country and State */}
+                    {inputs.country === 'US' ? (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>Country</InputLabel>
+                            <Select
+                              name="country"
+                              value={inputs.country}
+                              label="Country"
+                              onChange={handleCountryChange}
+                            >
+                              <MenuItem value="US">United States</MenuItem>
+                              <MenuItem value="TW">Taiwan</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>State</InputLabel>
+                            <Select
+                              name="state"
+                              value={inputs.state}
+                              label="State"
+                              onChange={handleStateChange}
+                            >
+                              {STATES.map(state => (
+                                <MenuItem key={state} value={state}>{state}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    ) : (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth>
+                            <InputLabel>Country</InputLabel>
+                            <Select
+                              name="country"
+                              value={inputs.country}
+                              label="Country"
+                              onChange={handleCountryChange}
+                            >
+                              <MenuItem value="US">United States</MenuItem>
+                              <MenuItem value="TW">Taiwan</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    )}
+
+                    {/* Row 2: Age */}
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
                         <TextField
@@ -690,42 +755,44 @@ const FireCalculator: React.FC = () => {
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                    Retirement Accounts
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Pre-tax 401(k) Contribution"
-                        name="preTax401k"
-                        type="number"
-                        value={inputs.preTax401k}
-                        onChange={handleInputChange}
-                        slotProps={{
-                          htmlInput: { min: 0 },
-                          input: {
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>
-                          }
-                        }}
-                      />
+                                           {inputs.country === 'US' && (
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                      Retirement Accounts
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Pre-tax 401(k) Contribution"
+                          name="preTax401k"
+                          type="number"
+                          value={inputs.preTax401k}
+                          onChange={handleInputChange}
+                          slotProps={{
+                            htmlInput: { min: 0 },
+                            input: {
+                              startAdornment: <InputAdornment position="start">$</InputAdornment>
+                            }
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          sx={{ width: '100%', minWidth: '200px' }}
+                          label="Employer Match (%)"
+                          name="employerMatch"
+                          type="number"
+                          value={inputs.employerMatch}
+                          onChange={handleInputChange}
+                          slotProps={{ htmlInput: { min: 0, max: 100 } }}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        sx={{ width: '100%', minWidth: '200px' }}
-                        label="Employer Match (%)"
-                        name="employerMatch"
-                        type="number"
-                        value={inputs.employerMatch}
-                        onChange={handleInputChange}
-                        slotProps={{ htmlInput: { min: 0, max: 100 } }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Grid>
+                  </Paper>
+                </Grid>
+              )}
             </Grid>
           </Grid>
 
@@ -802,22 +869,7 @@ const FireCalculator: React.FC = () => {
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                 Yearly Income
               </Typography>
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>State</InputLabel>
-                    <Select
-                      value={inputs.state}
-                      label="State"
-                      onChange={handleStateChange}
-                    >
-                      {STATES.map(state => (
-                        <MenuItem key={state} value={state}>{state}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+
               {yearlyIncome.map((item) => (
                 <Grid container spacing={2} key={item.id} sx={{ mb: 2 }}>
                   <Grid item xs={3}>
