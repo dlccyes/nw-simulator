@@ -1,0 +1,37 @@
+<h1>FIRE Calculator + NW Simulator</h1>
+<p>A Financial Independence, Retire Early (FIRE) calculator with net worth projection. Supports US and Taiwan with country-specific tax calculations, retirement accounts, and payroll deductions.</p>
+<p><strong>🌐 Website: <a href="https://nw.derricklin.net/">https://nw.derricklin.net/</a></strong></p>
+<p><strong>⚠️ Disclaimer: This is 95% vibe-coded. Accuracy not guaranteed.</strong></p>
+<h2>Features</h2>
+<ul>
+<li>🇺🇸 <strong>US Support</strong>: Federal/state taxes, 401k, Social Security, Medicare</li>
+<li>🇹🇼 <strong>Taiwan Support</strong>: Income tax, labor insurance, health insurance  </li>
+<li>📊 <strong>Projections</strong>: Real vs nominal net worth, tax breakdowns, FIRE timeline</li>
+<li>💼 <strong>Flexible Income &amp; Spending</strong>: Multiple income and spending phases</li>
+<li>🎯 <strong>Scenarios</strong>: Stop at FIRE vs continue working options</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li><strong>Backend</strong>: Flask (Python) deployed on GCP Cloud Run</li>
+<li><strong>Frontend</strong>: React (TypeScript) deployed on GitHub Pages</li>
+<li><strong>Tax Data</strong>: JSON configuration files for easy updates</li>
+<li><strong>Database</strong>: MongoDB for profile storage</li>
+<li><strong>CI/CD</strong>: GitHub Actions for automated testing and deployment</li>
+</ul>
+<h2>Quick Start</h2>
+<p>Start local mongodb server:</p>
+<pre><code class="language-bash">brew services start mongodb-community
+</code></pre>
+<p>Run backend server:</p>
+<pre><code class="language-bash">cd backend
+python3 app.py
+</code></pre>
+<p>Run frontend server:</p>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<h2>Testing</h2>
+<p>Run all tests:</p>
+<pre><code class="language-bash">cd backend/api
+python3 -m pytest -v
+</code></pre>
+
