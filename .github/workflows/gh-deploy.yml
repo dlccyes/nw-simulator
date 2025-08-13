@@ -33,6 +33,12 @@ jobs:
         env:
           CI: false # This prevents treating warnings as errors
 
+      - name: Install markdown-to-html converter and generate docs
+        run: |
+          npm install -g marked
+          mkdir -p dist/doc
+          marked README.md > dist/doc/index.html
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
