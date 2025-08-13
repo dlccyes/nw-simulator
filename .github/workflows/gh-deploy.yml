@@ -37,7 +37,8 @@ jobs:
         run: |
           npm install -g marked
           mkdir -p dist/doc
-          marked README.md > dist/doc/index.html
+          marked README.md > /tmp/readme-content.html
+          sed '/{{CONTENT}}/r /tmp/readme-content.html' doc-template.html | sed '/{{CONTENT}}/d' > dist/doc/index.html
 
       - name: Copy firebase.json to dist
         run: cp firebase.json dist/
