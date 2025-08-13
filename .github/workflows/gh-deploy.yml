@@ -39,6 +39,9 @@ jobs:
           mkdir -p dist/doc
           marked README.md > dist/doc/index.html
 
+      - name: Copy firebase.json to dist
+        run: cp firebase.json dist/
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
