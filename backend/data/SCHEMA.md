@@ -1,0 +1,121 @@
+# Tax Configuration Schema
+
+## Overview
+
+The tax system has been redesigned to be forward-compatible and support multiple countries with different tax structures. All hardcoded tax values have been moved to JSON configuration files.
+
+## Schema Structure
+
+### Top Level
+```json
+{
+  "federal": { ... },       // Federal/national tax configuration
+  "payroll_taxes": { ... }, // Payroll/social security taxes
+  "states": { ... }         // State/regional taxes (optional, US only)
+}
+```
+
+### Federal Tax Configuration
+```json
+"federal": {
+  "standard_deduction": 14600,
+  "brackets": [
+    {"min": 0, "max": 11600, "rate": 0.10},
+    {"min": 11600, "max": 47150, "rate": 0.12},
+    ...
+    {"min": 609350, "max": null, "rate": 0.37}
+  ]
+}
+```
+
+### Payroll Tax Configuration
+
+#### US Structure
+```json
+"payroll_taxes": {
+  "social_security": {
+    "rate": 0.062,
+    "wage_base": 168600
+  },
+  "medicare": {
+    "rate": 0.0145,
+    "additional_rate": 0.009,
+    "additional_threshold": 200000
+  }
+}
+```
+
+#### Taiwan Structure (Example)
+```json
+"payroll_taxes": {
+  "labor_insurance": {
+    "rate": 0.025
+  },
+  "health_insurance": {
+    "rate": 0.0155
+  }
+}
+```
+
+### State/Regional Tax Configuration
+```json
+"states": {
+  "CA": {
+    "standard_deduction": 5540,
+    "brackets": [
+      {"min": 0, "max": 10756, "rate": 0.01},
+      ...
+    ]
+  },
+  "FL": {
+    "standard_deduction": 0,
+    "brackets": []  // No state income tax
+  }
+}
+```
+
+## File Structure
+
+```
+backend/data/tax-rates/
+├── US.json    # United States tax configuration
+├── TW.json    # Taiwan tax configuration
+└── XX.json    # Additional countries as needed
+```
+
+Each file is named with the two-letter country code and contains the tax configuration for that country.
+
+## Forward Compatibility
+
+### Supporting Countries Without State Taxes
+The schema handles countries without regional taxes by:
+1. Omitting the `states` key entirely
+2. The tax calculation system automatically returns empty state tax configurations for non-US countries
+
+### Adding New Countries
+To add a new country:
+1. Create `{COUNTRY_CODE}.json` in `backend/data/tax-rates/` following the schema
+2. Implement country-specific payroll tax logic in `tax.py` if needed
+3. The system will automatically load and use the new configuration
+
+### Extending Tax Types
+New tax types can be added to the `payroll_taxes` section without breaking existing functionality. The tax calculation logic can be extended to handle new tax types while maintaining backward compatibility.
+
+## API Changes
+
+The tax calculation functions now accept an optional `country_code` parameter:
+```python
+calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US')
+```
+
+This allows the same tax engine to work with different countries while maintaining backward compatibility for existing code.
+
+## Benefits
+
+1. **No Hardcoded Values**: All tax rates and thresholds are now in JSON files
+2. **Easy Updates**: Tax rates can be updated without code changes
+3. **Multi-Country Support**: Framework supports any number of countries
+4. **Forward Compatible**: New tax types and countries can be added without breaking changes
+5. **Clean Schema**: Simple structure with country code as filename, no redundant metadata
+6. **Organized Structure**: All tax files in dedicated `tax-rates` directory
+7. **Flexible Structure**: Accommodates different tax systems (federal only, state taxes, different payroll tax structures) 

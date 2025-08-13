@@ -1,37 +1,76 @@
 import json
 import os
 
-# Load state tax rates from JSON file
-def load_us_tax_rates():
+# Cache for loaded tax configurations
+_tax_config_cache = {}
+
+def load_tax_config(country_code='US'):
+    """
+    Load tax configuration for a specific country.
+    
+    Args:
+        country_code: Two-letter country code (e.g., 'US', 'TW')
+    
+    Returns:
+        Dictionary containing tax configuration for the country
+    """
+    if country_code in _tax_config_cache:
+        return _tax_config_cache[country_code]
+    
     try:
         # Get the directory where this file is located
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up one level to backend directory, then into data
-        data_dir = os.path.join(current_dir, '..', 'data')
-        json_path = os.path.join(data_dir, 'us_tax_rates.json')
+        # Go up one level to backend directory, then into data/tax-rates
+        data_dir = os.path.join(current_dir, '..', 'data', 'tax-rates')
+        
+        # Use country code directly as filename
+        filename = f'{country_code}.json'
+        json_path = os.path.join(data_dir, filename)
         
         with open(json_path, 'r') as f:
-            return json.load(f)
+            config = json.load(f)
+            _tax_config_cache[country_code] = config
+            return config
     except Exception as e:
-        print(f"Warning: Could not load US tax rates from JSON: {e}")
-        # Fallback to empty rates if JSON loading fails
-        return {}
+        print(f"Warning: Could not load tax rates for {country_code}: {e}")
+        # Return empty configuration for unknown countries
+        return {
+            'federal': {'standard_deduction': 0, 'brackets': []},
+            'payroll_taxes': {},
+            'states': {} if country_code == 'US' else None
+        }
 
-# Load state tax rates
-US_TAX_RATES = load_us_tax_rates()
+# Load default US tax configuration
+TAX_CONFIG = load_tax_config('US')
 
-# FICA constants for 2024
-SOCIAL_SECURITY_WAGE_BASE = 168600
-SOCIAL_SECURITY_RATE = 0.062
-MEDICARE_RATE = 0.0145
-MEDICARE_ADDITIONAL_RATE = 0.009
-MEDICARE_ADDITIONAL_THRESHOLD = 200000
+def get_tax_config(country_code='US'):
+    """Get the tax configuration for a specific country"""
+    return load_tax_config(country_code)
 
-# Standard deductions
-FEDERAL_STANDARD_DEDUCTION = 14600
-CA_STANDARD_DEDUCTION = 5540
+def get_federal_config(country_code='US'):
+    """Get federal tax configuration for a specific country"""
+    config = load_tax_config(country_code)
+    return config.get('federal', {})
+
+def get_payroll_config(country_code='US'):
+    """Get payroll tax configuration for a specific country"""
+    config = load_tax_config(country_code)
+    return config.get('payroll_taxes', {})
+
+def get_state_config(state, country_code='US'):
+    """Get state/regional tax configuration for a specific country"""
+    config = load_tax_config(country_code)
+    
+    # Only US has state taxes in our current implementation
+    if country_code == 'US':
+        states = config.get('states', {})
+        return states.get(state, {'standard_deduction': 0, 'brackets': []})
+    else:
+        # Non-US countries don't have state taxes
+        return {'standard_deduction': 0, 'brackets': []}
 
 def calculate_tax_for_bracket(income, brackets):
+    """Calculate tax based on progressive brackets"""
     tax = 0
     for bracket in brackets:
         min_income = bracket["min"]
@@ -48,32 +87,67 @@ def calculate_tax_for_bracket(income, brackets):
                 tax += taxable_amount * rate
     return tax
 
-def calculate_income_tax(income, state, pre_tax_401k, employer_match):
+def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US'):
     """
     Calculate income tax for the calculator.
-    Returns (total_available_income, effective_tax_rate, tax_breakdown)
-    where total_available_income = after_tax_income + employer_match
+    
+    Args:
+        income: Gross income
+        state: State/region code (only used for US)
+        pre_tax_401k: Pre-tax retirement contributions
+        employer_match: Employer match rate (decimal)
+        country_code: Two-letter country code
+    
+    Returns:
+        (total_available_income, effective_tax_rate, tax_breakdown)
+        where total_available_income = after_tax_income + employer_match
     """
     if income <= 0:
         return 0, 0, {}
+    
+    # Get tax configurations for the specific country
+    federal_config = get_federal_config(country_code)
+    payroll_config = get_payroll_config(country_code)
+    state_config = get_state_config(state, country_code)
     
     # Calculate employer match amount (employer_match is already a decimal, e.g., 0.05 for 5%)
     employer_match_amount = income * employer_match
     
     # Calculate taxable income after deductions
-    federal_taxable_income = max(0, income - pre_tax_401k - FEDERAL_STANDARD_DEDUCTION)
-    state_taxable_income = max(0, income - pre_tax_401k - CA_STANDARD_DEDUCTION)
+    federal_standard_deduction = federal_config.get('standard_deduction', 0)
+    state_standard_deduction = state_config.get('standard_deduction', 0)
+    
+    federal_taxable_income = max(0, income - pre_tax_401k - federal_standard_deduction)
+    state_taxable_income = max(0, income - pre_tax_401k - state_standard_deduction)
     
     # Calculate federal tax
-    federal_tax = calculate_tax_for_bracket(federal_taxable_income, US_TAX_RATES.get('federal', []))
+    federal_brackets = federal_config.get('brackets', [])
+    federal_tax = calculate_tax_for_bracket(federal_taxable_income, federal_brackets)
     
     # Calculate state tax
-    state_tax = calculate_tax_for_bracket(state_taxable_income, US_TAX_RATES.get(state, []))
+    state_brackets = state_config.get('brackets', [])
+    state_tax = calculate_tax_for_bracket(state_taxable_income, state_brackets)
     
-    # Calculate FICA taxes
-    social_security_tax = min(income * SOCIAL_SECURITY_RATE, SOCIAL_SECURITY_WAGE_BASE * SOCIAL_SECURITY_RATE)
-    medicare_tax = income * MEDICARE_RATE
-    additional_medicare_tax = max(0, income - MEDICARE_ADDITIONAL_THRESHOLD) * MEDICARE_ADDITIONAL_RATE
+    # Calculate payroll taxes (implementation varies by country)
+    social_security_tax = 0
+    medicare_tax = 0
+    additional_medicare_tax = 0
+    
+    if country_code == 'US':
+        # US payroll taxes
+        social_security_config = payroll_config.get('social_security', {})
+        medicare_config = payroll_config.get('medicare', {})
+        
+        social_security_rate = social_security_config.get('rate', 0)
+        social_security_wage_base = social_security_config.get('wage_base', 0)
+        medicare_rate = medicare_config.get('rate', 0)
+        medicare_additional_rate = medicare_config.get('additional_rate', 0)
+        medicare_additional_threshold = medicare_config.get('additional_threshold', 0)
+        
+        social_security_tax = min(income * social_security_rate, social_security_wage_base * social_security_rate)
+        medicare_tax = income * medicare_rate
+        additional_medicare_tax = max(0, income - medicare_additional_threshold) * medicare_additional_rate
+    # Add other countries' payroll tax calculations here as needed
     
     total_tax = federal_tax + state_tax + social_security_tax + medicare_tax + additional_medicare_tax
     after_tax_income = income - total_tax
@@ -98,11 +172,13 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match):
     return total_available_income, effective_tax_rate, tax_breakdown
 
 def calculate_tax(data):
+    """Legacy API function for backward compatibility"""
     income = data['income']
     state = data['state']
     pre_tax_401k = data.get('preTax401k', 0)
+    country_code = data.get('country', 'US')
     
-    _, _, tax_breakdown = calculate_income_tax(income, state, pre_tax_401k, 0)
+    _, _, tax_breakdown = calculate_income_tax(income, state, pre_tax_401k, 0, country_code)
     
     # For the old API, return after-tax income without employer match
     after_tax_income = tax_breakdown['afterTaxIncome']
