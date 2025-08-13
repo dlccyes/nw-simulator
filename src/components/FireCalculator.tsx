@@ -647,15 +647,31 @@ const FireCalculator: React.FC = () => {
               )}
             </Box>
             <Box sx={{ mb: 4 }}>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {inputs.country === 'US' ? (
-                  'Enter the money in today\'s US dollars (USD).'
-                ) : inputs.country === 'TW' ? (
-                  'Enter the money in today\'s Taiwan dollars (TWD).'
-                ) : (
-                  'Enter the money in today\'s local currency.'
-                )}
-              </Typography>
+                          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+              {inputs.country === 'US' ? (
+                'Enter the money in today\'s US dollars (USD).'
+              ) : inputs.country === 'TW' ? (
+                'Enter the money in today\'s Taiwan dollars (TWD).'
+              ) : (
+                'Enter the money in today\'s local currency.'
+              )}
+              {' '}
+              For detailed usage instructions, <Typography 
+                component="a"
+                href="/doc"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                consult the manual
+              </Typography>.
+            </Typography>
 
               <Box 
                 sx={{ 
