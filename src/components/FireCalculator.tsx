@@ -649,15 +649,13 @@ const FireCalculator: React.FC = () => {
                     <Typography variant="body1" color="text.secondary" sx={{ mb: 3, fontSize: '0.95rem' }}>
                       {inputs.country === 'US' ? (
                         <>
-                          <strong>Tax Info:</strong> Federal standard deduction is ${taxInfo?.federal?.standard_deduction?.toLocaleString() || '14,600'}. State deductions vary by state.
-                          <br />
-                          <strong>401(k) & Payroll:</strong> Pre-tax 401(k) contributions reduce taxable income. Social Security (6.2%, capped at $168,600) and Medicare (1.45% + 0.9% additional on income over $200,000) are automatically deducted.
+                          All tax calculations include federal and state taxes (if applicable), plus mandatory payroll deductions. 
+                          Tax rates and deductions are for single filers. Pre-tax 401(k) contributions reduce your taxable income.
                         </>
                       ) : inputs.country === 'TW' ? (
                         <>
-                          <strong>Tax Info:</strong> Standard deduction is NT${taxInfo?.federal?.standard_deduction?.toLocaleString() || '446,000'} (for unmarried, non-disabled employees under 70).
-                          <br />
-                          <strong>Payroll Deductions:</strong> Labor Insurance ({((taxInfo?.payroll_taxes?.labor_insurance?.rate || 0.025) * 100).toFixed(1)}%) and Health Insurance ({((taxInfo?.payroll_taxes?.health_insurance?.rate || 0.0155) * 100).toFixed(2)}%, capped at NT${taxInfo?.payroll_taxes?.health_insurance?.annual_cap?.toLocaleString() || '56,364'}/year) are automatically deducted from all income.
+                          All calculations include income tax and mandatory payroll deductions (Labor and Health Insurance). 
+                          Tax rates and deductions apply to unmarried, non-disabled employees under 70.
                         </>
                       ) : null}
                     </Typography>
@@ -665,8 +663,15 @@ const FireCalculator: React.FC = () => {
                     {taxInfo && (
                       <>
                         <Typography variant="h6" sx={{ mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
-                          Tax Brackets ({inputs.country === 'US' ? 'Federal' : 'Income Tax'})
+                          {inputs.country === 'US' ? 'Federal Tax' : 'Income Tax'}
                         </Typography>
+                        {taxInfo.federal?.standard_deduction && (
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Standard Deduction:</strong> {inputs.country === 'US' ? '$' : 'NT$'}{taxInfo.federal.standard_deduction.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        )}
                         <TableContainer sx={{ mb: 3 }}>
                           <Table size="small">
                             <TableHead>
@@ -687,6 +692,45 @@ const FireCalculator: React.FC = () => {
                             </TableBody>
                           </Table>
                         </TableContainer>
+
+                        {inputs.country === 'US' && inputs.state && taxInfo.states?.[inputs.state] && (
+                          <>
+                            <Typography variant="h6" sx={{ mt: 3, mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
+                              {inputs.state} State Tax
+                            </Typography>
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="body2" color="text.secondary">
+                                <strong>Standard Deduction:</strong> ${taxInfo.states[inputs.state].standard_deduction?.toLocaleString() || '0'}
+                              </Typography>
+                            </Box>
+                            {taxInfo.states[inputs.state].brackets && taxInfo.states[inputs.state].brackets.length > 0 ? (
+                              <TableContainer sx={{ mb: 3 }}>
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell><strong>Income Range</strong></TableCell>
+                                      <TableCell align="right"><strong>Tax Rate</strong></TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {taxInfo.states[inputs.state].brackets.map((bracket: any, index: number) => (
+                                      <TableRow key={index}>
+                                        <TableCell>
+                                          ${bracket.min.toLocaleString()} - {bracket.max ? `$${bracket.max.toLocaleString()}` : '∞'}
+                                        </TableCell>
+                                        <TableCell align="right">{(bracket.rate * 100).toFixed(1)}%</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                            ) : (
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
+                                No state income tax
+                              </Typography>
+                            )}
+                          </>
+                        )}
 
                         {inputs.country === 'US' && taxInfo.payroll_taxes && (
                           <>
