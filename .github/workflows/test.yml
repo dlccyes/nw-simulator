@@ -39,14 +39,13 @@ jobs:
     - name: Run Python tests
       working-directory: ./backend/api
       run: |
-        python -m pytest test_calculator.py -v
-        python test_calculator.py
+        python -m pytest -v
         
     - name: Run Python tests with coverage (optional)
       working-directory: ./backend/api
       run: |
         pip install pytest-cov
-        python -m pytest test_calculator.py --cov=. --cov-report=xml
+        python -m pytest --cov=. --cov-report=xml
       continue-on-error: true
 
   test-frontend:

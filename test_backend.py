@@ -24,7 +24,7 @@ def main():
         # Run tests with pytest
         print("📊 Running tests with pytest...")
         result = subprocess.run([
-            sys.executable, '-m', 'pytest', 'test_calculator.py', '-v'
+            sys.executable, '-m', 'pytest', '-v'
         ], cwd=backend_dir, capture_output=True, text=True)
         
         if result.returncode == 0:
