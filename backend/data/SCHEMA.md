@@ -45,14 +45,17 @@ The tax system has been redesigned to be forward-compatible and support multiple
 }
 ```
 
-#### Taiwan Structure (Example)
+#### Taiwan Structure
 ```json
 "payroll_taxes": {
   "labor_insurance": {
-    "rate": 0.025
+    "rate": 0.025,
+    "description": "Direct payroll deduction"
   },
   "health_insurance": {
-    "rate": 0.0155
+    "rate": 0.0155,
+    "annual_cap": 4697,
+    "description": "Direct payroll deduction with annual cap"
   }
 }
 ```
@@ -109,6 +112,17 @@ calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='
 ```
 
 This allows the same tax engine to work with different countries while maintaining backward compatibility for existing code.
+
+## Country-Specific Implementations
+
+### Taiwan (TW)
+Taiwan's tax system includes:
+- **Federal income tax**: Progressive brackets with standard deduction
+- **Labor Insurance**: 2.5% of income (treated as payroll tax)
+- **Health Insurance**: 1.55% of income with annual cap of 4,697 TWD
+- **No state/regional taxes**
+
+Both labor and health insurance are direct payroll deductions, similar to US Social Security and Medicare, but with Taiwan-specific rates and caps.
 
 ## Benefits
 

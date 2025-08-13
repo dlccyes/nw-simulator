@@ -147,6 +147,24 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         social_security_tax = min(income * social_security_rate, social_security_wage_base * social_security_rate)
         medicare_tax = income * medicare_rate
         additional_medicare_tax = max(0, income - medicare_additional_threshold) * medicare_additional_rate
+    
+    elif country_code == 'TW':
+        # Taiwan payroll taxes (direct deductions from payroll)
+        labor_insurance_config = payroll_config.get('labor_insurance', {})
+        health_insurance_config = payroll_config.get('health_insurance', {})
+        
+        # Labor insurance - direct rate on income
+        labor_insurance_rate = labor_insurance_config.get('rate', 0)
+        social_security_tax = income * labor_insurance_rate
+        
+        # Health insurance - rate with annual cap
+        health_insurance_rate = health_insurance_config.get('rate', 0)
+        health_insurance_cap = health_insurance_config.get('annual_cap', 0)
+        health_insurance_tax = income * health_insurance_rate
+        if health_insurance_cap > 0:
+            health_insurance_tax = min(health_insurance_tax, health_insurance_cap)
+        medicare_tax = health_insurance_tax
+    
     # Add other countries' payroll tax calculations here as needed
     
     total_tax = federal_tax + state_tax + social_security_tax + medicare_tax + additional_medicare_tax
@@ -158,16 +176,29 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
     # Calculate effective tax rate
     effective_tax_rate = (total_tax / income) * 100 if income > 0 else 0
     
-    tax_breakdown = {
-        'federalTax': federal_tax,
-        'stateTax': state_tax,
-        'socialSecurityTax': social_security_tax,
-        'medicareTax': medicare_tax,
-        'additionalMedicareTax': additional_medicare_tax,
-        'totalTax': total_tax,
-        'afterTaxIncome': after_tax_income,
-        'employerMatch': employer_match_amount
-    }
+    # Adjust field names based on country for better clarity
+    if country_code == 'TW':
+        tax_breakdown = {
+            'federalTax': federal_tax,
+            'stateTax': state_tax,
+            'laborInsuranceTax': social_security_tax,  # Taiwan: Labor Insurance
+            'healthInsuranceTax': medicare_tax,        # Taiwan: Health Insurance  
+            'additionalMedicareTax': additional_medicare_tax,
+            'totalTax': total_tax,
+            'afterTaxIncome': after_tax_income,
+            'employerMatch': employer_match_amount
+        }
+    else:
+        tax_breakdown = {
+            'federalTax': federal_tax,
+            'stateTax': state_tax,
+            'socialSecurityTax': social_security_tax,
+            'medicareTax': medicare_tax,
+            'additionalMedicareTax': additional_medicare_tax,
+            'totalTax': total_tax,
+            'afterTaxIncome': after_tax_income,
+            'employerMatch': employer_match_amount
+        }
     
     return total_available_income, effective_tax_rate, tax_breakdown
 
@@ -183,12 +214,24 @@ def calculate_tax(data):
     # For the old API, return after-tax income without employer match
     after_tax_income = tax_breakdown['afterTaxIncome']
     
-    return {
-        'federalTax': tax_breakdown['federalTax'],
-        'stateTax': tax_breakdown['stateTax'],
-        'socialSecurityTax': tax_breakdown['socialSecurityTax'],
-        'medicareTax': tax_breakdown['medicareTax'],
-        'additionalMedicareTax': tax_breakdown['additionalMedicareTax'],
-        'totalTax': tax_breakdown['totalTax'],
-        'afterTaxIncome': after_tax_income
-    }
+    # Handle country-specific field names
+    if country_code == 'TW':
+        return {
+            'federalTax': tax_breakdown['federalTax'],
+            'stateTax': tax_breakdown['stateTax'],
+            'laborInsuranceTax': tax_breakdown.get('laborInsuranceTax', 0),
+            'healthInsuranceTax': tax_breakdown.get('healthInsuranceTax', 0),
+            'additionalMedicareTax': tax_breakdown['additionalMedicareTax'],
+            'totalTax': tax_breakdown['totalTax'],
+            'afterTaxIncome': after_tax_income
+        }
+    else:
+        return {
+            'federalTax': tax_breakdown['federalTax'],
+            'stateTax': tax_breakdown['stateTax'],
+            'socialSecurityTax': tax_breakdown.get('socialSecurityTax', 0),
+            'medicareTax': tax_breakdown.get('medicareTax', 0),
+            'additionalMedicareTax': tax_breakdown['additionalMedicareTax'],
+            'totalTax': tax_breakdown['totalTax'],
+            'afterTaxIncome': after_tax_income
+        }

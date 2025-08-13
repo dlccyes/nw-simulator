@@ -2,19 +2,22 @@
   "federal": {
     "standard_deduction": 446000,
     "brackets": [
-      {"min": 0, "max": 560000, "rate": 0.05},
-      {"min": 560001, "max": 1260000, "rate": 0.12},
-      {"min": 1260001, "max": 2520000, "rate": 0.20},
-      {"min": 2520001, "max": 4720000, "rate": 0.30},
-      {"min": 4720001, "max": null, "rate": 0.40}
+      {"min": 0, "max": 590000, "rate": 0.05},
+      {"min": 590001, "max": 1330000, "rate": 0.12},
+      {"min": 1330001, "max": 2660000, "rate": 0.20},
+      {"min": 2660001, "max": 4980000, "rate": 0.30},
+      {"min": 4980001, "max": null, "rate": 0.40}
     ]
   },
   "payroll_taxes": {
     "labor_insurance": {
-      "rate": 0.025
+      "rate": 0.025,
+      "description": "Direct payroll deduction"
     },
     "health_insurance": {
-      "rate": 0.0155
+      "rate": 0.0155,
+      "annual_cap": 56364,
+      "description": "Direct payroll deduction with annual cap"
     }
   }
 } 

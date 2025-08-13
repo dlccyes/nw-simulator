@@ -581,7 +581,19 @@ const FireCalculator: React.FC = () => {
               )}
             </Box>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-              Enter the money in today's dollars.
+              {inputs.country === 'US' ? (
+                'Enter the money in today\'s dollars.'
+              ) : inputs.country === 'TW' ? (
+                <>
+                  Enter the money in today's Taiwan dollars (TWD).
+                  <br />
+                  <strong>Tax Info:</strong> Standard deduction is NT$446,000 (for unmarried, non-disabled employees under 70).
+                  <br />
+                  <strong>Payroll Deductions:</strong> Labor Insurance (2.5%) and Health Insurance (1.55%, capped at NT$56,364/year) are automatically deducted from all income.
+                </>
+              ) : (
+                'Enter the money in today\'s local currency.'
+              )}
             </Typography>
           </Grid>
 
