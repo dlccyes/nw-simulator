@@ -31,7 +31,8 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
-  CircularProgress
+  CircularProgress,
+  Collapse
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon } from '@mui/icons-material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -314,12 +315,29 @@ const FireCalculator: React.FC = () => {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [stopAtFire, setStopAtFire] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [taxInfo, setTaxInfo] = useState<any>(null);
 
   useEffect(() => {
     if (enableProfile) {
       loadProfiles();
     }
   }, [enableProfile]);
+
+  useEffect(() => {
+    const fetchTaxInfo = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/tax-info/${inputs.country}`);
+        if (response.ok) {
+          const data = await response.json();
+          setTaxInfo(data);
+        }
+      } catch (error) {
+        console.error('Error fetching tax info:', error);
+      }
+    };
+
+    fetchTaxInfo();
+  }, [inputs.country]);
 
   const loadProfiles = async () => {
     try {
@@ -580,21 +598,124 @@ const FireCalculator: React.FC = () => {
                 </>
               )}
             </Box>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-              {inputs.country === 'US' ? (
-                'Enter the money in today\'s dollars.'
-              ) : inputs.country === 'TW' ? (
-                <>
-                  Enter the money in today's Taiwan dollars (TWD).
-                  <br />
-                  <strong>Tax Info:</strong> Standard deduction is NT$446,000 (for unmarried, non-disabled employees under 70).
-                  <br />
-                  <strong>Payroll Deductions:</strong> Labor Insurance (2.5%) and Health Insurance (1.55%, capped at NT$56,364/year) are automatically deducted from all income.
-                </>
-              ) : (
-                'Enter the money in today\'s local currency.'
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                {inputs.country === 'US' ? (
+                  <>
+                    Enter the money in today's US dollars (USD).
+                    <br />
+                    <strong>Tax Info:</strong> Federal standard deduction is ${taxInfo?.federal?.standard_deduction?.toLocaleString() || '14,600'}. State deductions vary by state.
+                    <br />
+                    <strong>401(k) & Payroll:</strong> Pre-tax 401(k) contributions reduce taxable income. Social Security (6.2%, capped at $168,600) and Medicare (1.45% + 0.9% additional on income over $200,000) are automatically deducted.
+                  </>
+                ) : inputs.country === 'TW' ? (
+                  <>
+                    Enter the money in today's Taiwan dollars (TWD).
+                    <br />
+                    <strong>Tax Info:</strong> Standard deduction is NT${taxInfo?.federal?.standard_deduction?.toLocaleString() || '446,000'} (for unmarried, non-disabled employees under 70).
+                    <br />
+                    <strong>Payroll Deductions:</strong> Labor Insurance ({((taxInfo?.payroll_taxes?.labor_insurance?.rate || 0.025) * 100).toFixed(1)}%) and Health Insurance ({((taxInfo?.payroll_taxes?.health_insurance?.rate || 0.0155) * 100).toFixed(2)}%, capped at NT${taxInfo?.payroll_taxes?.health_insurance?.annual_cap?.toLocaleString() || '56,364'}/year) are automatically deducted from all income.
+                  </>
+                ) : (
+                  'Enter the money in today\'s local currency.'
+                )}
+              </Typography>
+
+              {taxInfo && (
+                <Paper sx={{ p: 2, mt: 2, backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)' }}>
+                  <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem', fontWeight: 600 }}>
+                    Tax Brackets ({inputs.country === 'US' ? 'Federal' : 'Income Tax'})
+                  </Typography>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell><strong>Income Range</strong></TableCell>
+                          <TableCell align="right"><strong>Tax Rate</strong></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {taxInfo.federal?.brackets?.map((bracket: any, index: number) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              {inputs.country === 'US' ? '$' : 'NT$'}{bracket.min.toLocaleString()} - {bracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${bracket.max.toLocaleString()}` : '∞'}
+                            </TableCell>
+                            <TableCell align="right">{(bracket.rate * 100).toFixed(1)}%</TableCell>
+                          </TableRow>
+                        )) || []}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  {inputs.country === 'US' && taxInfo.payroll_taxes && (
+                    <>
+                      <Typography variant="h6" sx={{ mt: 3, mb: 2, fontSize: '1rem', fontWeight: 600 }}>
+                        Payroll Taxes
+                      </Typography>
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell><strong>Type</strong></TableCell>
+                              <TableCell align="right"><strong>Rate</strong></TableCell>
+                              <TableCell align="right"><strong>Cap/Notes</strong></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>Social Security</TableCell>
+                              <TableCell align="right">{((taxInfo.payroll_taxes.social_security?.rate || 0) * 100).toFixed(1)}%</TableCell>
+                              <TableCell align="right">${taxInfo.payroll_taxes.social_security?.wage_base?.toLocaleString() || 'N/A'} wage base</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Medicare</TableCell>
+                              <TableCell align="right">{((taxInfo.payroll_taxes.medicare?.rate || 0) * 100).toFixed(2)}%</TableCell>
+                              <TableCell align="right">No cap</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Medicare Additional</TableCell>
+                              <TableCell align="right">{((taxInfo.payroll_taxes.medicare?.additional_rate || 0) * 100).toFixed(1)}%</TableCell>
+                              <TableCell align="right">On income over ${taxInfo.payroll_taxes.medicare?.additional_threshold?.toLocaleString() || 'N/A'}</TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </>
+                  )}
+
+                  {inputs.country === 'TW' && taxInfo.payroll_taxes && (
+                    <>
+                      <Typography variant="h6" sx={{ mt: 3, mb: 2, fontSize: '1rem', fontWeight: 600 }}>
+                        Payroll Deductions
+                      </Typography>
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell><strong>Type</strong></TableCell>
+                              <TableCell align="right"><strong>Rate</strong></TableCell>
+                              <TableCell align="right"><strong>Annual Cap</strong></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>Labor Insurance</TableCell>
+                              <TableCell align="right">{((taxInfo.payroll_taxes.labor_insurance?.rate || 0) * 100).toFixed(1)}%</TableCell>
+                              <TableCell align="right">No cap</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Health Insurance</TableCell>
+                              <TableCell align="right">{((taxInfo.payroll_taxes.health_insurance?.rate || 0) * 100).toFixed(2)}%</TableCell>
+                              <TableCell align="right">NT${taxInfo.payroll_taxes.health_insurance?.annual_cap?.toLocaleString() || 'N/A'}</TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </>
+                  )}
+                </Paper>
               )}
-            </Typography>
+            </Box>
           </Grid>
 
                     <Grid item xs={12} sx={{ width: '100%' }}>

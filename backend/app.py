@@ -3,7 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from api.calculator import calculate_fire_projection
-from api.tax import calculate_tax
+from api.tax import calculate_tax, get_tax_info
 import logging
 import time
 
@@ -49,6 +49,14 @@ def tax():
     data = request.json
     try:
         result = calculate_tax(data)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/tax-info/<country_code>', methods=['GET'])
+def tax_info(country_code):
+    try:
+        result = get_tax_info(country_code.upper())
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 400

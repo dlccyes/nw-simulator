@@ -235,3 +235,29 @@ def calculate_tax(data):
             'totalTax': tax_breakdown['totalTax'],
             'afterTaxIncome': after_tax_income
         }
+
+def get_tax_info(country_code='US'):
+    """
+    Get tax configuration info for API exposure.
+    Returns tax brackets, deductions, and payroll tax info for display.
+    """
+    try:
+        config = load_tax_config(country_code)
+        
+        # Format the response for frontend consumption
+        tax_info = {
+            'country': country_code,
+            'federal': config.get('federal', {}),
+            'payroll_taxes': config.get('payroll_taxes', {}),
+            'states': config.get('states', {}) if country_code == 'US' else None
+        }
+        
+        return tax_info
+    except Exception as e:
+        print(f"Error getting tax info for {country_code}: {e}")
+        return {
+            'country': country_code,
+            'federal': {'standard_deduction': 0, 'brackets': []},
+            'payroll_taxes': {},
+            'states': {} if country_code == 'US' else None
+        }
