@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
   Box,
@@ -22,6 +22,35 @@ import {
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
+
+interface TaxBracket {
+  min: number;
+  max: number | null;
+  rate: number;
+}
+
+interface TaxConfig {
+  standard_deduction: number;
+  brackets: TaxBracket[];
+}
+
+interface PayrollTaxConfig {
+  social_security: {
+    rate: number;
+    wage_base: number;
+  };
+  medicare: {
+    rate: number;
+    additional_rate: number;
+    additional_threshold: number;
+  };
+}
+
+interface TaxInfoData {
+  federal: TaxConfig;
+  payroll_taxes: PayrollTaxConfig;
+  states: { [key: string]: TaxConfig };
+}
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -50,7 +79,7 @@ const UsTaxTable: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [dialogTaxType, setDialogTaxType] = useState<'federal' | 'fica' | 'state'>('federal');
   const [dialogStateCode, setDialogStateCode] = useState<string>('');
-  const [taxInfoData, setTaxInfoData] = useState<any>(null);
+  const [taxInfoData, setTaxInfoData] = useState<TaxInfoData | null>(null);
   
   // State filtering
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
@@ -111,7 +140,7 @@ const UsTaxTable: React.FC = () => {
     { code: 'DC', name: 'District of Columbia' }
   ];
 
-  const fetchTaxData = async () => {
+  const fetchTaxData = useCallback(async () => {
     const numericIncome = parseFloat(income.replace(/,/g, ''));
     if (!income || numericIncome < 1) {
       setError('Please enter a valid income amount (minimum $1)');
@@ -133,7 +162,7 @@ const UsTaxTable: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [income]);
 
   useEffect(() => {
     if (income && parseFloat(income) > 0) {
@@ -141,7 +170,7 @@ const UsTaxTable: React.FC = () => {
     }
     // Load tax info data
     fetchTaxInfoData();
-  }, []);
+  }, [fetchTaxData, income]);
 
   const fetchTaxInfoData = async () => {
     try {
@@ -160,7 +189,7 @@ const UsTaxTable: React.FC = () => {
     }
 
     fetchTaxData();
-  }, [income]);
+  }, [fetchTaxData, income]);
 
   const handleSort = (field: SortField) => {
     const isAsc = sortField === field && sortDirection === 'asc';

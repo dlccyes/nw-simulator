@@ -168,7 +168,7 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
           </Box>
         );
 
-      case 'state':
+      case 'state': {
         if (!stateCode || !taxData.states[stateCode]) {
           return <Typography>No state tax information available.</Typography>;
         }
@@ -212,6 +212,7 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
             </TableContainer>
           </Box>
         );
+      }
 
       default:
         return <Typography>No information available.</Typography>;

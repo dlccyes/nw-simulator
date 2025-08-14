@@ -25,17 +25,23 @@ db = client.fire_calculator
 profiles = db.profiles
 
 @app.before_request
+
+
 def before_request():
     g.start_time = time.time()
     logger.info(f'Received {request.method} request to {request.path}')
 
 @app.after_request
+
+
 def after_request(response):
     duration = time.time() - g.start_time
     logger.info(f'Completed {request.method} request to {request.path} in {duration:.2f}s with status {response.status_code}')
     return response
 
 @app.route('/api/calculate', methods=['POST'])
+
+
 def calculate():
     data = request.json
     try:
@@ -46,6 +52,8 @@ def calculate():
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/tax', methods=['POST'])
+
+
 def tax():
     data = request.json
     try:
@@ -55,6 +63,8 @@ def tax():
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/tax-info/<country_code>', methods=['GET'])
+
+
 def tax_info(country_code):
     try:
         result = get_tax_info(country_code.upper())
@@ -63,6 +73,8 @@ def tax_info(country_code):
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/profiles', methods=['GET'])
+
+
 def list_profiles():
     try:
         profiles_list = list(profiles.find({}, {'_id': 1, 'name': 1}))
@@ -74,6 +86,8 @@ def list_profiles():
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/profiles', methods=['POST'])
+
+
 def create_profile():
     logger.info('Received create profile request')
     try:
@@ -90,6 +104,8 @@ def create_profile():
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/profiles/<profile_id>', methods=['GET'])
+
+
 def get_profile_by_id(profile_id):
     try:
         profile = profiles.find_one({'_id': ObjectId(profile_id)})
@@ -101,6 +117,8 @@ def get_profile_by_id(profile_id):
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/profiles/<profile_id>', methods=['DELETE'])
+
+
 def delete_profile_by_id(profile_id):
     try:
         result = profiles.delete_one({'_id': ObjectId(profile_id)})
@@ -111,6 +129,8 @@ def delete_profile_by_id(profile_id):
         return jsonify({'error': str(e)}), 400
 
 @app.route('/api/us-tax-comparison', methods=['POST'])
+
+
 def us_tax_comparison():
     """
     Calculate effective tax rates and after-tax income for all US states.
@@ -119,17 +139,20 @@ def us_tax_comparison():
     """
     try:
         data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
         income = data.get('income', 0)
-        
+
         if income <= 0:
             return jsonify({'error': 'Income must be greater than 0'}), 400
-        
+
         # Load US tax configuration to get all states
         us_config = load_tax_config('US')
         states = us_config.get('states', {}) or {}
-        
+
         results = []
-        
+
         for state_code, state_config in states.items():
             # Calculate tax for this state (no 401k contributions as requested)
             total_available_income, effective_tax_rate, tax_breakdown = calculate_income_tax(
@@ -139,10 +162,10 @@ def us_tax_comparison():
                 employer_match=0,  # No employer match
                 country_code='US'
             )
-            
+
             # Get state name (using state code for now, could be enhanced with full names)
             state_name = get_state_name(state_code)
-            
+
             results.append({
                 'stateCode': state_code,
                 'stateName': state_name,
@@ -151,19 +174,20 @@ def us_tax_comparison():
                 'totalTax': round(tax_breakdown['totalTax'], 2),
                 'federalTax': round(tax_breakdown['federalTax'], 2),
                 'stateTax': round(tax_breakdown['stateTax'], 2),
-                'payrollTax': round(tax_breakdown['socialSecurityTax'] + 
-                                 tax_breakdown['medicareTax'] + 
+                'payrollTax': round(tax_breakdown['socialSecurityTax'] +
+                                 tax_breakdown['medicareTax'] +
                                  tax_breakdown['additionalMedicareTax'], 2)
             })
-        
+
         # Sort by effective rate (lowest first)
         results.sort(key=lambda x: x['effectiveRate'])
-        
+
         return jsonify(results)
-        
+
     except Exception as e:
         logger.error(f'US tax comparison request failed: {str(e)}')
         return jsonify({'error': str(e)}), 400
+
 
 def get_state_name(state_code):
     """Convert state code to full state name"""

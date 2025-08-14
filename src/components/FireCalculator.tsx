@@ -153,7 +153,7 @@ const STATES = [
   'WY'   // Wyoming
 ];
 
-const Grid = MuiGrid as any;  // Type assertion to bypass the type error
+const Grid = MuiGrid as React.ComponentType<Record<string, unknown>>;  // Type assertion to bypass the type error
 
 const NetWorthChart: React.FC<{ data: Omit<ChartData, 'id'>[]; fireAge: number }> = ({ data, fireAge }) => {
   return (
@@ -347,14 +347,29 @@ const FireCalculator: React.FC = () => {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [stopAtFire, setStopAtFire] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [taxInfo, setTaxInfo] = useState<any>(null);
+  const [taxInfo, setTaxInfo] = useState<{
+    federal?: {
+      standard_deduction?: number;
+      brackets?: Array<{min: number; max: number | null; rate: number}>;
+    };
+    states?: Record<string, {
+      standard_deduction?: number;
+      brackets?: Array<{min: number; max: number | null; rate: number}>;
+    }>;
+    payroll_taxes?: {
+      social_security?: {rate: number; wage_base: number};
+      medicare?: {rate: number; additional_rate: number; additional_threshold: number};
+      labor_insurance?: {rate: number};
+      health_insurance?: {rate: number; annual_cap: number};
+    };
+  } | null>(null);
   const [infoExpanded, setInfoExpanded] = useState(false);
 
   useEffect(() => {
     if (enableProfile) {
       loadProfiles();
     }
-  }, [enableProfile]);
+  }, []);
 
   useEffect(() => {
     const fetchTaxInfo = async () => {
@@ -421,14 +436,14 @@ const FireCalculator: React.FC = () => {
         employerMatch: config.employerMatch
       });
 
-      setYearlySpending(config.yearlySpending.map((d: any) => ({
+      setYearlySpending(config.yearlySpending.map((d: {id: string; startAge: number; endAge: number; amount: number}) => ({
         id: d.id,
         startAge: d.startAge,
         endAge: d.endAge,
         spending: d.amount
       })));
 
-      setYearlyIncome(config.yearlyIncome.map((d: any) => ({
+      setYearlyIncome(config.yearlyIncome.map((d: {id: string; startAge: number; endAge: number; amount: number}) => ({
         id: d.id,
         startAge: d.startAge,
         endAge: d.endAge,
@@ -759,7 +774,7 @@ const FireCalculator: React.FC = () => {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {taxInfo.federal?.brackets?.map((bracket: any, index: number) => (
+                              {taxInfo.federal?.brackets?.map((bracket: {min: number; max: number | null; rate: number}, index: number) => (
                                 <TableRow key={index}>
                                   <TableCell>
                                     {inputs.country === 'US' ? '$' : 'NT$'}{bracket.min.toLocaleString()} - {bracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${bracket.max.toLocaleString()}` : '∞'}
@@ -781,7 +796,7 @@ const FireCalculator: React.FC = () => {
                                 <strong>Standard Deduction:</strong> ${taxInfo.states[inputs.state].standard_deduction?.toLocaleString() || '0'}
                               </Typography>
                             </Box>
-                            {taxInfo.states[inputs.state].brackets && taxInfo.states[inputs.state].brackets.length > 0 ? (
+                            {taxInfo.states?.[inputs.state]?.brackets && taxInfo.states[inputs.state]?.brackets && taxInfo.states[inputs.state]!.brackets!.length > 0 ? (
                               <TableContainer sx={{ mb: 3 }}>
                                 <Table size="small">
                                   <TableHead>
@@ -791,7 +806,7 @@ const FireCalculator: React.FC = () => {
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {taxInfo.states[inputs.state].brackets.map((bracket: any, index: number) => (
+                                    {taxInfo.states[inputs.state]!.brackets!.map((bracket: {min: number; max: number | null; rate: number}, index: number) => (
                                       <TableRow key={index}>
                                         <TableCell>
                                           ${bracket.min.toLocaleString()} - {bracket.max ? `$${bracket.max.toLocaleString()}` : '∞'}
