@@ -34,6 +34,7 @@ import {
   CircularProgress,
   Collapse
 } from '@mui/material';
+import CalculateButton from './CalculateButton';
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -1231,41 +1232,11 @@ const FireCalculator: React.FC = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
+            <CalculateButton
               onClick={handleCalculate}
+              loading={loading}
               fullWidth
-              size="large"
-              sx={{ 
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                '&:hover': {
-                  background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
-                },
-                minHeight: '48px',
-                '& .MuiCircularProgress-root': {
-                  color: 'white'
-                }
-              }}
-              disabled={loading}
-            >
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                width: '100%',
-                minWidth: '120px'
-              }}>
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  'Calculate'
-                )}
-              </Box>
-            </Button>
+            />
           </Grid>
 
           {results && (
