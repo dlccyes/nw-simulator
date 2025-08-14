@@ -15,9 +15,11 @@ import {
   CircularProgress,
   Alert,
   InputAdornment,
-  Slider
+  Slider,
+  Link
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
+import TaxInfoDialog from './TaxInfoDialog';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -41,6 +43,12 @@ const UsTaxTable: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('effectiveRate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Tax info dialog state
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogTaxType, setDialogTaxType] = useState<'federal' | 'fica' | 'state'>('federal');
+  const [dialogStateCode, setDialogStateCode] = useState<string>('');
+  const [taxInfoData, setTaxInfoData] = useState<any>(null);
 
   const fetchTaxData = async () => {
     const numericIncome = parseFloat(income.replace(/,/g, ''));
@@ -70,7 +78,18 @@ const UsTaxTable: React.FC = () => {
     if (income && parseFloat(income) > 0) {
       fetchTaxData();
     }
+    // Load tax info data
+    fetchTaxInfoData();
   }, []);
+
+  const fetchTaxInfoData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/tax-info/US`);
+      setTaxInfoData(response.data);
+    } catch (err) {
+      console.error('Failed to load tax info data:', err);
+    }
+  };
 
   // Auto-call API when income changes (immediate)
   useEffect(() => {
@@ -116,6 +135,12 @@ const UsTaxTable: React.FC = () => {
 
   const formatPercentage = (rate: number): string => {
     return `${rate.toFixed(2)}%`;
+  };
+
+  const handleTaxInfoClick = (taxType: 'federal' | 'fica' | 'state', stateCode?: string) => {
+    setDialogTaxType(taxType);
+    setDialogStateCode(stateCode || '');
+    setDialogOpen(true);
   };
 
   return (
@@ -197,29 +222,67 @@ const UsTaxTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Federal & FICA Taxes
             </Typography>
-            <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Federal Tax
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                  {formatCurrency(data[0]?.federalTax || 0)}
-                </Typography>
-                                  <Typography variant="body2" color="text.secondary">
+                          <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    <Link 
+                      component="button"
+                      variant="body2"
+                      onClick={() => handleTaxInfoClick('federal')}
+                      sx={{ 
+                        cursor: 'pointer', 
+                        textDecoration: 'none',
+                        color: 'primary.light',
+                        fontWeight: 500,
+                        '&:hover': {
+                          color: 'red',
+                          textDecoration: 'underline'
+                        },
+                        '&:focus': {
+                          outline: 'none'
+                        }
+                      }}
+                    >
+                      Federal Tax
+                    </Link>
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                    {formatCurrency(data[0]?.federalTax || 0)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
                     ({formatPercentage(((data[0]?.federalTax || 0) / parseFloat(income.replace(/,/g, ''))) * 100)})
                   </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  FICA Tax (Payroll)
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                  {formatCurrency(data[0]?.payrollTax || 0)}
-                </Typography>
-                                  <Typography variant="body2" color="text.secondary">
+                </Box>
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    <Link 
+                      component="button"
+                      variant="body2"
+                      onClick={() => handleTaxInfoClick('fica')}
+                      sx={{ 
+                        cursor: 'pointer', 
+                        textDecoration: 'none',
+                        color: 'primary.light',
+                        fontWeight: 500,
+                        '&:hover': {
+                          color: 'red',
+                          textDecoration: 'underline'
+                        },
+                        '&:focus': {
+                          outline: 'none'
+                        }
+                      }}
+                    >
+                      FICA Tax (Payroll)
+                    </Link>
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                    {formatCurrency(data[0]?.payrollTax || 0)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
                     ({formatPercentage(((data[0]?.payrollTax || 0) / parseFloat(income.replace(/,/g, ''))) * 100)})
                   </Typography>
-              </Box>
+                </Box>
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Combined Federal + FICA
@@ -286,11 +349,30 @@ const UsTaxTable: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sortedData.map((row) => (
-                  <TableRow key={row.stateCode} hover>
-                    <TableCell component="th" scope="row">
-                      {row.stateName}
-                    </TableCell>
+                                  {sortedData.map((row) => (
+                    <TableRow key={row.stateCode} hover>
+                      <TableCell component="th" scope="row">
+                        <Link 
+                          component="button"
+                          variant="body1"
+                          onClick={() => handleTaxInfoClick('state', row.stateCode)}
+                          sx={{ 
+                            cursor: 'pointer', 
+                            textDecoration: 'none',
+                            color: 'primary.light',
+                            fontWeight: 500,
+                            '&:hover': {
+                              color: 'red',
+                              textDecoration: 'underline'
+                            },
+                            '&:focus': {
+                              outline: 'none'
+                            }
+                          }}
+                        >
+                          {row.stateName}
+                        </Link>
+                      </TableCell>
                     <TableCell align="right">
                       <Box>
                         {formatCurrency(row.stateTax)}
@@ -322,6 +404,14 @@ const UsTaxTable: React.FC = () => {
           Actual taxes may vary based on individual circumstances, deductions, and credits.
         </Typography>
       )}
+
+      <TaxInfoDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        taxType={dialogTaxType}
+        stateCode={dialogStateCode}
+        taxData={taxInfoData}
+      />
     </Box>
   );
 };
