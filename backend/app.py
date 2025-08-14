@@ -15,7 +15,8 @@ app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:5173",
     "https://nw.derricklin.net",
-    "https://fire.derricklin.net"
+    "https://fire.derricklin.net",
+    "https://nw.approximator.net"
 ], max_age=3600)
 
 # MongoDB connection

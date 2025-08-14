@@ -2,7 +2,7 @@
 
 A Financial Independence, Retire Early (FIRE) calculator with net worth projection. Supports US and Taiwan with country-specific tax calculations, retirement accounts, and payroll deductions.
 
-**🌐 Website: [https://nw.derricklin.net/](https://nw.derricklin.net/)**
+**🌐 Website: [https://nw.approximator.net/](https://nw.approximator.net/)**
 
 **⚠️ Disclaimer: This is 95% vibe-coded. Accuracy not guaranteed.**
 
