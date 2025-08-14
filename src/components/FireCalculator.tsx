@@ -459,6 +459,21 @@ const FireCalculator: React.FC = () => {
     }));
   };
 
+  const handleMonetaryInputChange = (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/,/g, '');
+    if (value === '' || /^\d+$/.test(value)) {
+      const numericValue = value === '' ? 0 : parseInt(value);
+      setInputs(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+    }
+  };
+
+  const formatMonetaryValue = (value: number): string => {
+    return value === 0 ? '' : value.toLocaleString();
+  };
+
   const handleCountryChange = (event: SelectChangeEvent<string>) => {
     const newCountry = event.target.value;
     
@@ -963,11 +978,9 @@ const FireCalculator: React.FC = () => {
                           fullWidth
                           label="Current Net Worth"
                           name="currentNetWorth"
-                          type="number"
-                          value={inputs.currentNetWorth}
-                          onChange={handleInputChange}
+                          value={formatMonetaryValue(inputs.currentNetWorth)}
+                          onChange={handleMonetaryInputChange('currentNetWorth')}
                           slotProps={{
-                            htmlInput: { min: 0 },
                             input: {
                               startAdornment: <InputAdornment position="start">$</InputAdornment>
                             }
@@ -1009,11 +1022,9 @@ const FireCalculator: React.FC = () => {
                           fullWidth
                           label="Retirement Spending"
                           name="retirementSpending"
-                          type="number"
-                          value={inputs.retirementSpending}
-                          onChange={handleInputChange}
+                          value={formatMonetaryValue(inputs.retirementSpending)}
+                          onChange={handleMonetaryInputChange('retirementSpending')}
                           slotProps={{
-                            htmlInput: { min: 0 },
                             input: {
                               startAdornment: <InputAdornment position="start">$</InputAdornment>
                             }
@@ -1052,11 +1063,9 @@ const FireCalculator: React.FC = () => {
                           fullWidth
                           label="Pre-tax 401(k) Contribution"
                           name="preTax401k"
-                          type="number"
-                          value={inputs.preTax401k}
-                          onChange={handleInputChange}
+                          value={formatMonetaryValue(inputs.preTax401k)}
+                          onChange={handleMonetaryInputChange('preTax401k')}
                           slotProps={{
-                            htmlInput: { min: 0 },
                             input: {
                               startAdornment: <InputAdornment position="start">$</InputAdornment>
                             }
@@ -1112,11 +1121,15 @@ const FireCalculator: React.FC = () => {
                     <TextField
                       sx={{ width: '100%', minWidth: '200px' }}
                       label="Amount"
-                      type="number"
-                      value={item.spending}
-                      onChange={(e) => handleSpendingChange(yearlySpending.indexOf(item), 'spending', Number(e.target.value))}
+                      value={formatMonetaryValue(item.spending || 0)}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/,/g, '');
+                        if (value === '' || /^\d+$/.test(value)) {
+                          const numericValue = value === '' ? 0 : parseInt(value);
+                          handleSpendingChange(yearlySpending.indexOf(item), 'spending', numericValue);
+                        }
+                      }}
                       slotProps={{
-                        htmlInput: { min: 0 },
                         input: {
                           startAdornment: <InputAdornment position="start">$</InputAdornment>
                         }
@@ -1181,11 +1194,15 @@ const FireCalculator: React.FC = () => {
                     <TextField
                       sx={{ width: '100%', minWidth: '200px' }}
                       label="Amount"
-                      type="number"
-                      value={item.income}
-                      onChange={(e) => handleIncomeChange(yearlyIncome.indexOf(item), 'income', Number(e.target.value))}
+                      value={formatMonetaryValue(item.income || 0)}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/,/g, '');
+                        if (value === '' || /^\d+$/.test(value)) {
+                          const numericValue = value === '' ? 0 : parseInt(value);
+                          handleIncomeChange(yearlyIncome.indexOf(item), 'income', numericValue);
+                        }
+                      }}
                       slotProps={{
-                        htmlInput: { min: 0 },
                         input: {
                           startAdornment: <InputAdornment position="start">$</InputAdornment>
                         }

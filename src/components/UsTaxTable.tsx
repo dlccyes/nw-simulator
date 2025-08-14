@@ -39,7 +39,7 @@ interface StateComparison {
 type SortField = keyof StateComparison;
 
 const UsTaxTable: React.FC = () => {
-  const [income, setIncome] = useState<string>('230000');
+  const [income, setIncome] = useState<string>('230,000');
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -257,10 +257,13 @@ const UsTaxTable: React.FC = () => {
           </Typography>
           <Slider
             value={parseFloat(income.replace(/,/g, '')) || 1}
-            onChange={(_, newValue) => setIncome(newValue.toLocaleString())}
+            onChange={(_, newValue) => {
+              const roundedValue = Math.max(1, Math.round(Number(newValue) / 1000) * 1000);
+              setIncome(roundedValue.toLocaleString());
+            }}
             min={1}
             max={500000}
-            step={10000}
+            step={1000}
             sx={{ mt: 1 }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => `$${value.toLocaleString()}`}
