@@ -134,7 +134,7 @@ def delete_profile_by_id(profile_id):
 def us_tax_comparison():
     """
     Calculate effective tax rates and after-tax income for all US states.
-    Expects: { "income": number }
+    Expects: { "income": number, "filing_status": "single|married" }
     Returns: Array of state tax comparisons
     """
     try:
@@ -143,6 +143,7 @@ def us_tax_comparison():
             return jsonify({'error': 'No data provided'}), 400
 
         income = data.get('income', 0)
+        filing_status = data.get('filing_status', 'single')
 
         if income <= 0:
             return jsonify({'error': 'Income must be greater than 0'}), 400
@@ -160,7 +161,8 @@ def us_tax_comparison():
                 state=state_code,
                 pre_tax_401k=0,  # No 401k as requested
                 employer_match=0,  # No employer match
-                country_code='US'
+                country_code='US',
+                filing_status=filing_status
             )
 
             # Get state name (using state code for now, could be enhanced with full names)

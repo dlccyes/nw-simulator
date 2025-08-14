@@ -18,7 +18,11 @@ import {
   Slider,
   Link,
   Autocomplete,
-  Chip
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
@@ -69,6 +73,7 @@ type SortField = keyof StateComparison;
 
 const UsTaxTable: React.FC = () => {
   const [income, setIncome] = useState<string>('230,000');
+  const [filingStatus, setFilingStatus] = useState<string>('single');
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -152,7 +157,8 @@ const UsTaxTable: React.FC = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/us-tax-comparison`, {
-        income: numericIncome
+        income: numericIncome,
+        filing_status: filingStatus
       });
       // Only update data after successful response to prevent flash
       setData(response.data);
@@ -162,7 +168,7 @@ const UsTaxTable: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [income]);
+  }, [income, filingStatus]);
 
   useEffect(() => {
     if (income && parseFloat(income) > 0) {
@@ -283,6 +289,7 @@ const UsTaxTable: React.FC = () => {
       >
         Compare effective tax rates and after-tax income across all US states based on your income.
         This calculation includes federal, state, and payroll taxes, but excludes 401(k) contributions.
+        Tax rates shown are for {filingStatus === 'married' ? 'married filing jointly' : 'single filers'}.
       </Typography>
 
       <Box sx={{ mb: 3 }}>
@@ -317,6 +324,17 @@ const UsTaxTable: React.FC = () => {
             }}
             sx={{ minWidth: { xs: '100%', sm: 200 } }}
           />
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }}>
+            <InputLabel>Filing Status</InputLabel>
+            <Select
+              value={filingStatus}
+              label="Filing Status"
+              onChange={(e) => setFilingStatus(e.target.value)}
+            >
+              <MenuItem value="single">Single</MenuItem>
+              <MenuItem value="married">Married Filing Jointly</MenuItem>
+            </Select>
+          </FormControl>
           <CalculateButton 
             type="submit"
             loading={loading}

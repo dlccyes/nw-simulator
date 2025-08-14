@@ -37,6 +37,7 @@ def calculate_fire_projection(data):
     employer_match = data['employerMatch'] / 100
     country = data.get('country', 'US')
     state = data.get('state', 'CA')
+    filing_status = data.get('filingStatus', 'single')
     stop_at_fire = data.get('stopAtFire', False)
 
     # Calculate real return rate and check FIRE possibility
@@ -67,7 +68,7 @@ def calculate_fire_projection(data):
         )
 
         total_available_income, effective_tax_rate, _ = calculate_income_tax(
-            gross_income, state, pre_tax_401k, employer_match, country
+            gross_income, state, pre_tax_401k, employer_match, country, filing_status
         )
 
         _, real_interest_earned = calculate_net_worth(
@@ -93,7 +94,7 @@ def calculate_fire_projection(data):
         )
 
         total_available_income, effective_tax_rate, _ = calculate_income_tax(
-            gross_income, state, pre_tax_401k, employer_match, country
+            gross_income, state, pre_tax_401k, employer_match, country, filing_status
         )
 
         _, real_interest_earned = calculate_net_worth(

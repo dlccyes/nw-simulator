@@ -52,10 +52,17 @@ def get_tax_config(country_code='US'):
     return load_tax_config(country_code)
 
 
-def get_federal_config(country_code='US'):
-    """Get federal tax configuration for a specific country"""
+def get_federal_config(country_code='US', filing_status='single'):
+    """Get federal tax configuration for a specific country and filing status"""
     config = load_tax_config(country_code)
-    return config.get('federal', {})
+    federal_config = config.get('federal', {})
+    
+    # Check if filing status specific config exists
+    if filing_status in federal_config:
+        return federal_config[filing_status]
+    
+    # Fall back to general config for backward compatibility
+    return federal_config
 
 
 def get_payroll_config(country_code='US'):
@@ -64,14 +71,21 @@ def get_payroll_config(country_code='US'):
     return config.get('payroll_taxes', {})
 
 
-def get_state_config(state, country_code='US'):
-    """Get state/regional tax configuration for a specific country"""
+def get_state_config(state, country_code='US', filing_status='single'):
+    """Get state/regional tax configuration for a specific country and filing status"""
     config = load_tax_config(country_code)
 
     # Only US has state taxes in our current implementation
     if country_code == 'US':
         states = config.get('states', {})
-        return states.get(state, {'standard_deduction': 0, 'brackets': []})
+        state_config = states.get(state, {'standard_deduction': 0, 'brackets': []})
+        
+        # Check if filing status specific config exists
+        if filing_status in state_config:
+            return state_config[filing_status]
+        
+        # Fall back to general config for backward compatibility
+        return state_config
     else:
         # Non-US countries don't have state taxes
         return {'standard_deduction': 0, 'brackets': []}
@@ -96,7 +110,7 @@ def calculate_tax_for_bracket(income, brackets):
     return tax
 
 
-def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US'):
+def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US', filing_status='single'):
     """
     Calculate income tax for the calculator.
 
@@ -106,6 +120,7 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         pre_tax_401k: Pre-tax retirement contributions
         employer_match: Employer match rate (decimal)
         country_code: Two-letter country code
+        filing_status: Filing status ('single' or 'married')
 
     Returns:
         (total_available_income, effective_tax_rate, tax_breakdown)
@@ -115,9 +130,9 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         return 0, 0, {}
 
     # Get tax configurations for the specific country
-    federal_config = get_federal_config(country_code)
+    federal_config = get_federal_config(country_code, filing_status)
     payroll_config = get_payroll_config(country_code)
-    state_config = get_state_config(state, country_code)
+    state_config = get_state_config(state, country_code, filing_status)
 
     # Calculate employer match amount (employer_match is already a decimal, e.g., 0.05 for 5%)
     employer_match_amount = income * employer_match
@@ -151,7 +166,12 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         social_security_wage_base = social_security_config.get('wage_base', 0)
         medicare_rate = medicare_config.get('rate', 0)
         medicare_additional_rate = medicare_config.get('additional_rate', 0)
-        medicare_additional_threshold = medicare_config.get('additional_threshold', 0)
+        
+        # Use different threshold for married filing jointly
+        if filing_status == 'married':
+            medicare_additional_threshold = medicare_config.get('additional_threshold_married', medicare_config.get('additional_threshold', 0))
+        else:
+            medicare_additional_threshold = medicare_config.get('additional_threshold', 0)
 
         social_security_tax = min(income * social_security_rate, social_security_wage_base * social_security_rate)
         medicare_tax = income * medicare_rate

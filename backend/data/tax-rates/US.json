@@ -1,15 +1,85 @@
 {
   "federal": {
-    "standard_deduction": 14600,
-    "brackets": [
-      {"min": 0, "max": 11600, "rate": 0.10},
-      {"min": 11600, "max": 47150, "rate": 0.12},
-      {"min": 47150, "max": 100525, "rate": 0.22},
-      {"min": 100525, "max": 191950, "rate": 0.24},
-      {"min": 191950, "max": 243725, "rate": 0.32},
-      {"min": 243725, "max": 609350, "rate": 0.35},
-      {"min": 609350, "max": null, "rate": 0.37}
-    ]
+    "single": {
+      "standard_deduction": 14600,
+      "brackets": [
+        {
+          "min": 0,
+          "max": 11600,
+          "rate": 0.1
+        },
+        {
+          "min": 11600,
+          "max": 47150,
+          "rate": 0.12
+        },
+        {
+          "min": 47150,
+          "max": 100525,
+          "rate": 0.22
+        },
+        {
+          "min": 100525,
+          "max": 191950,
+          "rate": 0.24
+        },
+        {
+          "min": 191950,
+          "max": 243725,
+          "rate": 0.32
+        },
+        {
+          "min": 243725,
+          "max": 609350,
+          "rate": 0.35
+        },
+        {
+          "min": 609350,
+          "max": null,
+          "rate": 0.37
+        }
+      ]
+    },
+    "married": {
+      "standard_deduction": 29200,
+      "brackets": [
+        {
+          "min": 0,
+          "max": 23200,
+          "rate": 0.1
+        },
+        {
+          "min": 23200,
+          "max": 94300,
+          "rate": 0.12
+        },
+        {
+          "min": 94300,
+          "max": 201050,
+          "rate": 0.22
+        },
+        {
+          "min": 201050,
+          "max": 383900,
+          "rate": 0.24
+        },
+        {
+          "min": 383900,
+          "max": 487450,
+          "rate": 0.32
+        },
+        {
+          "min": 487450,
+          "max": 731200,
+          "rate": 0.35
+        },
+        {
+          "min": 731200,
+          "max": null,
+          "rate": 0.37
+        }
+      ]
+    }
   },
   "payroll_taxes": {
     "social_security": {
@@ -19,416 +89,2139 @@
     "medicare": {
       "rate": 0.0145,
       "additional_rate": 0.009,
-      "additional_threshold": 200000
+      "additional_threshold": 200000,
+      "additional_threshold_married": 250000
     }
   },
   "states": {
     "AL": {
-      "standard_deduction": 2500,
-      "brackets": [
-        {"min": 0, "max": 500, "rate": 0.02},
-        {"min": 500, "max": 3000, "rate": 0.04},
-        {"min": 3000, "max": null, "rate": 0.05}
-      ]
+      "single": {
+        "standard_deduction": 3000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 500,
+            "rate": 0.02
+          },
+          {
+            "min": 500,
+            "max": 3000,
+            "rate": 0.04
+          },
+          {
+            "min": 3000,
+            "max": null,
+            "rate": 0.05
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 8500,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1000,
+            "rate": 0.02
+          },
+          {
+            "min": 1000,
+            "max": 6000,
+            "rate": 0.04
+          },
+          {
+            "min": 6000,
+            "max": null,
+            "rate": 0.05
+          }
+        ]
+      }
     },
     "AK": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "AR": {
-      "standard_deduction": 2340,
-      "brackets": [
-        {"min": 0, "max": 4500, "rate": 0.02},
-        {"min": 4500, "max": null, "rate": 0.039}
-      ]
+      "single": {
+        "standard_deduction": 2410,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 4500,
+            "rate": 0.02
+          },
+          {
+            "min": 4500,
+            "max": null,
+            "rate": 0.039
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 4820,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 4500,
+            "rate": 0.02
+          },
+          {
+            "min": 4500,
+            "max": null,
+            "rate": 0.039
+          }
+        ]
+      }
     },
     "AZ": {
-      "standard_deduction": 5000,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.025}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.025
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.025
+          }
+        ]
+      }
     },
     "CA": {
-      "standard_deduction": 5540,
-      "brackets": [
-        {"min": 0, "max": 10756, "rate": 0.01},
-        {"min": 10756, "max": 25499, "rate": 0.02},
-        {"min": 25499, "max": 40245, "rate": 0.04},
-        {"min": 40245, "max": 55866, "rate": 0.06},
-        {"min": 55866, "max": 70606, "rate": 0.08},
-        {"min": 70606, "max": 360659, "rate": 0.093},
-        {"min": 360659, "max": 432787, "rate": 0.103},
-        {"min": 432787, "max": 721314, "rate": 0.113},
-        {"min": 721314, "max": 1000000, "rate": 0.123},
-        {"min": 1000000, "max": null, "rate": 0.133}
-      ]
+      "single": {
+        "standard_deduction": 5540,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10756,
+            "rate": 0.01
+          },
+          {
+            "min": 10756,
+            "max": 25499,
+            "rate": 0.02
+          },
+          {
+            "min": 25499,
+            "max": 40245,
+            "rate": 0.04
+          },
+          {
+            "min": 40245,
+            "max": 55866,
+            "rate": 0.06
+          },
+          {
+            "min": 55866,
+            "max": 70606,
+            "rate": 0.08
+          },
+          {
+            "min": 70606,
+            "max": 360659,
+            "rate": 0.09300000000000001
+          },
+          {
+            "min": 360659,
+            "max": 432787,
+            "rate": 0.10300000000000001
+          },
+          {
+            "min": 432787,
+            "max": 721314,
+            "rate": 0.113
+          },
+          {
+            "min": 721314,
+            "max": 1000000,
+            "rate": 0.12300000000000001
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.133
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 11080,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 21512,
+            "rate": 0.01
+          },
+          {
+            "min": 21512,
+            "max": 50998,
+            "rate": 0.02
+          },
+          {
+            "min": 50998,
+            "max": 80490,
+            "rate": 0.04
+          },
+          {
+            "min": 80490,
+            "max": 111732,
+            "rate": 0.06
+          },
+          {
+            "min": 111732,
+            "max": 141732,
+            "rate": 0.08
+          },
+          {
+            "min": 141732,
+            "max": 721318,
+            "rate": 0.09300000000000001
+          },
+          {
+            "min": 721318,
+            "max": 865574,
+            "rate": 0.10300000000000001
+          },
+          {
+            "min": 865574,
+            "max": 1000000,
+            "rate": 0.113
+          },
+          {
+            "min": 1000000,
+            "max": 1442628,
+            "rate": 0.12300000000000001
+          },
+          {
+            "min": 1442628,
+            "max": null,
+            "rate": 0.133
+          }
+        ]
+      }
     },
     "CO": {
-      "standard_deduction": 5000,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.044}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.044000000000000004
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.044000000000000004
+          }
+        ]
+      }
     },
     "CT": {
-      "standard_deduction": 15000,
-      "brackets": [
-        {"min": 0, "max": 10000, "rate": 0.02},
-        {"min": 10000, "max": 50000, "rate": 0.045},
-        {"min": 50000, "max": 100000, "rate": 0.055},
-        {"min": 100000, "max": 200000, "rate": 0.06},
-        {"min": 200000, "max": 250000, "rate": 0.065},
-        {"min": 250000, "max": 500000, "rate": 0.069},
-        {"min": 500000, "max": null, "rate": 0.0699}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10000,
+            "rate": 0.02
+          },
+          {
+            "min": 10000,
+            "max": 50000,
+            "rate": 0.045
+          },
+          {
+            "min": 50000,
+            "max": 100000,
+            "rate": 0.055
+          },
+          {
+            "min": 100000,
+            "max": 200000,
+            "rate": 0.06
+          },
+          {
+            "min": 200000,
+            "max": 250000,
+            "rate": 0.065
+          },
+          {
+            "min": 250000,
+            "max": 500000,
+            "rate": 0.069
+          },
+          {
+            "min": 500000,
+            "max": null,
+            "rate": 0.0699
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 20000,
+            "rate": 0.02
+          },
+          {
+            "min": 20000,
+            "max": 100000,
+            "rate": 0.045
+          },
+          {
+            "min": 100000,
+            "max": 200000,
+            "rate": 0.055
+          },
+          {
+            "min": 200000,
+            "max": 400000,
+            "rate": 0.06
+          },
+          {
+            "min": 400000,
+            "max": 500000,
+            "rate": 0.065
+          },
+          {
+            "min": 500000,
+            "max": 1000000,
+            "rate": 0.069
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.0699
+          }
+        ]
+      }
     },
     "DC": {
-      "standard_deduction": 12950,
-      "brackets": [
-        {"min": 0, "max": 10000, "rate": 0.04},
-        {"min": 10000, "max": 40000, "rate": 0.06},
-        {"min": 40000, "max": 60000, "rate": 0.065},
-        {"min": 60000, "max": 250000, "rate": 0.085},
-        {"min": 250000, "max": 500000, "rate": 0.0925},
-        {"min": 500000, "max": 1000000, "rate": 0.0975},
-        {"min": 1000000, "max": null, "rate": 0.1075}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10000,
+            "rate": 0.04
+          },
+          {
+            "min": 10000,
+            "max": 40000,
+            "rate": 0.06
+          },
+          {
+            "min": 40000,
+            "max": 60000,
+            "rate": 0.065
+          },
+          {
+            "min": 60000,
+            "max": 250000,
+            "rate": 0.085
+          },
+          {
+            "min": 250000,
+            "max": 500000,
+            "rate": 0.0925
+          },
+          {
+            "min": 500000,
+            "max": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.1075
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10000,
+            "rate": 0.04
+          },
+          {
+            "min": 10000,
+            "max": 40000,
+            "rate": 0.06
+          },
+          {
+            "min": 40000,
+            "max": 60000,
+            "rate": 0.065
+          },
+          {
+            "min": 60000,
+            "max": 250000,
+            "rate": 0.085
+          },
+          {
+            "min": 250000,
+            "max": 500000,
+            "rate": 0.0925
+          },
+          {
+            "min": 500000,
+            "max": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.1075
+          }
+        ]
+      }
     },
     "DE": {
-      "standard_deduction": 3250,
-      "brackets": [
-        {"min": 0, "max": 2000, "rate": 0.022},
-        {"min": 2000, "max": 5000, "rate": 0.039},
-        {"min": 5000, "max": 10000, "rate": 0.048},
-        {"min": 10000, "max": 20000, "rate": 0.052},
-        {"min": 20000, "max": 25000, "rate": 0.0555},
-        {"min": 25000, "max": 60000, "rate": 0.066},
-        {"min": 60000, "max": null, "rate": 0.066}
-      ]
+      "single": {
+        "standard_deduction": 3250,
+        "brackets": [
+          {
+            "min": 2000,
+            "max": 5000,
+            "rate": 0.022000000000000002
+          },
+          {
+            "min": 5000,
+            "max": 10000,
+            "rate": 0.039
+          },
+          {
+            "min": 10000,
+            "max": 20000,
+            "rate": 0.048
+          },
+          {
+            "min": 20000,
+            "max": 25000,
+            "rate": 0.052000000000000005
+          },
+          {
+            "min": 25000,
+            "max": 60000,
+            "rate": 0.0555
+          },
+          {
+            "min": 60000,
+            "max": null,
+            "rate": 0.066
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 6500,
+        "brackets": [
+          {
+            "min": 2000,
+            "max": 5000,
+            "rate": 0.022000000000000002
+          },
+          {
+            "min": 5000,
+            "max": 10000,
+            "rate": 0.039
+          },
+          {
+            "min": 10000,
+            "max": 20000,
+            "rate": 0.048
+          },
+          {
+            "min": 20000,
+            "max": 25000,
+            "rate": 0.052000000000000005
+          },
+          {
+            "min": 25000,
+            "max": 60000,
+            "rate": 0.0555
+          },
+          {
+            "min": 60000,
+            "max": null,
+            "rate": 0.066
+          }
+        ]
+      }
     },
     "FL": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "GA": {
-      "standard_deduction": 5400,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0539}
-      ]
+      "single": {
+        "standard_deduction": 12000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.053899999999999997
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 24000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.053899999999999997
+          }
+        ]
+      }
     },
     "HI": {
-      "standard_deduction": 4850,
-      "brackets": [
-        {"min": 0, "max": 9600, "rate": 0.014},
-        {"min": 9600, "max": 19200, "rate": 0.032},
-        {"min": 19200, "max": 28800, "rate": 0.055},
-        {"min": 28800, "max": 38400, "rate": 0.064},
-        {"min": 38400, "max": 48000, "rate": 0.068},
-        {"min": 48000, "max": 72000, "rate": 0.072},
-        {"min": 72000, "max": 96000, "rate": 0.076},
-        {"min": 96000, "max": 125000, "rate": 0.079},
-        {"min": 125000, "max": 175000, "rate": 0.0825},
-        {"min": 175000, "max": 225000, "rate": 0.09},
-        {"min": 225000, "max": 275000, "rate": 0.1},
-        {"min": 275000, "max": 325000, "rate": 0.11},
-        {"min": 325000, "max": null, "rate": 0.11}
-      ]
+      "single": {
+        "standard_deduction": 4400,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 9600,
+            "rate": 0.013999999999999999
+          },
+          {
+            "min": 9600,
+            "max": 14400,
+            "rate": 0.032
+          },
+          {
+            "min": 14400,
+            "max": 19200,
+            "rate": 0.055
+          },
+          {
+            "min": 19200,
+            "max": 24000,
+            "rate": 0.064
+          },
+          {
+            "min": 24000,
+            "max": 36000,
+            "rate": 0.068
+          },
+          {
+            "min": 36000,
+            "max": 48000,
+            "rate": 0.07200000000000001
+          },
+          {
+            "min": 48000,
+            "max": 125000,
+            "rate": 0.076
+          },
+          {
+            "min": 125000,
+            "max": 175000,
+            "rate": 0.079
+          },
+          {
+            "min": 175000,
+            "max": 225000,
+            "rate": 0.0825
+          },
+          {
+            "min": 225000,
+            "max": 275000,
+            "rate": 0.09
+          },
+          {
+            "min": 275000,
+            "max": 325000,
+            "rate": 0.1
+          },
+          {
+            "min": 325000,
+            "max": null,
+            "rate": 0.11
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 8800,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 19200,
+            "rate": 0.013999999999999999
+          },
+          {
+            "min": 19200,
+            "max": 28800,
+            "rate": 0.032
+          },
+          {
+            "min": 28800,
+            "max": 38400,
+            "rate": 0.055
+          },
+          {
+            "min": 38400,
+            "max": 48000,
+            "rate": 0.064
+          },
+          {
+            "min": 48000,
+            "max": 72000,
+            "rate": 0.068
+          },
+          {
+            "min": 72000,
+            "max": 96000,
+            "rate": 0.07200000000000001
+          },
+          {
+            "min": 96000,
+            "max": 250000,
+            "rate": 0.076
+          },
+          {
+            "min": 250000,
+            "max": 350000,
+            "rate": 0.079
+          },
+          {
+            "min": 350000,
+            "max": 450000,
+            "rate": 0.0825
+          },
+          {
+            "min": 450000,
+            "max": 550000,
+            "rate": 0.09
+          },
+          {
+            "min": 550000,
+            "max": 650000,
+            "rate": 0.1
+          },
+          {
+            "min": 650000,
+            "max": null,
+            "rate": 0.11
+          }
+        ]
+      }
     },
     "IA": {
-      "standard_deduction": 2180,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.038}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.038
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.038
+          }
+        ]
+      }
     },
     "ID": {
-      "standard_deduction": 5000,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.05695}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 4673,
+            "max": null,
+            "rate": 0.05695
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 9346,
+            "max": null,
+            "rate": 0.05695
+          }
+        ]
+      }
     },
     "IL": {
-      "standard_deduction": 2775,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0495}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0495
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0495
+          }
+        ]
+      }
     },
     "IN": {
-      "standard_deduction": 2500,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.03}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.03
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.03
+          }
+        ]
+      }
     },
     "KS": {
-      "standard_deduction": 3500,
-      "brackets": [
-        {"min": 0, "max": 23000, "rate": 0.052},
-        {"min": 23000, "max": null, "rate": 0.0558}
-      ]
+      "single": {
+        "standard_deduction": 3605,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 23000,
+            "rate": 0.052000000000000005
+          },
+          {
+            "min": 23000,
+            "max": null,
+            "rate": 0.0558
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 8240,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 46000,
+            "rate": 0.052000000000000005
+          },
+          {
+            "min": 46000,
+            "max": null,
+            "rate": 0.0558
+          }
+        ]
+      }
     },
     "KY": {
-      "standard_deduction": 2990,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.04}
-      ]
+      "single": {
+        "standard_deduction": 3270,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.04
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 6540,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.04
+          }
+        ]
+      }
     },
     "LA": {
-      "standard_deduction": 4500,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.03}
-      ]
+      "single": {
+        "standard_deduction": 12500,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 0,
+            "rate": 0.03
+          },
+          {
+            "min": 0,
+            "max": 26800,
+            "rate": 0.057999999999999996
+          },
+          {
+            "min": 26800,
+            "max": 63450,
+            "rate": 0.0675
+          },
+          {
+            "min": 63450,
+            "max": null,
+            "rate": 0.07150000000000001
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 25000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 0,
+            "rate": 0.03
+          },
+          {
+            "min": 0,
+            "max": 53600,
+            "rate": 0.057999999999999996
+          },
+          {
+            "min": 53600,
+            "max": 126900,
+            "rate": 0.0675
+          },
+          {
+            "min": 126900,
+            "max": null,
+            "rate": 0.07150000000000001
+          }
+        ]
+      }
     },
     "MA": {
-      "standard_deduction": 8800,
-      "brackets": [
-        {"min": 0, "max": 1083150, "rate": 0.05},
-        {"min": 1083150, "max": null, "rate": 0.09}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1083150,
+            "rate": 0.05
+          },
+          {
+            "min": 1083150,
+            "max": null,
+            "rate": 0.09
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1083150,
+            "rate": 0.05
+          },
+          {
+            "min": 1083150,
+            "max": null,
+            "rate": 0.09
+          }
+        ]
+      }
     },
     "MD": {
-      "standard_deduction": 4650,
-      "brackets": [
-        {"min": 0, "max": 1000, "rate": 0.02},
-        {"min": 1000, "max": 2000, "rate": 0.03},
-        {"min": 2000, "max": 3000, "rate": 0.04},
-        {"min": 3000, "max": 100000, "rate": 0.0475},
-        {"min": 100000, "max": 125000, "rate": 0.0525},
-        {"min": 125000, "max": 150000, "rate": 0.055},
-        {"min": 150000, "max": 225000, "rate": 0.0575},
-        {"min": 225000, "max": 250000, "rate": 0.0575},
-        {"min": 250000, "max": 300000, "rate": 0.0575},
-        {"min": 300000, "max": null, "rate": 0.0575}
-      ]
+      "single": {
+        "standard_deduction": 2700,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1000,
+            "rate": 0.02
+          },
+          {
+            "min": 1000,
+            "max": 2000,
+            "rate": 0.03
+          },
+          {
+            "min": 2000,
+            "max": 3000,
+            "rate": 0.04
+          },
+          {
+            "min": 3000,
+            "max": 100000,
+            "rate": 0.0475
+          },
+          {
+            "min": 100000,
+            "max": 125000,
+            "rate": 0.05
+          },
+          {
+            "min": 125000,
+            "max": 150000,
+            "rate": 0.0525
+          },
+          {
+            "min": 150000,
+            "max": 250000,
+            "rate": 0.055
+          },
+          {
+            "min": 250000,
+            "max": null,
+            "rate": 0.0575
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 5450,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1000,
+            "rate": 0.02
+          },
+          {
+            "min": 1000,
+            "max": 2000,
+            "rate": 0.03
+          },
+          {
+            "min": 2000,
+            "max": 3000,
+            "rate": 0.04
+          },
+          {
+            "min": 3000,
+            "max": 150000,
+            "rate": 0.0475
+          },
+          {
+            "min": 150000,
+            "max": 175000,
+            "rate": 0.05
+          },
+          {
+            "min": 175000,
+            "max": 225000,
+            "rate": 0.0525
+          },
+          {
+            "min": 225000,
+            "max": 300000,
+            "rate": 0.055
+          },
+          {
+            "min": 300000,
+            "max": null,
+            "rate": 0.0575
+          }
+        ]
+      }
     },
     "ME": {
-      "standard_deduction": 14050,
-      "brackets": [
-        {"min": 0, "max": 26800, "rate": 0.058},
-        {"min": 26800, "max": 63450, "rate": 0.0675},
-        {"min": 63450, "max": null, "rate": 0.0715}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.057999999999999996
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.057999999999999996
+          }
+        ]
+      }
     },
     "MI": {
-      "standard_deduction": 5050,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0425}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0425
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0425
+          }
+        ]
+      }
     },
     "MN": {
-      "standard_deduction": 14050,
-      "brackets": [
-        {"min": 0, "max": 32570, "rate": 0.0535},
-        {"min": 32570, "max": 106990, "rate": 0.068},
-        {"min": 106990, "max": 198630, "rate": 0.0785},
-        {"min": 198630, "max": null, "rate": 0.0985}
-      ]
+      "single": {
+        "standard_deduction": 14950,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 32570,
+            "rate": 0.0535
+          },
+          {
+            "min": 32570,
+            "max": 106990,
+            "rate": 0.068
+          },
+          {
+            "min": 106990,
+            "max": 198630,
+            "rate": 0.0785
+          },
+          {
+            "min": 198630,
+            "max": null,
+            "rate": 0.09849999999999999
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 29900,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 47620,
+            "rate": 0.0535
+          },
+          {
+            "min": 47620,
+            "max": 189180,
+            "rate": 0.068
+          },
+          {
+            "min": 189180,
+            "max": 330410,
+            "rate": 0.0785
+          },
+          {
+            "min": 330410,
+            "max": null,
+            "rate": 0.09849999999999999
+          }
+        ]
+      }
     },
     "MO": {
-      "standard_deduction": 12950,
-      "brackets": [
-        {"min": 0, "max": 1313, "rate": 0.02},
-        {"min": 1313, "max": 2626, "rate": 0.025},
-        {"min": 2626, "max": 3939, "rate": 0.03},
-        {"min": 3939, "max": 5252, "rate": 0.035},
-        {"min": 5252, "max": 6565, "rate": 0.04},
-        {"min": 6565, "max": 7878, "rate": 0.045},
-        {"min": 7878, "max": 9191, "rate": 0.047},
-        {"min": 9191, "max": null, "rate": 0.047}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 1313,
+            "max": 2626,
+            "rate": 0.02
+          },
+          {
+            "min": 2626,
+            "max": 3939,
+            "rate": 0.025
+          },
+          {
+            "min": 3939,
+            "max": 5252,
+            "rate": 0.03
+          },
+          {
+            "min": 5252,
+            "max": 6565,
+            "rate": 0.035
+          },
+          {
+            "min": 6565,
+            "max": 7878,
+            "rate": 0.04
+          },
+          {
+            "min": 7878,
+            "max": 9191,
+            "rate": 0.045
+          },
+          {
+            "min": 9191,
+            "max": null,
+            "rate": 0.047
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 1313,
+            "max": 2626,
+            "rate": 0.02
+          },
+          {
+            "min": 2626,
+            "max": 3939,
+            "rate": 0.025
+          },
+          {
+            "min": 3939,
+            "max": 5252,
+            "rate": 0.03
+          },
+          {
+            "min": 5252,
+            "max": 6565,
+            "rate": 0.035
+          },
+          {
+            "min": 6565,
+            "max": 7878,
+            "rate": 0.04
+          },
+          {
+            "min": 7878,
+            "max": 9191,
+            "rate": 0.045
+          },
+          {
+            "min": 9191,
+            "max": null,
+            "rate": 0.047
+          }
+        ]
+      }
     },
     "MS": {
-      "standard_deduction": 2300,
-      "brackets": [
-        {"min": 0, "max": 10000, "rate": 0.044},
-        {"min": 10000, "max": null, "rate": 0.044}
-      ]
+      "single": {
+        "standard_deduction": 2300,
+        "brackets": [
+          {
+            "min": 10000,
+            "max": null,
+            "rate": 0.044000000000000004
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 4600,
+        "brackets": [
+          {
+            "min": 10000,
+            "max": null,
+            "rate": 0.044000000000000004
+          }
+        ]
+      }
     },
     "MT": {
-      "standard_deduction": 5040,
-      "brackets": [
-        {"min": 0, "max": 21100, "rate": 0.047},
-        {"min": 21100, "max": null, "rate": 0.059}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 21100,
+            "rate": 0.047
+          },
+          {
+            "min": 21100,
+            "max": null,
+            "rate": 0.059000000000000004
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 42200,
+            "rate": 0.047
+          },
+          {
+            "min": 42200,
+            "max": null,
+            "rate": 0.059000000000000004
+          }
+        ]
+      }
     },
     "NC": {
-      "standard_deduction": 12750,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0425}
-      ]
+      "single": {
+        "standard_deduction": 12750,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0425
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 25500,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0425
+          }
+        ]
+      }
     },
     "ND": {
-      "standard_deduction": 14600,
-      "brackets": [
-        {"min": 0, "max": 48475, "rate": 0.0195},
-        {"min": 48475, "max": 244825, "rate": 0.025},
-        {"min": 244825, "max": null, "rate": 0.025}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 48475,
+            "max": 244825,
+            "rate": 0.0195
+          },
+          {
+            "min": 244825,
+            "max": 26050,
+            "rate": 0.025
+          },
+          {
+            "min": 26050,
+            "max": 100000,
+            "rate": 0.0275
+          },
+          {
+            "min": 100000,
+            "max": null,
+            "rate": 0.035
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 80975,
+            "max": 298075,
+            "rate": 0.0195
+          },
+          {
+            "min": 298075,
+            "max": 26050,
+            "rate": 0.025
+          },
+          {
+            "min": 26050,
+            "max": 100000,
+            "rate": 0.0275
+          },
+          {
+            "min": 100000,
+            "max": null,
+            "rate": 0.035
+          }
+        ]
+      }
     },
     "NE": {
-      "standard_deduction": 8100,
-      "brackets": [
-        {"min": 0, "max": 4030, "rate": 0.0246},
-        {"min": 4030, "max": 24120, "rate": 0.0351},
-        {"min": 24120, "max": 38870, "rate": 0.0501},
-        {"min": 38870, "max": null, "rate": 0.052}
-      ]
+      "single": {
+        "standard_deduction": 8600,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 4030,
+            "rate": 0.0246
+          },
+          {
+            "min": 4030,
+            "max": 24120,
+            "rate": 0.0351
+          },
+          {
+            "min": 24120,
+            "max": 38870,
+            "rate": 0.0501
+          },
+          {
+            "min": 38870,
+            "max": null,
+            "rate": 0.052000000000000005
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 17200,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 8040,
+            "rate": 0.0246
+          },
+          {
+            "min": 8040,
+            "max": 48250,
+            "rate": 0.0351
+          },
+          {
+            "min": 48250,
+            "max": 77730,
+            "rate": 0.0501
+          },
+          {
+            "min": 77730,
+            "max": null,
+            "rate": 0.052000000000000005
+          }
+        ]
+      }
     },
     "NH": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "NJ": {
-      "standard_deduction": 1000,
-      "brackets": [
-        {"min": 0, "max": 20000, "rate": 0.014},
-        {"min": 20000, "max": 35000, "rate": 0.0175},
-        {"min": 35000, "max": 40000, "rate": 0.035},
-        {"min": 40000, "max": 75000, "rate": 0.05525},
-        {"min": 75000, "max": 500000, "rate": 0.0637},
-        {"min": 500000, "max": 1000000, "rate": 0.0897},
-        {"min": 1000000, "max": null, "rate": 0.1075}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 20000,
+            "rate": 0.013999999999999999
+          },
+          {
+            "min": 20000,
+            "max": 35000,
+            "rate": 0.0175
+          },
+          {
+            "min": 35000,
+            "max": 40000,
+            "rate": 0.035
+          },
+          {
+            "min": 40000,
+            "max": 75000,
+            "rate": 0.05525
+          },
+          {
+            "min": 75000,
+            "max": 500000,
+            "rate": 0.0637
+          },
+          {
+            "min": 500000,
+            "max": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.1075
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 20000,
+            "rate": 0.013999999999999999
+          },
+          {
+            "min": 20000,
+            "max": 50000,
+            "rate": 0.0175
+          },
+          {
+            "min": 50000,
+            "max": 70000,
+            "rate": 0.0245
+          },
+          {
+            "min": 70000,
+            "max": 80000,
+            "rate": 0.035
+          },
+          {
+            "min": 80000,
+            "max": 150000,
+            "rate": 0.05525
+          },
+          {
+            "min": 150000,
+            "max": 500000,
+            "rate": 0.0637
+          },
+          {
+            "min": 500000,
+            "max": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "min": 1000000,
+            "max": null,
+            "rate": 0.1075
+          }
+        ]
+      }
     },
     "NM": {
-      "standard_deduction": 14050,
-      "brackets": [
-        {"min": 0, "max": 5500, "rate": 0.015},
-        {"min": 5500, "max": 16500, "rate": 0.032},
-        {"min": 16500, "max": 33500, "rate": 0.043},
-        {"min": 33500, "max": 66500, "rate": 0.047},
-        {"min": 66500, "max": 210000, "rate": 0.049},
-        {"min": 210000, "max": null, "rate": 0.059}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 5500,
+            "rate": 0.015
+          },
+          {
+            "min": 5500,
+            "max": 16500,
+            "rate": 0.032
+          },
+          {
+            "min": 16500,
+            "max": 33500,
+            "rate": 0.043
+          },
+          {
+            "min": 33500,
+            "max": 66500,
+            "rate": 0.047
+          },
+          {
+            "min": 66500,
+            "max": 210000,
+            "rate": 0.049
+          },
+          {
+            "min": 210000,
+            "max": null,
+            "rate": 0.059000000000000004
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 8000,
+            "rate": 0.015
+          },
+          {
+            "min": 8000,
+            "max": 25000,
+            "rate": 0.032
+          },
+          {
+            "min": 25000,
+            "max": 50000,
+            "rate": 0.043
+          },
+          {
+            "min": 50000,
+            "max": 100000,
+            "rate": 0.047
+          },
+          {
+            "min": 100000,
+            "max": 315000,
+            "rate": 0.049
+          },
+          {
+            "min": 315000,
+            "max": null,
+            "rate": 0.059000000000000004
+          }
+        ]
+      }
     },
     "NV": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "NY": {
-      "standard_deduction": 8000,
-      "brackets": [
-        {"min": 0, "max": 8500, "rate": 0.04},
-        {"min": 8500, "max": 11700, "rate": 0.045},
-        {"min": 11700, "max": 13900, "rate": 0.0525},
-        {"min": 13900, "max": 80650, "rate": 0.055},
-        {"min": 80650, "max": 215400, "rate": 0.0585},
-        {"min": 215400, "max": 1077550, "rate": 0.0965},
-        {"min": 1077550, "max": 5000000, "rate": 0.103},
-        {"min": 5000000, "max": 25000000, "rate": 0.109},
-        {"min": 25000000, "max": null, "rate": 0.109}
-      ]
+      "single": {
+        "standard_deduction": 8000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 8500,
+            "rate": 0.04
+          },
+          {
+            "min": 8500,
+            "max": 11700,
+            "rate": 0.045
+          },
+          {
+            "min": 11700,
+            "max": 13900,
+            "rate": 0.0525
+          },
+          {
+            "min": 13900,
+            "max": 80650,
+            "rate": 0.055
+          },
+          {
+            "min": 80650,
+            "max": 215400,
+            "rate": 0.06
+          },
+          {
+            "min": 215400,
+            "max": 1077550,
+            "rate": 0.06849999999999999
+          },
+          {
+            "min": 1077550,
+            "max": 5000000,
+            "rate": 0.0965
+          },
+          {
+            "min": 5000000,
+            "max": 25000000,
+            "rate": 0.10300000000000001
+          },
+          {
+            "min": 25000000,
+            "max": null,
+            "rate": 0.109
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 16050,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 17150,
+            "rate": 0.04
+          },
+          {
+            "min": 17150,
+            "max": 23600,
+            "rate": 0.045
+          },
+          {
+            "min": 23600,
+            "max": 27900,
+            "rate": 0.0525
+          },
+          {
+            "min": 27900,
+            "max": 161550,
+            "rate": 0.055
+          },
+          {
+            "min": 161550,
+            "max": 323200,
+            "rate": 0.06
+          },
+          {
+            "min": 323200,
+            "max": 2155350,
+            "rate": 0.06849999999999999
+          },
+          {
+            "min": 2155350,
+            "max": 5000000,
+            "rate": 0.0965
+          },
+          {
+            "min": 5000000,
+            "max": 25000000,
+            "rate": 0.10300000000000001
+          },
+          {
+            "min": 25000000,
+            "max": null,
+            "rate": 0.109
+          }
+        ]
+      }
     },
     "OH": {
-      "standard_deduction": 2700,
-      "brackets": [
-        {"min": 0, "max": 26050, "rate": 0.0275},
-        {"min": 26050, "max": 100000, "rate": 0.035},
-        {"min": 100000, "max": null, "rate": 0.035}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 26050,
+            "max": null,
+            "rate": 0.0275
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 26050,
+            "max": null,
+            "rate": 0.0275
+          }
+        ]
+      }
     },
     "OK": {
-      "standard_deduction": 6350,
-      "brackets": [
-        {"min": 0, "max": 1000, "rate": 0.0025},
-        {"min": 1000, "max": 2000, "rate": 0.0075},
-        {"min": 2000, "max": 2500, "rate": 0.0175},
-        {"min": 2500, "max": 3750, "rate": 0.0275},
-        {"min": 3750, "max": 4900, "rate": 0.0375},
-        {"min": 4900, "max": 7200, "rate": 0.0475},
-        {"min": 7200, "max": null, "rate": 0.0475}
-      ]
+      "single": {
+        "standard_deduction": 6350,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 1000,
+            "rate": 0.0025
+          },
+          {
+            "min": 1000,
+            "max": 2500,
+            "rate": 0.0075
+          },
+          {
+            "min": 2500,
+            "max": 3750,
+            "rate": 0.0175
+          },
+          {
+            "min": 3750,
+            "max": 4900,
+            "rate": 0.0275
+          },
+          {
+            "min": 4900,
+            "max": 7200,
+            "rate": 0.0375
+          },
+          {
+            "min": 7200,
+            "max": null,
+            "rate": 0.0475
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 12700,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 2000,
+            "rate": 0.0025
+          },
+          {
+            "min": 2000,
+            "max": 5000,
+            "rate": 0.0075
+          },
+          {
+            "min": 5000,
+            "max": 7500,
+            "rate": 0.0175
+          },
+          {
+            "min": 7500,
+            "max": 9800,
+            "rate": 0.0275
+          },
+          {
+            "min": 9800,
+            "max": 14400,
+            "rate": 0.0375
+          },
+          {
+            "min": 14400,
+            "max": null,
+            "rate": 0.0475
+          }
+        ]
+      }
     },
     "OR": {
-      "standard_deduction": 2710,
-      "brackets": [
-        {"min": 0, "max": 4400, "rate": 0.0475},
-        {"min": 4400, "max": 11050, "rate": 0.0675},
-        {"min": 11050, "max": 125000, "rate": 0.0875},
-        {"min": 125000, "max": null, "rate": 0.099}
-      ]
+      "single": {
+        "standard_deduction": 2800,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 4400,
+            "rate": 0.0475
+          },
+          {
+            "min": 4400,
+            "max": 11050,
+            "rate": 0.0675
+          },
+          {
+            "min": 11050,
+            "max": 125000,
+            "rate": 0.0875
+          },
+          {
+            "min": 125000,
+            "max": null,
+            "rate": 0.099
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 5600,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 8800,
+            "rate": 0.0475
+          },
+          {
+            "min": 8800,
+            "max": 22100,
+            "rate": 0.0675
+          },
+          {
+            "min": 22100,
+            "max": 250000,
+            "rate": 0.0875
+          },
+          {
+            "min": 250000,
+            "max": null,
+            "rate": 0.099
+          }
+        ]
+      }
     },
     "PA": {
-      "standard_deduction": 0,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0307}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.030699999999999998
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.030699999999999998
+          }
+        ]
+      }
     },
     "RI": {
-      "standard_deduction": 9650,
-      "brackets": [
-        {"min": 0, "max": 79900, "rate": 0.0375},
-        {"min": 79900, "max": 181650, "rate": 0.0475},
-        {"min": 181650, "max": null, "rate": 0.0599}
-      ]
+      "single": {
+        "standard_deduction": 10900,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 79900,
+            "rate": 0.0375
+          },
+          {
+            "min": 79900,
+            "max": 181650,
+            "rate": 0.0475
+          },
+          {
+            "min": 181650,
+            "max": null,
+            "rate": 0.0599
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 21800,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 79900,
+            "rate": 0.0375
+          },
+          {
+            "min": 79900,
+            "max": 181650,
+            "rate": 0.0475
+          },
+          {
+            "min": 181650,
+            "max": null,
+            "rate": 0.0599
+          }
+        ]
+      }
     },
     "SC": {
-      "standard_deduction": 7160,
-      "brackets": [
-        {"min": 0, "max": 3560, "rate": 0.0},
-        {"min": 3560, "max": 17830, "rate": 0.03},
-        {"min": 17830, "max": null, "rate": 0.062}
-      ]
+      "single": {
+        "standard_deduction": 15000,
+        "brackets": [
+          {
+            "min": 3560,
+            "max": 17830,
+            "rate": 0.03
+          },
+          {
+            "min": 17830,
+            "max": null,
+            "rate": 0.062
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 30000,
+        "brackets": [
+          {
+            "min": 3560,
+            "max": 17830,
+            "rate": 0.03
+          },
+          {
+            "min": 17830,
+            "max": null,
+            "rate": 0.062
+          }
+        ]
+      }
     },
     "SD": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "TN": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "TX": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     },
     "UT": {
-      "standard_deduction": 9350,
-      "brackets": [
-        {"min": 0, "max": null, "rate": 0.0455}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0455
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": null,
+            "rate": 0.0455
+          }
+        ]
+      }
     },
     "VA": {
-      "standard_deduction": 4500,
-      "brackets": [
-        {"min": 0, "max": 3000, "rate": 0.02},
-        {"min": 3000, "max": 5000, "rate": 0.03},
-        {"min": 5000, "max": 17000, "rate": 0.05},
-        {"min": 17000, "max": null, "rate": 0.0575}
-      ]
+      "single": {
+        "standard_deduction": 8500,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 3000,
+            "rate": 0.02
+          },
+          {
+            "min": 3000,
+            "max": 5000,
+            "rate": 0.03
+          },
+          {
+            "min": 5000,
+            "max": 17000,
+            "rate": 0.05
+          },
+          {
+            "min": 17000,
+            "max": null,
+            "rate": 0.0575
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 17000,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 3000,
+            "rate": 0.02
+          },
+          {
+            "min": 3000,
+            "max": 5000,
+            "rate": 0.03
+          },
+          {
+            "min": 5000,
+            "max": 17000,
+            "rate": 0.05
+          },
+          {
+            "min": 17000,
+            "max": null,
+            "rate": 0.0575
+          }
+        ]
+      }
     },
     "VT": {
-      "standard_deduction": 7300,
-      "brackets": [
-        {"min": 0, "max": 47900, "rate": 0.0335},
-        {"min": 47900, "max": 116000, "rate": 0.066},
-        {"min": 116000, "max": 242000, "rate": 0.076},
-        {"min": 242000, "max": null, "rate": 0.0875}
-      ]
+      "single": {
+        "standard_deduction": 7400,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 47900,
+            "rate": 0.0335
+          },
+          {
+            "min": 47900,
+            "max": 116000,
+            "rate": 0.066
+          },
+          {
+            "min": 116000,
+            "max": 242000,
+            "rate": 0.076
+          },
+          {
+            "min": 242000,
+            "max": null,
+            "rate": 0.0875
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 14850,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 79950,
+            "rate": 0.0335
+          },
+          {
+            "min": 79950,
+            "max": 193300,
+            "rate": 0.066
+          },
+          {
+            "min": 193300,
+            "max": 294600,
+            "rate": 0.076
+          },
+          {
+            "min": 294600,
+            "max": null,
+            "rate": 0.0875
+          }
+        ]
+      }
     },
     "WA": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 270000,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 270000,
+        "brackets": []
+      }
     },
     "WV": {
-      "standard_deduction": 2000,
-      "brackets": [
-        {"min": 0, "max": 10000, "rate": 0.022},
-        {"min": 10000, "max": 25000, "rate": 0.0296},
-        {"min": 25000, "max": 40000, "rate": 0.0333},
-        {"min": 40000, "max": 60000, "rate": 0.0444},
-        {"min": 60000, "max": null, "rate": 0.0482}
-      ]
+      "single": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10000,
+            "rate": 0.0222
+          },
+          {
+            "min": 10000,
+            "max": 25000,
+            "rate": 0.0296
+          },
+          {
+            "min": 25000,
+            "max": 40000,
+            "rate": 0.0333
+          },
+          {
+            "min": 40000,
+            "max": 60000,
+            "rate": 0.0444
+          },
+          {
+            "min": 60000,
+            "max": null,
+            "rate": 0.0482
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 10000,
+            "rate": 0.0222
+          },
+          {
+            "min": 10000,
+            "max": 25000,
+            "rate": 0.0296
+          },
+          {
+            "min": 25000,
+            "max": 40000,
+            "rate": 0.0333
+          },
+          {
+            "min": 40000,
+            "max": 60000,
+            "rate": 0.0444
+          },
+          {
+            "min": 60000,
+            "max": null,
+            "rate": 0.0482
+          }
+        ]
+      }
     },
     "WI": {
-      "standard_deduction": 14800,
-      "brackets": [
-        {"min": 0, "max": 14680, "rate": 0.035},
-        {"min": 14680, "max": 29370, "rate": 0.044},
-        {"min": 29370, "max": 323290, "rate": 0.053},
-        {"min": 323290, "max": null, "rate": 0.0765}
-      ]
+      "single": {
+        "standard_deduction": 13560,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 14680,
+            "rate": 0.035
+          },
+          {
+            "min": 14680,
+            "max": 29370,
+            "rate": 0.044000000000000004
+          },
+          {
+            "min": 29370,
+            "max": 323290,
+            "rate": 0.053
+          },
+          {
+            "min": 323290,
+            "max": null,
+            "rate": 0.0765
+          }
+        ]
+      },
+      "married": {
+        "standard_deduction": 25110,
+        "brackets": [
+          {
+            "min": 0,
+            "max": 19580,
+            "rate": 0.035
+          },
+          {
+            "min": 19580,
+            "max": 39150,
+            "rate": 0.044000000000000004
+          },
+          {
+            "min": 39150,
+            "max": 431060,
+            "rate": 0.053
+          },
+          {
+            "min": 431060,
+            "max": null,
+            "rate": 0.0765
+          }
+        ]
+      }
     },
     "WY": {
-      "standard_deduction": 0,
-      "brackets": []
+      "single": {
+        "standard_deduction": 0,
+        "brackets": []
+      },
+      "married": {
+        "standard_deduction": 0,
+        "brackets": []
+      }
     }
   }
-} 
+}

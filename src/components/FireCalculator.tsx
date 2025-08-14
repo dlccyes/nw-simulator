@@ -55,6 +55,7 @@ interface Inputs {
   state: string;
   preTax401k: number;
   employerMatch: number;
+  filingStatus: string;
 }
 
 interface YearlyDataItem {
@@ -296,7 +297,8 @@ const FireCalculator: React.FC = () => {
     country: 'US' as const,
     state: 'CA',
     preTax401k: 23000,
-    employerMatch: 5
+    employerMatch: 5,
+    filingStatus: 'single'
   };
 
   // Default values for Taiwan (10x monetary values)
@@ -311,7 +313,8 @@ const FireCalculator: React.FC = () => {
     country: 'TW' as const,
     state: '',
     preTax401k: 0,
-    employerMatch: 0
+    employerMatch: 0,
+    filingStatus: 'single'
   };
 
   const US_SPENDING_DEFAULTS = [
@@ -351,10 +354,26 @@ const FireCalculator: React.FC = () => {
     federal?: {
       standard_deduction?: number;
       brackets?: Array<{min: number; max: number | null; rate: number}>;
+      single?: {
+        standard_deduction?: number;
+        brackets?: Array<{min: number; max: number | null; rate: number}>;
+      };
+      married?: {
+        standard_deduction?: number;
+        brackets?: Array<{min: number; max: number | null; rate: number}>;
+      };
     };
     states?: Record<string, {
       standard_deduction?: number;
       brackets?: Array<{min: number; max: number | null; rate: number}>;
+      single?: {
+        standard_deduction?: number;
+        brackets?: Array<{min: number; max: number | null; rate: number}>;
+      };
+      married?: {
+        standard_deduction?: number;
+        brackets?: Array<{min: number; max: number | null; rate: number}>;
+      };
     }>;
     payroll_taxes?: {
       social_security?: {rate: number; wage_base: number};
@@ -433,7 +452,8 @@ const FireCalculator: React.FC = () => {
         country: config.country || 'US',
         state: config.state,
         preTax401k: config.preTax401k,
-        employerMatch: config.employerMatch
+        employerMatch: config.employerMatch,
+        filingStatus: config.filingStatus || 'single'
       });
 
       setYearlySpending(config.yearlySpending.map((d: {id: string; startAge: number; endAge: number; amount: number}) => ({
@@ -515,6 +535,13 @@ const FireCalculator: React.FC = () => {
     setInputs({
       ...inputs,
       state: event.target.value
+    });
+  };
+
+  const handleFilingStatusChange = (event: SelectChangeEvent<string>) => {
+    setInputs({
+      ...inputs,
+      filingStatus: event.target.value
     });
   };
 
@@ -743,7 +770,7 @@ const FireCalculator: React.FC = () => {
                       {inputs.country === 'US' ? (
                         <>
                           All tax calculations include federal and state taxes (if applicable), plus mandatory payroll deductions. 
-                          Tax rates and deductions are for single filers. Pre-tax 401(k) contributions reduce your taxable income.
+                          Tax rates and deductions are for {inputs.filingStatus === 'married' ? 'married filing jointly' : 'single filers'}. Pre-tax 401(k) contributions reduce your taxable income.
                         </>
                       ) : inputs.country === 'TW' ? (
                         <>
@@ -758,10 +785,16 @@ const FireCalculator: React.FC = () => {
                         <Typography variant="h6" sx={{ mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
                           {inputs.country === 'US' ? 'Federal Tax' : 'Income Tax'}
                         </Typography>
-                        {taxInfo.federal?.standard_deduction && (
+                        {taxInfo.federal && (
                           <Box sx={{ mb: 2 }}>
                             <Typography variant="body2" color="text.secondary">
-                              <strong>Standard Deduction:</strong> {inputs.country === 'US' ? '$' : 'NT$'}{taxInfo.federal.standard_deduction.toLocaleString()}
+                              <strong>Standard Deduction:</strong>
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                              Single: {inputs.country === 'US' ? '$' : 'NT$'}{(taxInfo.federal.single?.standard_deduction || taxInfo.federal.standard_deduction || 0).toLocaleString()}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                              Married: {inputs.country === 'US' ? '$' : 'NT$'}{(taxInfo.federal.married?.standard_deduction || taxInfo.federal.standard_deduction || 0).toLocaleString()}
                             </Typography>
                           </Box>
                         )}
@@ -769,19 +802,45 @@ const FireCalculator: React.FC = () => {
                           <Table size="small">
                             <TableHead>
                               <TableRow>
-                                <TableCell><strong>Income Range</strong></TableCell>
+                                <TableCell><strong>Income Range (Single)</strong></TableCell>
+                                <TableCell><strong>Income Range (Married)</strong></TableCell>
                                 <TableCell align="right"><strong>Tax Rate</strong></TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {taxInfo.federal?.brackets?.map((bracket: {min: number; max: number | null; rate: number}, index: number) => (
-                                <TableRow key={index}>
-                                  <TableCell>
-                                    {inputs.country === 'US' ? '$' : 'NT$'}{bracket.min.toLocaleString()} - {bracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${bracket.max.toLocaleString()}` : '∞'}
-                                  </TableCell>
-                                  <TableCell align="right">{(bracket.rate * 100).toFixed(1)}%</TableCell>
-                                </TableRow>
-                              )) || []}
+                              {(() => {
+                                const singleBrackets = taxInfo.federal?.single?.brackets || taxInfo.federal?.brackets || [];
+                                const marriedBrackets = taxInfo.federal?.married?.brackets || taxInfo.federal?.brackets || [];
+                                const maxLength = Math.max(singleBrackets.length, marriedBrackets.length);
+                                
+                                return Array.from({ length: maxLength }, (_, index) => {
+                                  const singleBracket = singleBrackets[index];
+                                  const marriedBracket = marriedBrackets[index];
+                                  
+                                  return (
+                                    <TableRow key={index}>
+                                      <TableCell>
+                                        {singleBracket ? 
+                                          `${inputs.country === 'US' ? '$' : 'NT$'}${singleBracket.min.toLocaleString()} - ${singleBracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${singleBracket.max.toLocaleString()}` : '∞'}` : 
+                                          '-'
+                                        }
+                                      </TableCell>
+                                      <TableCell>
+                                        {marriedBracket ? 
+                                          `${inputs.country === 'US' ? '$' : 'NT$'}${marriedBracket.min.toLocaleString()} - ${marriedBracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${marriedBracket.max.toLocaleString()}` : '∞'}` : 
+                                          '-'
+                                        }
+                                      </TableCell>
+                                      <TableCell align="right">
+                                        {singleBracket?.rate || marriedBracket?.rate ? 
+                                          `${((singleBracket?.rate || marriedBracket?.rate || 0) * 100).toFixed(1)}%` : 
+                                          '-'
+                                        }
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                });
+                              })()}
                             </TableBody>
                           </Table>
                         </TableContainer>
@@ -793,7 +852,13 @@ const FireCalculator: React.FC = () => {
                             </Typography>
                             <Box sx={{ mb: 2 }}>
                               <Typography variant="body2" color="text.secondary">
-                                <strong>Standard Deduction:</strong> ${taxInfo.states[inputs.state].standard_deduction?.toLocaleString() || '0'}
+                                <strong>Standard Deduction:</strong>
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                                Single: ${(taxInfo.states[inputs.state].single?.standard_deduction || taxInfo.states[inputs.state].standard_deduction || 0).toLocaleString()}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                                Married: ${(taxInfo.states[inputs.state].married?.standard_deduction || taxInfo.states[inputs.state].standard_deduction || 0).toLocaleString()}
                               </Typography>
                             </Box>
                             {taxInfo.states?.[inputs.state]?.brackets && taxInfo.states[inputs.state]?.brackets && taxInfo.states[inputs.state]!.brackets!.length > 0 ? (
@@ -801,19 +866,45 @@ const FireCalculator: React.FC = () => {
                                 <Table size="small">
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell><strong>Income Range</strong></TableCell>
+                                      <TableCell><strong>Income Range (Single)</strong></TableCell>
+                                      <TableCell><strong>Income Range (Married)</strong></TableCell>
                                       <TableCell align="right"><strong>Tax Rate</strong></TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {taxInfo.states[inputs.state]!.brackets!.map((bracket: {min: number; max: number | null; rate: number}, index: number) => (
-                                      <TableRow key={index}>
-                                        <TableCell>
-                                          ${bracket.min.toLocaleString()} - {bracket.max ? `$${bracket.max.toLocaleString()}` : '∞'}
-                                        </TableCell>
-                                        <TableCell align="right">{(bracket.rate * 100).toFixed(1)}%</TableCell>
-                                      </TableRow>
-                                    ))}
+                                    {(() => {
+                                      const singleBrackets = taxInfo.states[inputs.state]?.single?.brackets || taxInfo.states[inputs.state]?.brackets || [];
+                                      const marriedBrackets = taxInfo.states[inputs.state]?.married?.brackets || taxInfo.states[inputs.state]?.brackets || [];
+                                      const maxLength = Math.max(singleBrackets.length, marriedBrackets.length);
+                                      
+                                      return Array.from({ length: maxLength }, (_, index) => {
+                                        const singleBracket = singleBrackets[index];
+                                        const marriedBracket = marriedBrackets[index];
+                                        
+                                        return (
+                                          <TableRow key={index}>
+                                            <TableCell>
+                                              {singleBracket ? 
+                                                `$${singleBracket.min.toLocaleString()} - ${singleBracket.max ? `$${singleBracket.max.toLocaleString()}` : '∞'}` : 
+                                                '-'
+                                              }
+                                            </TableCell>
+                                            <TableCell>
+                                              {marriedBracket ? 
+                                                `$${marriedBracket.min.toLocaleString()} - ${marriedBracket.max ? `$${marriedBracket.max.toLocaleString()}` : '∞'}` : 
+                                                '-'
+                                              }
+                                            </TableCell>
+                                            <TableCell align="right">
+                                              {singleBracket?.rate || marriedBracket?.rate ? 
+                                                `${((singleBracket?.rate || marriedBracket?.rate || 0) * 100).toFixed(1)}%` : 
+                                                '-'
+                                              }
+                                            </TableCell>
+                                          </TableRow>
+                                        );
+                                      });
+                                    })()}
                                   </TableBody>
                                 </Table>
                               </TableContainer>
@@ -953,6 +1044,33 @@ const FireCalculator: React.FC = () => {
                             >
                               <MenuItem value="US">United States</MenuItem>
                               <MenuItem value="TW">Taiwan</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    )}
+
+                    {/* Row 1.5: Filing Status (US only) */}
+                    {inputs.country === 'US' && (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth sx={{ minWidth: 220 }}>
+                            <InputLabel>Filing Status</InputLabel>
+                            <Select
+                              name="filingStatus"
+                              value={inputs.filingStatus}
+                              label="Filing Status"
+                              onChange={handleFilingStatusChange}
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: {
+                                    minWidth: 220
+                                  }
+                                }
+                              }}
+                            >
+                              <MenuItem value="single">Single</MenuItem>
+                              <MenuItem value="married">Married Filing Jointly</MenuItem>
                             </Select>
                           </FormControl>
                         </Grid>
