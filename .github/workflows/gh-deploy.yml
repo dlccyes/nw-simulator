@@ -35,9 +35,9 @@ jobs:
 
       - name: Install markdown-to-html converter and generate docs
         run: |
-          npm install -g marked
+          npm install markdown-it markdown-it-anchor
           mkdir -p dist/doc
-          marked manual.md > /tmp/manual-content.html
+          node generate-docs.js
           sed '/{{CONTENT}}/r /tmp/manual-content.html' doc-template.html | sed '/{{CONTENT}}/d' > dist/doc/index.html
 
       - name: Copy firebase.json to dist

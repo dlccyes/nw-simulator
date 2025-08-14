@@ -17,7 +17,7 @@ A comprehensive guide to using the net worth simulator with multi-country suppor
 7. [Understanding Results](#understanding-results)
 8. [Advanced Scenarios](#advanced-scenarios)
 9. [Profile Management](#profile-management)
-10. [Tips & Best Practices](#tips--best-practices)
+10. [Tips & Best Practices](#tips-best-practices)
 
 ## Getting Started
 
