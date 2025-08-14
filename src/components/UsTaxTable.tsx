@@ -16,7 +16,9 @@ import {
   Alert,
   InputAdornment,
   Slider,
-  Link
+  Link,
+  Autocomplete,
+  Chip
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
@@ -49,6 +51,65 @@ const UsTaxTable: React.FC = () => {
   const [dialogTaxType, setDialogTaxType] = useState<'federal' | 'fica' | 'state'>('federal');
   const [dialogStateCode, setDialogStateCode] = useState<string>('');
   const [taxInfoData, setTaxInfoData] = useState<any>(null);
+  
+  // State filtering
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState<string>('');
+
+  // All US states for autocomplete
+  const allStates = [
+    { code: 'AL', name: 'Alabama' },
+    { code: 'AK', name: 'Alaska' },
+    { code: 'AZ', name: 'Arizona' },
+    { code: 'AR', name: 'Arkansas' },
+    { code: 'CA', name: 'California' },
+    { code: 'CO', name: 'Colorado' },
+    { code: 'CT', name: 'Connecticut' },
+    { code: 'DE', name: 'Delaware' },
+    { code: 'FL', name: 'Florida' },
+    { code: 'GA', name: 'Georgia' },
+    { code: 'HI', name: 'Hawaii' },
+    { code: 'ID', name: 'Idaho' },
+    { code: 'IL', name: 'Illinois' },
+    { code: 'IN', name: 'Indiana' },
+    { code: 'IA', name: 'Iowa' },
+    { code: 'KS', name: 'Kansas' },
+    { code: 'KY', name: 'Kentucky' },
+    { code: 'LA', name: 'Louisiana' },
+    { code: 'ME', name: 'Maine' },
+    { code: 'MD', name: 'Maryland' },
+    { code: 'MA', name: 'Massachusetts' },
+    { code: 'MI', name: 'Michigan' },
+    { code: 'MN', name: 'Minnesota' },
+    { code: 'MS', name: 'Mississippi' },
+    { code: 'MO', name: 'Missouri' },
+    { code: 'MT', name: 'Montana' },
+    { code: 'NE', name: 'Nebraska' },
+    { code: 'NV', name: 'Nevada' },
+    { code: 'NH', name: 'New Hampshire' },
+    { code: 'NJ', name: 'New Jersey' },
+    { code: 'NM', name: 'New Mexico' },
+    { code: 'NY', name: 'New York' },
+    { code: 'NC', name: 'North Carolina' },
+    { code: 'ND', name: 'North Dakota' },
+    { code: 'OH', name: 'Ohio' },
+    { code: 'OK', name: 'Oklahoma' },
+    { code: 'OR', name: 'Oregon' },
+    { code: 'PA', name: 'Pennsylvania' },
+    { code: 'RI', name: 'Rhode Island' },
+    { code: 'SC', name: 'South Carolina' },
+    { code: 'SD', name: 'South Dakota' },
+    { code: 'TN', name: 'Tennessee' },
+    { code: 'TX', name: 'Texas' },
+    { code: 'UT', name: 'Utah' },
+    { code: 'VT', name: 'Vermont' },
+    { code: 'VA', name: 'Virginia' },
+    { code: 'WA', name: 'Washington' },
+    { code: 'WV', name: 'West Virginia' },
+    { code: 'WI', name: 'Wisconsin' },
+    { code: 'WY', name: 'Wyoming' },
+    { code: 'DC', name: 'District of Columbia' }
+  ];
 
   const fetchTaxData = async () => {
     const numericIncome = parseFloat(income.replace(/,/g, ''));
@@ -107,7 +168,11 @@ const UsTaxTable: React.FC = () => {
     setSortField(field);
   };
 
-  const sortedData = [...data].sort((a, b) => {
+  const filteredData = selectedStates.length > 0 
+    ? data.filter(row => selectedStates.includes(row.stateCode))
+    : data;
+
+  const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
     
@@ -199,6 +264,108 @@ const UsTaxTable: React.FC = () => {
             sx={{ mt: 1 }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => `$${value.toLocaleString()}`}
+          />
+        </Box>
+
+        <Box sx={{ mt: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Filter states (optional)
+            </Typography>
+            {selectedStates.length > 0 && (
+              <Typography variant="body2" color="text.secondary">
+                Showing {filteredData.length} of {data.length} states
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => setSelectedStates([])}
+                  sx={{ 
+                    ml: 1,
+                    cursor: 'pointer', 
+                    textDecoration: 'none',
+                    color: 'primary.light',
+                    fontWeight: 500,
+                    '&:hover': {
+                      color: 'red'
+                    },
+                    '&:focus': {
+                      outline: 'none'
+                    }
+                  }}
+                >
+                  (clear all)
+                </Link>
+              </Typography>
+            )}
+          </Box>
+          <Autocomplete
+            multiple
+            options={allStates}
+            getOptionLabel={(option) => option.name}
+            value={selectedStates.map(stateCode => 
+              allStates.find(state => state.code === stateCode)
+            ).filter((state): state is { code: string; name: string } => state !== undefined)}
+            inputValue={inputValue}
+            onInputChange={(_, newInputValue, reason) => {
+              if (reason !== 'reset') {
+                setInputValue(newInputValue);
+              }
+            }}
+            onChange={(_, newValue) => {
+              setSelectedStates(newValue.map(state => state.code));
+            }}
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && inputValue.trim()) {
+                event.preventDefault();
+                
+                // Find the first matching option
+                const filteredOptions = allStates.filter(option =>
+                  option.name.toLowerCase().includes(inputValue.toLowerCase()) &&
+                  !selectedStates.includes(option.code)
+                );
+                
+                if (filteredOptions.length > 0) {
+                  const firstMatch = filteredOptions[0];
+                  setSelectedStates([...selectedStates, firstMatch.code]);
+                  setTimeout(() => setInputValue(''), 0); // Clear the input after selection
+                }
+              }
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option.code}
+                  sx={{
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    '& .MuiChip-label': {
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    },
+                    '& .MuiChip-deleteIcon': {
+                      color: 'white',
+                      '&:hover': {
+                        color: 'rgba(255, 255, 255, 0.8)'
+                      }
+                    }
+                  }}
+                />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={selectedStates.length === 0 ? "Search and select states to filter..." : "Add more states..."}
+                variant="outlined"
+              />
+            )}
           />
         </Box>
       </Box>
