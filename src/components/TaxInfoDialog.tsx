@@ -177,7 +177,7 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
         if (stateData.brackets.length === 0) {
           return (
             <Typography variant="body1">
-              {getStateName(stateCode)} has no state income tax.
+              {getStateName(stateCode)} has no state income tax 🥳
             </Typography>
           );
         }

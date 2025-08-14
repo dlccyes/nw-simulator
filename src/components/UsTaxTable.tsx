@@ -215,15 +215,33 @@ const UsTaxTable: React.FC = () => {
       bgcolor: 'background.default'
     }}>
       <Typography 
-        variant="h4" 
+        variant="h3" 
         component="h1" 
         gutterBottom
         sx={{ 
-          fontSize: { xs: '1.75rem', sm: '2.125rem', md: '2.125rem' },
-          fontWeight: 800
+          fontWeight: 800,
+          mb: 4,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
         }}
       >
-        US State Tax Comparison
+        <span style={{
+          background: 'linear-gradient(45deg, #1976d2, #d32f2f)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          fontWeight: 800,
+          letterSpacing: '0.05em'
+        }}>
+          US
+        </span>
+        <span style={{
+          fontWeight: 800,
+          letterSpacing: '0.05em'
+        }}>
+          State Tax Comparison
+        </span>
       </Typography>
       
       <Typography 
@@ -277,9 +295,6 @@ const UsTaxTable: React.FC = () => {
         </Box>
         
         <Box sx={{ px: { xs: 1, sm: 2 } }}>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Adjust income: $1 - $500,000
-          </Typography>
           <Slider
             value={parseFloat(income.replace(/,/g, '')) || 1}
             onChange={(_, newValue) => {
@@ -549,30 +564,48 @@ const UsTaxTable: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sortedData.map((row) => (
-                    <TableRow key={row.stateCode} hover>
-                      <TableCell component="th" scope="row">
-                        <Link 
-                          component="button"
-                          variant="body1"
-                          onClick={() => handleTaxInfoClick('state', row.stateCode)}
-                          sx={{ 
-                            cursor: 'pointer', 
-                            textDecoration: 'none',
-                            color: 'primary.light',
-                            fontWeight: 500,
-                            '&:hover': {
-                              color: 'red',
-                              textDecoration: 'underline'
-                            },
-                            '&:focus': {
-                              outline: 'none'
-                            }
-                          }}
-                        >
-                          {row.stateName}
-                        </Link>
-                      </TableCell>
+                  {sortedData.map((row) => {
+                    // Add medal emojis to top 3 most taxed states (highest effective rate)
+                    // Get the top 3 states by effective rate from the original data
+                    const top3MostTaxedStates = [...data]
+                      .sort((a, b) => b.effectiveRate - a.effectiveRate)
+                      .slice(0, 3);
+                    
+                    const stateRank = top3MostTaxedStates.findIndex(state => state.stateCode === row.stateCode);
+                    let displayName = row.stateName;
+                    
+                    if (stateRank === 0) {
+                      displayName = `${row.stateName} 🥇`; // 1st place - gold
+                    } else if (stateRank === 1) {
+                      displayName = `${row.stateName} 🥈`; // 2nd place - silver
+                    } else if (stateRank === 2) {
+                      displayName = `${row.stateName} 🥉`; // 3rd place - bronze
+                    }
+                    
+                    return (
+                      <TableRow key={row.stateCode} hover>
+                        <TableCell component="th" scope="row">
+                          <Link 
+                            component="button"
+                            variant="body1"
+                            onClick={() => handleTaxInfoClick('state', row.stateCode)}
+                            sx={{ 
+                              cursor: 'pointer', 
+                              textDecoration: 'none',
+                              color: 'primary.light',
+                              fontWeight: 500,
+                              '&:hover': {
+                                color: 'red',
+                                textDecoration: 'underline'
+                              },
+                              '&:focus': {
+                                outline: 'none'
+                              }
+                            }}
+                          >
+                            {displayName}
+                          </Link>
+                        </TableCell>
                       <TableCell align="right">
                         <Box>
                           {formatCurrency(row.stateTax)}
@@ -591,7 +624,8 @@ const UsTaxTable: React.FC = () => {
                         {formatCurrency(row.afterTaxIncome)}
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
