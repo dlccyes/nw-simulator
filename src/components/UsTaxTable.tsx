@@ -209,12 +209,31 @@ const UsTaxTable: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <Box sx={{ 
+      p: { xs: 2, sm: 3, md: 4 },
+      minHeight: '100vh',
+      bgcolor: 'background.default'
+    }}>
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        gutterBottom
+        sx={{ 
+          fontSize: { xs: '1.75rem', sm: '2.125rem', md: '2.125rem' },
+          fontWeight: 800
+        }}
+      >
         US State Tax Comparison
       </Typography>
       
-      <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+      <Typography 
+        variant="body1" 
+        sx={{ 
+          mb: 3, 
+          color: 'text.secondary',
+          fontSize: { xs: '0.875rem', sm: '1rem' }
+        }}
+      >
         Compare effective tax rates and after-tax income across all US states based on your income.
         This calculation includes federal, state, and payroll taxes, but excludes 401(k) contributions.
       </Typography>
@@ -228,7 +247,13 @@ const UsTaxTable: React.FC = () => {
             // Remove focus from the button after submission
             (e.target as HTMLFormElement).querySelector('button')?.blur();
           }}
-          sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3 }}
+          sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2, 
+            alignItems: { xs: 'stretch', sm: 'center' }, 
+            mb: 3 
+          }}
         >
           <TextField
             label="Annual Income"
@@ -243,7 +268,7 @@ const UsTaxTable: React.FC = () => {
             InputProps={{
               startAdornment: <InputAdornment position="start">$</InputAdornment>,
             }}
-            sx={{ minWidth: 200 }}
+            sx={{ minWidth: { xs: '100%', sm: 200 } }}
           />
           <CalculateButton 
             type="submit"
@@ -251,7 +276,7 @@ const UsTaxTable: React.FC = () => {
           />
         </Box>
         
-        <Box sx={{ px: 2 }}>
+        <Box sx={{ px: { xs: 1, sm: 2 } }}>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Adjust income: $1 - $500,000
           </Typography>
@@ -388,11 +413,11 @@ const UsTaxTable: React.FC = () => {
       {data.length > 0 && (
         <Box>
           
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Federal & FICA Taxes
             </Typography>
-                          <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     <Link 
@@ -467,59 +492,64 @@ const UsTaxTable: React.FC = () => {
             </Box>
           </Paper>
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === 'stateName'}
-                      direction={sortField === 'stateName' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('stateName')}
-                    >
-                      State
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="right">
-                    <TableSortLabel
-                      active={sortField === 'stateTax'}
-                      direction={sortField === 'stateTax' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('stateTax')}
-                    >
-                      State Tax
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="right">
-                    <TableSortLabel
-                      active={sortField === 'effectiveRate'}
-                      direction={sortField === 'effectiveRate' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('effectiveRate')}
-                    >
-                      Total Effective Rate
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="right">
-                    <TableSortLabel
-                      active={sortField === 'totalTax'}
-                      direction={sortField === 'totalTax' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('totalTax')}
-                    >
-                      Total Tax
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="right">
-                    <TableSortLabel
-                      active={sortField === 'afterTaxIncome'}
-                      direction={sortField === 'afterTaxIncome' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('afterTaxIncome')}
-                    >
-                      After-Tax Income
-                    </TableSortLabel>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                                  {sortedData.map((row) => (
+          <Box sx={{ 
+            width: '100%',
+            display: 'grid',
+            overflowX: 'auto'
+          }}>
+            <TableContainer component={Paper}>
+              <Table size="small" sx={{ '& .MuiTableCell-root': { px: { xs: 1, sm: 2 } } }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <TableSortLabel
+                        active={sortField === 'stateName'}
+                        direction={sortField === 'stateName' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('stateName')}
+                      >
+                        State
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right">
+                      <TableSortLabel
+                        active={sortField === 'stateTax'}
+                        direction={sortField === 'stateTax' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('stateTax')}
+                      >
+                        State Tax
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right">
+                      <TableSortLabel
+                        active={sortField === 'effectiveRate'}
+                        direction={sortField === 'effectiveRate' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('effectiveRate')}
+                      >
+                        Total Effective Rate
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right">
+                      <TableSortLabel
+                        active={sortField === 'totalTax'}
+                        direction={sortField === 'totalTax' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('totalTax')}
+                      >
+                        Total Tax
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right">
+                      <TableSortLabel
+                        active={sortField === 'afterTaxIncome'}
+                        direction={sortField === 'afterTaxIncome' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('afterTaxIncome')}
+                      >
+                        After-Tax Income
+                      </TableSortLabel>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedData.map((row) => (
                     <TableRow key={row.stateCode} hover>
                       <TableCell component="th" scope="row">
                         <Link 
@@ -543,28 +573,29 @@ const UsTaxTable: React.FC = () => {
                           {row.stateName}
                         </Link>
                       </TableCell>
-                    <TableCell align="right">
-                      <Box>
-                        {formatCurrency(row.stateTax)}
-                      </Box>
-                      <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                        ({formatPercentage((row.stateTax / parseFloat(income.replace(/,/g, ''))) * 100)})
-                      </Box>
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatPercentage(row.effectiveRate)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(row.totalTax)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(row.afterTaxIncome)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                      <TableCell align="right">
+                        <Box>
+                          {formatCurrency(row.stateTax)}
+                        </Box>
+                        <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+                          ({formatPercentage((row.stateTax / parseFloat(income.replace(/,/g, ''))) * 100)})
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        {formatPercentage(row.effectiveRate)}
+                      </TableCell>
+                      <TableCell align="right">
+                        {formatCurrency(row.totalTax)}
+                      </TableCell>
+                      <TableCell align="right">
+                        {formatCurrency(row.afterTaxIncome)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
         </Box>
       )}
 

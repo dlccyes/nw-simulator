@@ -31,7 +31,6 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
-  CircularProgress,
   Collapse
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
