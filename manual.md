@@ -1,6 +1,6 @@
-# NW Simulator + FIRE Calculator Usage Manual
+# Financial Planning Tools Usage Manual
 
-A comprehensive guide to using the net worth simulator with multi-country support.
+A comprehensive guide to using the FIRE Calculator and US Tax Comparison tools.
 
 **⚠️ Disclaimer: This is 95% vibe-coded. Accuracy not guaranteed.**
 
@@ -9,18 +9,38 @@ A comprehensive guide to using the net worth simulator with multi-country suppor
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
-2. [Basic Information](#basic-information)
-3. [Income Planning](#income-planning)
-4. [Spending Planning](#spending-planning)
-5. [Retirement Accounts (US Only)](#retirement-accounts-us-only)
-6. [Country-Specific Features](#country-specific-features)
-7. [Understanding Results](#understanding-results)
-8. [Advanced Scenarios](#advanced-scenarios)
-9. [Tips & Best Practices](#tips-best-practices)
+2. [FIRE Calculator](#fire-calculator)
+   - [Basic Information](#basic-information)
+   - [Income Planning](#income-planning)
+   - [Spending Planning](#spending-planning)
+   - [Retirement Accounts (US Only)](#retirement-accounts-us-only)
+   - [Understanding Results](#understanding-results)
+   - [Advanced Scenarios](#advanced-scenarios)
+3. [US Tax Comparison](#us-tax-comparison)
+   - [Overview](#overview)
+   - [Partner Income Features](#partner-income-features)
+   - [Filing Status Options](#filing-status-options)
+   - [Filtering and Sorting](#filtering-and-sorting)
+4. [Country-Specific Features](#country-specific-features)
+5. [Tips & Best Practices](#tips-best-practices)
 
 ## Getting Started
 
 ### Website Access
+Visit [https://nw.approximator.net/](https://nw.approximator.net/) to access both tools:
+- **FIRE Calculator**: Main page for retirement planning and net worth projections
+- **US Tax Comparison**: Navigate to the tax comparison tool via the top navigation
+
+### Navigation
+- **Dark Mode Toggle**: Available on both pages - click the moon/sun icon in the top-right
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Collapsible Sections**: Info sections are expanded by default but can be collapsed
+
+### Tool Overview
+1. **FIRE Calculator**: Plan your path to financial independence with detailed projections
+2. **US Tax Comparison**: Compare tax burdens across all 50 US states for optimal location planning
+
+## FIRE Calculator
 
 ### First Steps
 1. **Select Your Country**: Choose between US or Taiwan for country-specific tax calculations
@@ -180,6 +200,100 @@ Click the **"Info"** section to see:
 - Standard deductions
 - Payroll tax rates and caps
 
+## US Tax Comparison
+
+### Overview
+The US Tax Comparison tool helps you compare effective tax rates across all 50 US states to make informed decisions about where to live for optimal tax efficiency.
+
+### Basic Usage
+1. **Enter Your Income**: Input your annual income (e.g., $230,000)
+2. **Select Filing Status**: Choose Single, Married Filing Jointly, or Compare Both
+3. **Calculate**: Click "Calculate Tax Comparison" to see results
+4. **Analyze**: Review the sortable table with tax breakdowns by state
+
+### Partner Income Features
+
+#### Adding a Partner
+1. Click **"Add Partner Income"** button
+2. Enter your partner's annual income
+3. Use the **interactive pie chart** to adjust income distribution
+4. **Quick Split Options**: Use 50/50, 60/40, 70/30, 80/20, 90/10, or 100/0 buttons
+
+#### How Partner Calculations Work
+- **Single Filing**: Taxes calculated separately for each person, then summed
+- **Married Filing Jointly**: Combined income for tax brackets, but Social Security calculated individually
+- **Pie Chart**: Visual representation of income split with real-time updates
+
+#### Interactive Income Distribution
+- **Drag the Slider**: Adjust the percentage split between partners
+- **Live Updates**: Income boxes update automatically as you drag
+- **Precise Control**: Slider snaps to clean 5% increments
+- **Total Display**: Shows combined household income prominently
+
+### Filing Status Options
+
+#### Single
+- Calculates taxes as if both partners file separately
+- Useful for unmarried couples or comparing scenarios
+
+#### Married Filing Jointly
+- Uses married tax brackets for combined income
+- Applies proper standard deductions for married couples
+- Calculates Social Security tax individually for each partner
+
+#### Compare Both
+- Shows **both** Single and Married scenarios side-by-side
+- Each state appears twice in the table: once for Single, once for Married
+- Helpful for couples deciding whether marriage saves on taxes
+- Uses emoji indicators: 🫃 for Single, 👩‍❤️‍👩 for Married
+
+### Filtering and Sorting
+
+#### State Filtering
+- **Search Box**: Type to filter specific states (e.g., "California", "CA")
+- **Multiple Selection**: Choose multiple states to compare
+- **Clear Filters**: Remove all filters to see all states again
+
+#### Filing Type Filtering (Compare Mode)
+- **Single 🫃**: Show only single filing results
+- **Married 👩‍❤️‍👩**: Show only married filing results
+- **Both**: Show all results (default)
+
+#### Sorting Options
+- **Click Column Headers**: Sort by any column (Total Tax, State Tax, Federal Tax, etc.)
+- **Default Sort**: Total Tax descending (highest to lowest)
+- **Medal Rankings**: 🥇 🥈 🥉 for top 3 states in current sort
+
+### Understanding the Results
+
+#### Tax Breakdown Columns
+- **State**: State name with ranking medal
+- **Total Tax**: Combined federal, state, and payroll taxes
+- **Effective Rate**: Total tax as percentage of income
+- **Federal Tax**: Federal income tax amount and percentage
+- **State Tax**: State income tax amount and percentage
+- **Payroll Tax**: Combined Social Security and Medicare taxes
+- **After-Tax Income**: Take-home pay after all taxes
+
+#### Federal & FICA Section
+Displays detailed breakdown of federal taxes:
+- **Federal Income Tax**: Progressive tax brackets
+- **Social Security**: 6.2% up to wage base limit
+- **Medicare**: 1.45% + additional 0.9% for high earners
+- **Total Federal & FICA**: Combined amount
+
+#### Interactive Elements
+- **Clickable Tax Types**: Click "Federal", "FICA", or "State" for detailed information
+- **Tax Bracket Details**: See exact brackets and rates
+- **Payroll Tax Caps**: Understand Social Security wage base limits
+
+### Pro Tips for Tax Comparison
+1. **Consider Total Tax Burden**: Don't just look at state income tax
+2. **Factor in Cost of Living**: Low taxes might mean higher living costs
+3. **Plan for Retirement**: Some states don't tax retirement income
+4. **Compare Both Scenarios**: If married, check if filing jointly saves money
+5. **Account for Deductions**: State and local tax deduction limits may apply
+
 ## Advanced Scenarios
 
 ### Stop at FIRE vs Continue Working
@@ -252,20 +366,47 @@ Click the **"Info"** section to see:
 
 ## Frequently Asked Questions
 
+### General Questions
+
 ### Q: How accurate are the tax calculations?
-A: The calculator uses current tax brackets and rates but is "95% vibe-coded." Consult a tax professional for precise calculations.
+A: The calculator uses current 2024 tax brackets and rates but is "95% vibe-coded." Consult a tax professional for precise calculations.
+
+### Q: Can I use this on mobile devices?
+A: Yes! Both tools are fully responsive and work well on phones, tablets, and desktop computers.
+
+### Q: Is my data saved or shared?
+A: No personal data is stored or shared. All calculations happen in your browser or on our servers temporarily.
+
+### FIRE Calculator Questions
 
 ### Q: Should I include home equity in net worth?
 A: Yes, but consider that your primary residence isn't a liquid investment.
 
 ### Q: What if I live in multiple states/countries?
-A: Use the location where you'll spend most of your earning years.
+A: Use the location where you'll spend most of your earning years for the FIRE calculator.
 
 ### Q: How often should I update my projections?
 A: At least annually, or when major life changes occur.
 
 ### Q: What's a safe withdrawal rate?
 A: 3.5-4% is commonly cited, but consider your specific situation and risk tolerance.
+
+### US Tax Comparison Questions
+
+### Q: How does partner income calculation work?
+A: For Single filing, we calculate taxes separately for each person and sum them. For Married Filing Jointly, we combine income for tax brackets but calculate Social Security tax individually.
+
+### Q: Why are Social Security taxes calculated individually for married couples?
+A: The Social Security wage base ($160,200 in 2024) applies to each individual, not the combined household income.
+
+### Q: Should I use the Compare Both filing option?
+A: Yes! If you're married or considering marriage, this shows whether filing jointly saves money compared to filing separately.
+
+### Q: Which states have no income tax?
+A: Alaska, Florida, Nevada, New Hampshire, South Dakota, Tennessee, Texas, Washington, and Wyoming have no state income tax.
+
+### Q: Does the tax comparison include local taxes?
+A: No, it only includes federal and state taxes. Local taxes vary significantly by city and county.
 
 ---
 

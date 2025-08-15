@@ -1,6 +1,6 @@
-# FIRE Calculator + NW Simulator
+# FIRE Calculator + US Tax Comparison
 
-A Financial Independence, Retire Early (FIRE) calculator with net worth projection. Supports US and Taiwan with country-specific tax calculations, retirement accounts, and payroll deductions.
+A comprehensive financial planning tool featuring a FIRE (Financial Independence, Retire Early) calculator with net worth projections and a US state tax comparison tool. Supports US and Taiwan with accurate tax calculations, retirement accounts, and payroll deductions.
 
 **🌐 Website: [https://nw.approximator.net/](https://nw.approximator.net/)**
 
@@ -8,11 +8,22 @@ A Financial Independence, Retire Early (FIRE) calculator with net worth projecti
 
 ## Features
 
+### 🔥 FIRE Calculator
 - 🇺🇸 **US Support**: Federal/state taxes, 401k, Social Security, Medicare
 - 🇹🇼 **Taiwan Support**: Income tax, labor insurance, health insurance  
 - 📊 **Projections**: Real vs nominal net worth, tax breakdowns, FIRE timeline
 - 💼 **Flexible Income & Spending**: Multiple income and spending phases
 - 🎯 **Scenarios**: Stop at FIRE vs continue working options
+- 🌓 **Dark Mode**: Toggle between light and dark themes
+- 💾 **Profile Management**: Save and load calculation profiles (local development)
+
+### 🗺️ US Tax Comparison
+- 📊 **State-by-State Analysis**: Compare effective tax rates across all 50 US states
+- 👥 **Partner Income Support**: Calculate taxes for couples with dual incomes
+- 📈 **Interactive Charts**: Visual breakdown of tax components with pie charts
+- 🔄 **Filing Status Options**: Single, Married Filing Jointly, or Compare Both
+- 🎯 **Smart Filtering**: Filter states and filing types to focus your comparison
+- 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## Tech Stack
 
@@ -40,11 +51,47 @@ Run frontend server:
 npm run dev
 ```
 
-## Testing
+## Development
 
-Run all tests:
+### Using Makefile Commands
+
+Run all tests, build, and cleanup:
+```bash
+make test
+```
+
+Run individual commands:
+```bash
+make test-backend    # Backend tests only
+make test-frontend   # Frontend tests only
+make build          # Production build
+make build-clean    # Build and cleanup artifacts
+make clean          # Cleanup build artifacts
+make dev            # Start development server
+make lint           # Run linting
+```
+
+### Manual Testing
+
+Run backend tests:
 ```bash
 cd backend/api
 python3 -m pytest -v
 ```
+
+## Key Features Explained
+
+### Partner Income Calculations
+- **Single Filing**: Calculates taxes separately for each person and sums them
+- **Married Filing Jointly**: Combines income for tax brackets but calculates Social Security tax individually
+- **Interactive Pie Chart**: Adjust income distribution between partners with visual feedback
+
+### Tax Information Integration
+- **Clickable Tax Components**: Click on Federal, FICA, or State taxes for detailed breakdowns
+- **2024 Tax Data**: Current tax brackets, standard deductions, and payroll tax rates
+- **Country-Specific Details**: Different tax structures for US vs Taiwan
+
+### SPA Deployment
+- **GitHub Pages Compatible**: Includes 404.html redirect for client-side routing
+- **Custom Domain Ready**: Configured for both project sites and custom domains
 
