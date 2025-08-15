@@ -69,6 +69,7 @@ interface StateComparison {
   federalTax: number;
   stateTax: number;
   payrollTax: number;
+  filingType?: 'single' | 'married';
 }
 
 type SortField = keyof StateComparison;
@@ -318,11 +319,16 @@ const UsTaxTable: React.FC = () => {
         Compare effective tax rates and after-tax income across all US states based on your income
         {hasPartner && ` (${formatCurrency(parseFloat(income.replace(/,/g, '')))} + ${formatCurrency(parseFloat(partnerIncome.replace(/,/g, '')))} partner income)`}.
         This calculation includes federal, state, and payroll taxes, but excludes 401(k) contributions.
-        Tax rates shown are for {filingStatus === 'married' ? 'married filing jointly' : 'single filers'}
-        {hasPartner && '. All percentages are calculated based on total household income'}
+        {filingStatus === 'compare' ? (
+          <>Tax rates shown for <strong>both single and married filing jointly</strong> to help you compare which option saves more money.</>
+        ) : (
+          <>Tax rates shown are for {filingStatus === 'married' ? 'married filing jointly' : 'single filers'}</>
+        )}
+        {hasPartner && filingStatus !== 'compare' && '. All percentages are calculated based on total household income'}
         .
         {hasPartner && filingStatus === 'single' && ' (calculated separately for each person)'}
-        {hasPartner && filingStatus === 'married' && ' (combined income, but Social Security tax calculated individually)'}.
+        {hasPartner && filingStatus === 'married' && ' (combined income, but Social Security tax calculated individually)'}
+        {filingStatus === 'compare' && ' In compare mode, each state appears twice: once for single filing and once for married filing jointly.'}.
       </Typography>
 
       <Box sx={{ mb: 3 }}>
@@ -366,6 +372,7 @@ const UsTaxTable: React.FC = () => {
             >
               <MenuItem value="single">Single</MenuItem>
               <MenuItem value="married">Married Filing Jointly</MenuItem>
+              <MenuItem value="compare">Compare Both</MenuItem>
             </Select>
           </FormControl>
           <CalculateButton 
@@ -395,7 +402,10 @@ const UsTaxTable: React.FC = () => {
           {!hasPartner ? (
             <Button
               variant="outlined"
-              onClick={() => setHasPartner(true)}
+              onClick={() => {
+                setHasPartner(true);
+                setPartnerIncome(income); // Set partner income to match current income
+              }}
               sx={{ 
                 borderStyle: 'dashed',
                 borderColor: 'primary.main',
@@ -639,107 +649,7 @@ const UsTaxTable: React.FC = () => {
           )}
         </Box>
 
-        <Box sx={{ mt: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              Filter states (optional)
-            </Typography>
-            {selectedStates.length > 0 && (
-              <Typography variant="body2" color="text.secondary">
-                Showing {filteredData.length} of {data.length} states
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={() => setSelectedStates([])}
-                  sx={{ 
-                    ml: 1,
-                    cursor: 'pointer', 
-                    textDecoration: 'none',
-                    color: 'primary.light',
-                    fontWeight: 500,
-                    '&:hover': {
-                      color: 'red'
-                    },
-                    '&:focus': {
-                      outline: 'none'
-                    }
-                  }}
-                >
-                  (clear all)
-                </Link>
-              </Typography>
-            )}
-          </Box>
-          <Autocomplete
-            multiple
-            options={allStates}
-            getOptionLabel={(option) => option.name}
-            value={selectedStates.map(stateCode => 
-              allStates.find(state => state.code === stateCode)
-            ).filter((state): state is { code: string; name: string } => state !== undefined)}
-            inputValue={inputValue}
-            onInputChange={(_, newInputValue, reason) => {
-              if (reason !== 'reset') {
-                setInputValue(newInputValue);
-              }
-            }}
-            onChange={(_, newValue) => {
-              setSelectedStates(newValue.map(state => state.code));
-            }}
-            selectOnFocus
-            clearOnBlur
-            handleHomeEndKeys
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && inputValue.trim()) {
-                event.preventDefault();
-                
-                // Find the first matching option
-                const filteredOptions = allStates.filter(option =>
-                  option.name.toLowerCase().includes(inputValue.toLowerCase()) &&
-                  !selectedStates.includes(option.code)
-                );
-                
-                if (filteredOptions.length > 0) {
-                  const firstMatch = filteredOptions[0];
-                  setSelectedStates([...selectedStates, firstMatch.code]);
-                  setTimeout(() => setInputValue(''), 0); // Clear the input after selection
-                }
-              }
-            }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  label={option.name}
-                  {...getTagProps({ index })}
-                  key={option.code}
-                  sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    '& .MuiChip-label': {
-                      fontWeight: 600,
-                      fontSize: '0.9rem'
-                    },
-                    '& .MuiChip-deleteIcon': {
-                      color: 'white',
-                      '&:hover': {
-                        color: 'rgba(255, 255, 255, 0.8)'
-                      }
-                    }
-                  }}
-                />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder={selectedStates.length === 0 ? "Search and select states to filter..." : "Add more states..."}
-                variant="outlined"
-              />
-            )}
-          />
-        </Box>
+
       </Box>
 
       {error && (
@@ -761,7 +671,172 @@ const UsTaxTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Federal & FICA Taxes
             </Typography>
-                          <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
+            {filingStatus === 'compare' ? (
+              // Compare mode: show both single and married side by side
+              <Box>
+                {/* Single Filing Row */}
+                <Box sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                  <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                    Single Filing
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        <Link 
+                          component="button"
+                          variant="body2"
+                          onClick={() => handleTaxInfoClick('federal')}
+                          sx={{ 
+                            cursor: 'pointer', 
+                            textDecoration: 'none',
+                            color: 'primary.light',
+                            fontWeight: 500,
+                            '&:hover': {
+                              color: 'red',
+                              textDecoration: 'underline'
+                            },
+                            '&:focus': {
+                              outline: 'none'
+                            }
+                          }}
+                        >
+                          Federal Tax
+                        </Link>
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(data.find(d => d.filingType === 'single')?.federalTax || 0)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage(((data.find(d => d.filingType === 'single')?.federalTax || 0) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        <Link 
+                          component="button"
+                          variant="body2"
+                          onClick={() => handleTaxInfoClick('fica')}
+                          sx={{ 
+                            cursor: 'pointer', 
+                            textDecoration: 'none',
+                            color: 'primary.light',
+                            fontWeight: 500,
+                            '&:hover': {
+                              color: 'red',
+                              textDecoration: 'underline'
+                            },
+                            '&:focus': {
+                              outline: 'none'
+                            }
+                          }}
+                        >
+                          FICA Tax (Payroll)
+                        </Link>
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(data.find(d => d.filingType === 'single')?.payrollTax || 0)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage(((data.find(d => d.filingType === 'single')?.payrollTax || 0) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Combined Federal + FICA
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency((data.find(d => d.filingType === 'single')?.federalTax || 0) + (data.find(d => d.filingType === 'single')?.payrollTax || 0))}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage((((data.find(d => d.filingType === 'single')?.federalTax || 0) + (data.find(d => d.filingType === 'single')?.payrollTax || 0)) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Married Filing Row */}
+                <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                  <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'secondary.main' }}>
+                    Married Filing Jointly
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        <Link 
+                          component="button"
+                          variant="body2"
+                          onClick={() => handleTaxInfoClick('federal')}
+                          sx={{ 
+                            cursor: 'pointer', 
+                            textDecoration: 'none',
+                            color: 'primary.light',
+                            fontWeight: 500,
+                            '&:hover': {
+                              color: 'red',
+                              textDecoration: 'underline'
+                            },
+                            '&:focus': {
+                              outline: 'none'
+                            }
+                          }}
+                        >
+                          Federal Tax
+                        </Link>
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(data.find(d => d.filingType === 'married')?.federalTax || 0)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage(((data.find(d => d.filingType === 'married')?.federalTax || 0) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        <Link 
+                          component="button"
+                          variant="body2"
+                          onClick={() => handleTaxInfoClick('fica')}
+                          sx={{ 
+                            cursor: 'pointer', 
+                            textDecoration: 'none',
+                            color: 'primary.light',
+                            fontWeight: 500,
+                            '&:hover': {
+                              color: 'red',
+                              textDecoration: 'underline'
+                            },
+                            '&:focus': {
+                              outline: 'none'
+                            }
+                          }}
+                        >
+                          FICA Tax (Payroll)
+                        </Link>
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(data.find(d => d.filingType === 'married')?.payrollTax || 0)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage(((data.find(d => d.filingType === 'married')?.payrollTax || 0) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Combined Federal + FICA
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                        {formatCurrency((data.find(d => d.filingType === 'married')?.federalTax || 0) + (data.find(d => d.filingType === 'married')?.payrollTax || 0))}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ({formatPercentage((((data.find(d => d.filingType === 'married')?.federalTax || 0) + (data.find(d => d.filingType === 'married')?.payrollTax || 0)) / getTotalIncome()) * 100)})
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            ) : (
+              // Normal mode: show single result
+              <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     <Link 
@@ -822,19 +897,123 @@ const UsTaxTable: React.FC = () => {
                     ({formatPercentage(((data[0]?.payrollTax || 0) / getTotalIncome()) * 100)})
                   </Typography>
                 </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Combined Federal + FICA
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                  {formatCurrency((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0))}
-                </Typography>
-                                  <Typography variant="body2" color="text.secondary">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Combined Federal + FICA
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                    {formatCurrency((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0))}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
                     ({formatPercentage((((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0)) / getTotalIncome()) * 100)})
                   </Typography>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Paper>
+
+          {/* Filter states section */}
+          <Box sx={{ mt: 3, mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Filter states (optional)
+              </Typography>
+              {selectedStates.length > 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Showing {filteredData.length} of {data.length} rows
+                  <Link
+                    component="button"
+                    variant="body2"
+                    onClick={() => setSelectedStates([])}
+                    sx={{ 
+                      ml: 1,
+                      cursor: 'pointer', 
+                      textDecoration: 'none',
+                      color: 'primary.light',
+                      fontWeight: 500,
+                      '&:hover': {
+                        color: 'red'
+                      },
+                      '&:focus': {
+                        outline: 'none'
+                      }
+                    }}
+                  >
+                    (clear all)
+                  </Link>
+                </Typography>
+              )}
+            </Box>
+            <Autocomplete
+              multiple
+              options={allStates}
+              getOptionLabel={(option) => option.name}
+              value={selectedStates.map(stateCode => 
+                allStates.find(state => state.code === stateCode)
+              ).filter((state): state is { code: string; name: string } => state !== undefined)}
+              inputValue={inputValue}
+              onInputChange={(_, newInputValue, reason) => {
+                if (reason !== 'reset') {
+                  setInputValue(newInputValue);
+                }
+              }}
+              onChange={(_, newValue) => {
+                setSelectedStates(newValue.map(state => state.code));
+              }}
+              selectOnFocus
+              clearOnBlur
+              handleHomeEndKeys
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && inputValue.trim()) {
+                  event.preventDefault();
+                  
+                  // Find the first matching option
+                  const filteredOptions = allStates.filter(option =>
+                    option.name.toLowerCase().includes(inputValue.toLowerCase()) &&
+                    !selectedStates.includes(option.code)
+                  );
+                  
+                  if (filteredOptions.length > 0) {
+                    const firstMatch = filteredOptions[0];
+                    setSelectedStates([...selectedStates, firstMatch.code]);
+                    setTimeout(() => setInputValue(''), 0); // Clear the input after selection
+                  }
+                }
+              }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.name}
+                    {...getTagProps({ index })}
+                    key={option.code}
+                    sx={{
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      '& .MuiChip-label': {
+                        fontWeight: 600,
+                        fontSize: '0.9rem'
+                      },
+                      '& .MuiChip-deleteIcon': {
+                        color: 'white',
+                        '&:hover': {
+                          color: 'rgba(255, 255, 255, 0.8)'
+                        }
+                      }
+                    }}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={selectedStates.length === 0 ? "Search and select states to filter..." : "Add more states..."}
+                  variant="outlined"
+                />
+              )}
+            />
+          </Box>
 
           <Box sx={{ 
             width: '100%',
@@ -895,12 +1074,17 @@ const UsTaxTable: React.FC = () => {
                 <TableBody>
                   {sortedData.map((row) => {
                     // Add medal emojis to top 3 most taxed states (highest effective rate)
-                    // Get the top 3 states by effective rate from the original data
-                    const top3MostTaxedStates = [...data]
+                    // In compare mode, get top 3 from current filtered data, otherwise use original logic
+                    const dataForRanking = filingStatus === 'compare' ? sortedData : data;
+                    const top3MostTaxedStates = [...dataForRanking]
                       .sort((a, b) => b.effectiveRate - a.effectiveRate)
                       .slice(0, 3);
                     
-                    const stateRank = top3MostTaxedStates.findIndex(state => state.stateCode === row.stateCode);
+                    const stateRank = top3MostTaxedStates.findIndex(state => 
+                      filingStatus === 'compare' 
+                        ? state.stateName === row.stateName // Compare by full name including (Single)/(Married)
+                        : state.stateCode === row.stateCode // Normal mode compare by state code
+                    );
                     let displayName = row.stateName;
                     
                     if (stateRank === 0) {
@@ -912,7 +1096,7 @@ const UsTaxTable: React.FC = () => {
                     }
                     
                     return (
-                      <TableRow key={row.stateCode} hover>
+                      <TableRow key={filingStatus === 'compare' ? `${row.stateCode}-${row.filingType}` : row.stateCode} hover>
                         <TableCell component="th" scope="row">
                           <Link 
                             component="button"

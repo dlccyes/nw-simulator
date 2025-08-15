@@ -160,7 +160,151 @@ def us_tax_comparison():
         results = []
 
         for state_code, state_config in states.items():
-            if partner_income > 0:
+            if filing_status == 'compare':
+                # Compare mode: calculate both single and married filing
+                total_income = income + partner_income if partner_income > 0 else income
+                
+                # Calculate single filing
+                if partner_income > 0:
+                    # Two separate single calculations
+                    _, _, tax_breakdown1_single = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'
+                    )
+                    
+                    _, _, tax_breakdown2_single = calculate_income_tax(
+                        income=partner_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'
+                    )
+                    
+                    # Sum single filing results
+                    single_breakdown = {
+                        'afterTaxIncome': tax_breakdown1_single['afterTaxIncome'] + tax_breakdown2_single['afterTaxIncome'],
+                        'totalTax': tax_breakdown1_single['totalTax'] + tax_breakdown2_single['totalTax'],
+                        'federalTax': tax_breakdown1_single['federalTax'] + tax_breakdown2_single['federalTax'],
+                        'stateTax': tax_breakdown1_single['stateTax'] + tax_breakdown2_single['stateTax'],
+                        'socialSecurityTax': tax_breakdown1_single['socialSecurityTax'] + tax_breakdown2_single['socialSecurityTax'],
+                        'medicareTax': tax_breakdown1_single['medicareTax'] + tax_breakdown2_single['medicareTax'],
+                        'additionalMedicareTax': tax_breakdown1_single['additionalMedicareTax'] + tax_breakdown2_single['additionalMedicareTax']
+                    }
+                    single_effective_rate = (single_breakdown['totalTax'] / total_income) * 100
+                else:
+                    # Single person
+                    _, single_effective_rate, single_breakdown = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'
+                    )
+                
+                # Calculate married filing jointly
+                if partner_income > 0:
+                    # Use combined income for married but calculate SS individually
+                    _, _, combined_tax_breakdown = calculate_income_tax(
+                        income=total_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='married'
+                    )
+                    
+                    # Get individual SS calculations
+                    _, _, tax_breakdown1_ss = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'
+                    )
+                    
+                    _, _, tax_breakdown2_ss = calculate_income_tax(
+                        income=partner_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'
+                    )
+                    
+                    # Use combined calculation but replace SS with individual calculations
+                    married_breakdown = {
+                        'afterTaxIncome': combined_tax_breakdown['afterTaxIncome'],
+                        'federalTax': combined_tax_breakdown['federalTax'],
+                        'stateTax': combined_tax_breakdown['stateTax'],
+                        'medicareTax': combined_tax_breakdown['medicareTax'],
+                        'additionalMedicareTax': combined_tax_breakdown['additionalMedicareTax'],
+                        'socialSecurityTax': tax_breakdown1_ss['socialSecurityTax'] + tax_breakdown2_ss['socialSecurityTax']
+                    }
+                    
+                    # Recalculate total tax and after-tax income
+                    married_breakdown['totalTax'] = (
+                        married_breakdown['federalTax'] + 
+                        married_breakdown['stateTax'] + 
+                        married_breakdown['socialSecurityTax'] + 
+                        married_breakdown['medicareTax'] + 
+                        married_breakdown['additionalMedicareTax']
+                    )
+                    married_breakdown['afterTaxIncome'] = total_income - married_breakdown['totalTax']
+                    married_effective_rate = (married_breakdown['totalTax'] / total_income) * 100
+                else:
+                    # Single person filed as married
+                    _, married_effective_rate, married_breakdown = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='married'
+                    )
+                
+                # Get state name
+                state_name = get_state_name(state_code)
+                
+                # Return both single and married results as separate entries
+                results.append({
+                    'stateCode': state_code,
+                    'stateName': f"{state_name} 🫃 (Single)",
+                    'effectiveRate': round(single_effective_rate, 2),
+                    'afterTaxIncome': round(single_breakdown['afterTaxIncome'], 2),
+                    'totalTax': round(single_breakdown['totalTax'], 2),
+                    'federalTax': round(single_breakdown['federalTax'], 2),
+                    'stateTax': round(single_breakdown['stateTax'], 2),
+                    'payrollTax': round(single_breakdown['socialSecurityTax'] +
+                                     single_breakdown['medicareTax'] +
+                                     single_breakdown['additionalMedicareTax'], 2),
+                    'filingType': 'single'
+                })
+                
+                results.append({
+                    'stateCode': state_code,
+                    'stateName': f"{state_name} 👩‍❤️‍👩 (Married)",
+                    'effectiveRate': round(married_effective_rate, 2),
+                    'afterTaxIncome': round(married_breakdown['afterTaxIncome'], 2),
+                    'totalTax': round(married_breakdown['totalTax'], 2),
+                    'federalTax': round(married_breakdown['federalTax'], 2),
+                    'stateTax': round(married_breakdown['stateTax'], 2),
+                    'payrollTax': round(married_breakdown['socialSecurityTax'] +
+                                     married_breakdown['medicareTax'] +
+                                     married_breakdown['additionalMedicareTax'], 2),
+                    'filingType': 'married'
+                })
+                
+                # Skip the rest of the loop for compare mode
+                continue
+                
+            elif partner_income > 0:
                 # Handle partner income calculations
                 if filing_status == 'single':
                     # For single filing: calculate separately and sum
