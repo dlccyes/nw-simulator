@@ -16,6 +16,8 @@ The tax system has been redesigned to be forward-compatible and support multiple
 ```
 
 ### Federal Tax Configuration
+
+#### Single Filing Status Structure
 ```json
 "federal": {
   "standard_deduction": 14600,
@@ -27,6 +29,22 @@ The tax system has been redesigned to be forward-compatible and support multiple
   ]
 }
 ```
+
+#### Multiple Filing Status Structure
+```json
+"federal": {
+  "single": {
+    "standard_deduction": 14600,
+    "brackets": [...]
+  },
+  "married": {
+    "standard_deduction": 29200,
+    "brackets": [...]
+  }
+}
+```
+
+The system supports both legacy single-structure and modern multi-filing-status structures. For countries supporting married filing jointly (like US and Taiwan), use the multi-status structure.
 
 ### Payroll Tax Configuration
 
@@ -54,8 +72,9 @@ The tax system has been redesigned to be forward-compatible and support multiple
   },
   "health_insurance": {
     "rate": 0.0155,
-    "annual_cap": 4697,
-    "description": "Direct payroll deduction with annual cap"
+    "annual_cap": 56364,
+    "annual_cap_married": 112728,
+    "description": "Direct payroll deduction with annual cap (per person for single, combined for married)"
   }
 }
 ```

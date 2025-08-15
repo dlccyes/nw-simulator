@@ -186,9 +186,13 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         labor_insurance_rate = labor_insurance_config.get('rate', 0)
         social_security_tax = income * labor_insurance_rate
 
-        # Health insurance - rate with annual cap
+        # Health insurance - rate with annual cap (per person for single, combined for married)
         health_insurance_rate = health_insurance_config.get('rate', 0)
-        health_insurance_cap = health_insurance_config.get('annual_cap', 0)
+        if filing_status == 'married':
+            health_insurance_cap = health_insurance_config.get('annual_cap_married', health_insurance_config.get('annual_cap', 0) * 2)
+        else:
+            health_insurance_cap = health_insurance_config.get('annual_cap', 0)
+        
         health_insurance_tax = income * health_insurance_rate
         if health_insurance_cap > 0:
             health_insurance_tax = min(health_insurance_tax, health_insurance_cap)

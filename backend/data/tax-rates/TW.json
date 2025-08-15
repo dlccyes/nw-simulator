@@ -1,13 +1,25 @@
 {
   "federal": {
-    "standard_deduction": 446000,
-    "brackets": [
-      {"min": 0, "max": 590000, "rate": 0.05},
-      {"min": 590001, "max": 1330000, "rate": 0.12},
-      {"min": 1330001, "max": 2660000, "rate": 0.20},
-      {"min": 2660001, "max": 4980000, "rate": 0.30},
-      {"min": 4980001, "max": null, "rate": 0.40}
-    ]
+    "single": {
+      "standard_deduction": 446000,
+      "brackets": [
+        {"min": 0, "max": 590000, "rate": 0.05},
+        {"min": 590001, "max": 1330000, "rate": 0.12},
+        {"min": 1330001, "max": 2660000, "rate": 0.20},
+        {"min": 2660001, "max": 4980000, "rate": 0.30},
+        {"min": 4980001, "max": null, "rate": 0.40}
+      ]
+    },
+    "married": {
+      "standard_deduction": 892000,
+      "brackets": [
+        {"min": 0, "max": 590000, "rate": 0.05},
+        {"min": 590001, "max": 1330000, "rate": 0.12},
+        {"min": 1330001, "max": 2660000, "rate": 0.20},
+        {"min": 2660001, "max": 4980000, "rate": 0.30},
+        {"min": 4980001, "max": null, "rate": 0.40}
+      ]
+    }
   },
   "payroll_taxes": {
     "labor_insurance": {
@@ -17,7 +29,8 @@
     "health_insurance": {
       "rate": 0.0155,
       "annual_cap": 56364,
-      "description": "Direct payroll deduction with annual cap"
+      "annual_cap_married": 112728,
+      "description": "Direct payroll deduction with annual cap (per person for single, combined for married)"
     }
   }
 } 
