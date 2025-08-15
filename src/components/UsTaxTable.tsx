@@ -80,8 +80,8 @@ const UsTaxTable: React.FC = () => {
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [sortField, setSortField] = useState<SortField>('effectiveRate');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<SortField>('totalTax');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
   // Partner income state
   const [hasPartner, setHasPartner] = useState<boolean>(false);
@@ -406,11 +406,11 @@ const UsTaxTable: React.FC = () => {
                 setHasPartner(true);
                 setPartnerIncome(income); // Set partner income to match current income
               }}
-              sx={{ 
+                  sx={{ 
                 borderStyle: 'dashed',
                 borderColor: 'primary.main',
                 color: 'primary.main',
-                '&:hover': {
+                    '&:hover': {
                   borderColor: 'primary.dark',
                   backgroundColor: 'primary.light',
                   color: 'primary.contrastText'
@@ -435,7 +435,7 @@ const UsTaxTable: React.FC = () => {
               }}>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Partner Income
-                </Typography>
+              </Typography>
                 <Button
                   variant="text"
                   color="error"
@@ -444,7 +444,7 @@ const UsTaxTable: React.FC = () => {
                 >
                   Remove
                 </Button>
-              </Box>
+          </Box>
               
               <Box sx={{ 
                 display: 'flex',
@@ -471,7 +471,7 @@ const UsTaxTable: React.FC = () => {
                 <Box sx={{ px: { xs: 1, sm: 2 }, flex: 1 }}>
                   <Slider
                     value={parseFloat(partnerIncome.replace(/,/g, '')) || 0}
-                    onChange={(_, newValue) => {
+            onChange={(_, newValue) => {
                       const roundedValue = Math.max(0, Math.round(Number(newValue) / 10000) * 10000);
                       setPartnerIncome(roundedValue.toLocaleString());
                     }}
@@ -627,7 +627,7 @@ const UsTaxTable: React.FC = () => {
                            <Button
                              key={split.label}
                              size="small"
-                             variant="outlined"
+                variant="outlined"
                              onClick={() => {
                                const totalIncome = getTotalIncome();
                                const newYourIncome = Math.round(totalIncome * split.yourShare);
@@ -678,7 +678,7 @@ const UsTaxTable: React.FC = () => {
                 <Box sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                   <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                     Single Filing
-                  </Typography>
+            </Typography>
                   <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
                     <Box>
                       <Typography variant="body2" color="text.secondary">
@@ -836,7 +836,7 @@ const UsTaxTable: React.FC = () => {
               </Box>
             ) : (
               // Normal mode: show single result
-              <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
+                          <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     <Link 
@@ -897,18 +897,18 @@ const UsTaxTable: React.FC = () => {
                     ({formatPercentage(((data[0]?.payrollTax || 0) / getTotalIncome()) * 100)})
                   </Typography>
                 </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Combined Federal + FICA
-                  </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                    {formatCurrency((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0))}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Combined Federal + FICA
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                  {formatCurrency((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0))}
+                </Typography>
+                                  <Typography variant="body2" color="text.secondary">
                     ({formatPercentage((((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0)) / getTotalIncome()) * 100)})
                   </Typography>
-                </Box>
               </Box>
+            </Box>
             )}
           </Paper>
 
