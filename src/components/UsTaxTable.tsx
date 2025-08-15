@@ -22,7 +22,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Button
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
@@ -79,6 +80,10 @@ const UsTaxTable: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('effectiveRate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Partner income state
+  const [hasPartner, setHasPartner] = useState<boolean>(false);
+  const [partnerIncome, setPartnerIncome] = useState<string>('150,000');
   
   // Tax info dialog state
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -152,14 +157,29 @@ const UsTaxTable: React.FC = () => {
       return;
     }
 
+    let numericPartnerIncome = 0;
+    if (hasPartner) {
+      numericPartnerIncome = parseFloat(partnerIncome.replace(/,/g, ''));
+      if (!partnerIncome || numericPartnerIncome < 0) {
+        setError('Please enter a valid partner income amount (minimum $0)');
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/us-tax-comparison`, {
+      const requestData: any = {
         income: numericIncome,
         filing_status: filingStatus
-      });
+      };
+      
+      if (hasPartner) {
+        requestData.partner_income = numericPartnerIncome;
+      }
+
+      const response = await axios.post(`${API_BASE_URL}/api/us-tax-comparison`, requestData);
       // Only update data after successful response to prevent flash
       setData(response.data);
     } catch (err) {
@@ -168,7 +188,7 @@ const UsTaxTable: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [income, filingStatus]);
+  }, [income, filingStatus, hasPartner, partnerIncome]);
 
   useEffect(() => {
     if (income && parseFloat(income) > 0) {
@@ -237,6 +257,13 @@ const UsTaxTable: React.FC = () => {
     return `${rate.toFixed(2)}%`;
   };
 
+  // Calculate total income including partner
+  const getTotalIncome = (): number => {
+    const primaryIncome = parseFloat(income.replace(/,/g, ''));
+    const partnerIncomeValue = hasPartner ? parseFloat(partnerIncome.replace(/,/g, '')) || 0 : 0;
+    return primaryIncome + partnerIncomeValue;
+  };
+
   const handleTaxInfoClick = (taxType: 'federal' | 'fica' | 'state', stateCode?: string) => {
     setDialogTaxType(taxType);
     setDialogStateCode(stateCode || '');
@@ -287,9 +314,14 @@ const UsTaxTable: React.FC = () => {
           fontSize: { xs: '0.875rem', sm: '1rem' }
         }}
       >
-        Compare effective tax rates and after-tax income across all US states based on your income.
+        Compare effective tax rates and after-tax income across all US states based on your income
+        {hasPartner && ` (${formatCurrency(parseFloat(income.replace(/,/g, '')))} + ${formatCurrency(parseFloat(partnerIncome.replace(/,/g, '')))} partner income)`}.
         This calculation includes federal, state, and payroll taxes, but excludes 401(k) contributions.
-        Tax rates shown are for {filingStatus === 'married' ? 'married filing jointly' : 'single filers'}.
+        Tax rates shown are for {filingStatus === 'married' ? 'married filing jointly' : 'single filers'}
+        {hasPartner && '. All percentages are calculated based on total household income'}
+        .
+        {hasPartner && filingStatus === 'single' && ' (calculated separately for each person)'}
+        {hasPartner && filingStatus === 'married' && ' (combined income, but Social Security tax calculated individually)'}.
       </Typography>
 
       <Box sx={{ mb: 3 }}>
@@ -355,6 +387,101 @@ const UsTaxTable: React.FC = () => {
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => `$${value.toLocaleString()}`}
           />
+        </Box>
+
+        {/* Partner Income Section */}
+        <Box sx={{ mt: 3, mb: 3 }}>
+          {!hasPartner ? (
+            <Button
+              variant="outlined"
+              onClick={() => setHasPartner(true)}
+              sx={{ 
+                borderStyle: 'dashed',
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  backgroundColor: 'primary.light',
+                  color: 'primary.contrastText'
+                }
+              }}
+            >
+              Add Partner Income
+            </Button>
+          ) : (
+            <Box sx={{ 
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              p: 2,
+              backgroundColor: 'background.paper'
+            }}>
+              <Box sx={{ 
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 2
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Partner Income
+                </Typography>
+                <Button
+                  variant="text"
+                  color="error"
+                  size="small"
+                  onClick={() => setHasPartner(false)}
+                >
+                  Remove
+                </Button>
+              </Box>
+              
+              <Box sx={{ 
+                display: 'flex',
+                gap: 2,
+                alignItems: 'center',
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}>
+                <TextField
+                  label="Partner Annual Income"
+                  value={partnerIncome}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || /^\d+$/.test(value)) {
+                      const formattedValue = value === '' ? '' : parseInt(value).toLocaleString();
+                      setPartnerIncome(formattedValue);
+                    }
+                  }}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  }}
+                  sx={{ minWidth: { xs: '100%', sm: 200 } }}
+                />
+                
+                <Box sx={{ px: { xs: 1, sm: 2 }, flex: 1 }}>
+                  <Slider
+                    value={parseFloat(partnerIncome.replace(/,/g, '')) || 0}
+                    onChange={(_, newValue) => {
+                      const roundedValue = Math.max(0, Math.round(Number(newValue) / 1000) * 1000);
+                      setPartnerIncome(roundedValue.toLocaleString());
+                    }}
+                    min={0}
+                    max={500000}
+                    step={1000}
+                    sx={{ mt: 1 }}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(value) => `$${value.toLocaleString()}`}
+                  />
+                </Box>
+              </Box>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontStyle: 'italic' }}>
+                {filingStatus === 'single' 
+                  ? 'For single filing status: Taxes calculated separately for each person and summed.'
+                  : 'For married filing jointly: Combined income used for tax brackets, but Social Security tax calculated individually.'
+                }
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         <Box sx={{ mt: 3 }}>
@@ -507,7 +634,7 @@ const UsTaxTable: React.FC = () => {
                     {formatCurrency(data[0]?.federalTax || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    ({formatPercentage(((data[0]?.federalTax || 0) / parseFloat(income.replace(/,/g, ''))) * 100)})
+                    ({formatPercentage(((data[0]?.federalTax || 0) / getTotalIncome()) * 100)})
                   </Typography>
                 </Box>
                 <Box>
@@ -537,7 +664,7 @@ const UsTaxTable: React.FC = () => {
                     {formatCurrency(data[0]?.payrollTax || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    ({formatPercentage(((data[0]?.payrollTax || 0) / parseFloat(income.replace(/,/g, ''))) * 100)})
+                    ({formatPercentage(((data[0]?.payrollTax || 0) / getTotalIncome()) * 100)})
                   </Typography>
                 </Box>
               <Box>
@@ -548,7 +675,7 @@ const UsTaxTable: React.FC = () => {
                   {formatCurrency((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0))}
                 </Typography>
                                   <Typography variant="body2" color="text.secondary">
-                    ({formatPercentage((((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0)) / parseFloat(income.replace(/,/g, ''))) * 100)})
+                    ({formatPercentage((((data[0]?.federalTax || 0) + (data[0]?.payrollTax || 0)) / getTotalIncome()) * 100)})
                   </Typography>
               </Box>
             </Box>
@@ -658,7 +785,7 @@ const UsTaxTable: React.FC = () => {
                           {formatCurrency(row.stateTax)}
                         </Box>
                         <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                          ({formatPercentage((row.stateTax / parseFloat(income.replace(/,/g, ''))) * 100)})
+                          ({formatPercentage((row.stateTax / getTotalIncome()) * 100)})
                         </Box>
                       </TableCell>
                       <TableCell align="right">

@@ -134,7 +134,11 @@ def delete_profile_by_id(profile_id):
 def us_tax_comparison():
     """
     Calculate effective tax rates and after-tax income for all US states.
-    Expects: { "income": number, "filing_status": "single|married" }
+    Expects: { 
+        "income": number, 
+        "filing_status": "single|married", 
+        "partner_income": number (optional)
+    }
     Returns: Array of state tax comparisons
     """
     try:
@@ -143,6 +147,7 @@ def us_tax_comparison():
             return jsonify({'error': 'No data provided'}), 400
 
         income = data.get('income', 0)
+        partner_income = data.get('partner_income', 0)
         filing_status = data.get('filing_status', 'single')
 
         if income <= 0:
@@ -155,17 +160,111 @@ def us_tax_comparison():
         results = []
 
         for state_code, state_config in states.items():
-            # Calculate tax for this state (no 401k contributions as requested)
-            total_available_income, effective_tax_rate, tax_breakdown = calculate_income_tax(
-                income=income,
-                state=state_code,
-                pre_tax_401k=0,  # No 401k as requested
-                employer_match=0,  # No employer match
-                country_code='US',
-                filing_status=filing_status
-            )
+            if partner_income > 0:
+                # Handle partner income calculations
+                if filing_status == 'single':
+                    # For single filing: calculate separately and sum
+                    _, _, tax_breakdown1 = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status=filing_status
+                    )
+                    
+                    _, _, tax_breakdown2 = calculate_income_tax(
+                        income=partner_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status=filing_status
+                    )
+                    
+                    # Sum all tax components
+                    combined_breakdown = {
+                        'afterTaxIncome': tax_breakdown1['afterTaxIncome'] + tax_breakdown2['afterTaxIncome'],
+                        'totalTax': tax_breakdown1['totalTax'] + tax_breakdown2['totalTax'],
+                        'federalTax': tax_breakdown1['federalTax'] + tax_breakdown2['federalTax'],
+                        'stateTax': tax_breakdown1['stateTax'] + tax_breakdown2['stateTax'],
+                        'socialSecurityTax': tax_breakdown1['socialSecurityTax'] + tax_breakdown2['socialSecurityTax'],
+                        'medicareTax': tax_breakdown1['medicareTax'] + tax_breakdown2['medicareTax'],
+                        'additionalMedicareTax': tax_breakdown1['additionalMedicareTax'] + tax_breakdown2['additionalMedicareTax']
+                    }
+                    
+                    total_income = income + partner_income
+                    effective_tax_rate = (combined_breakdown['totalTax'] / total_income) * 100
+                    
+                elif filing_status == 'married':
+                    # For married filing jointly: use combined income but calculate Social Security individually
+                    total_income = income + partner_income
+                    
+                    # Calculate taxes using combined income
+                    _, _, combined_tax_breakdown = calculate_income_tax(
+                        income=total_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status=filing_status
+                    )
+                    
+                    # Calculate Social Security tax individually for each person
+                    _, _, tax_breakdown1 = calculate_income_tax(
+                        income=income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'  # Use single for individual SS calculation
+                    )
+                    
+                    _, _, tax_breakdown2 = calculate_income_tax(
+                        income=partner_income,
+                        state=state_code,
+                        pre_tax_401k=0,
+                        employer_match=0,
+                        country_code='US',
+                        filing_status='single'  # Use single for individual SS calculation
+                    )
+                    
+                    # Use combined tax calculation but replace Social Security with individual calculations
+                    combined_breakdown = {
+                        'afterTaxIncome': combined_tax_breakdown['afterTaxIncome'],
+                        'federalTax': combined_tax_breakdown['federalTax'],
+                        'stateTax': combined_tax_breakdown['stateTax'],
+                        'medicareTax': combined_tax_breakdown['medicareTax'],
+                        'additionalMedicareTax': combined_tax_breakdown['additionalMedicareTax'],
+                        'socialSecurityTax': tax_breakdown1['socialSecurityTax'] + tax_breakdown2['socialSecurityTax']
+                    }
+                    
+                    # Recalculate total tax and after-tax income with correct Social Security
+                    combined_breakdown['totalTax'] = (
+                        combined_breakdown['federalTax'] + 
+                        combined_breakdown['stateTax'] + 
+                        combined_breakdown['socialSecurityTax'] + 
+                        combined_breakdown['medicareTax'] + 
+                        combined_breakdown['additionalMedicareTax']
+                    )
+                    combined_breakdown['afterTaxIncome'] = total_income - combined_breakdown['totalTax']
+                    
+                    effective_tax_rate = (combined_breakdown['totalTax'] / total_income) * 100
+                
+                tax_breakdown = combined_breakdown
+                
+            else:
+                # Single income calculation (existing logic)
+                total_available_income, effective_tax_rate, tax_breakdown = calculate_income_tax(
+                    income=income,
+                    state=state_code,
+                    pre_tax_401k=0,  # No 401k as requested
+                    employer_match=0,  # No employer match
+                    country_code='US',
+                    filing_status=filing_status
+                )
 
-            # Get state name (using state code for now, could be enhanced with full names)
+            # Get state name
             state_name = get_state_name(state_code)
 
             results.append({
