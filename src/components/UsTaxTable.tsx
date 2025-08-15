@@ -693,6 +693,7 @@ const UsTaxTable: React.FC = () => {
         taxType={dialogTaxType}
         stateCode={dialogStateCode}
         taxData={taxInfoData}
+        country="US"
       />
     </Box>
   );

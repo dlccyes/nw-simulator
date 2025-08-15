@@ -32,9 +32,60 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
-  Collapse
+  Collapse,
+  Link
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
+import TaxInfoDialog from './TaxInfoDialog';
+
+// Import tax-related types
+interface TaxBracket {
+  min: number;
+  max: number | null;
+  rate: number;
+}
+
+interface TaxConfig {
+  standard_deduction: number;
+  brackets: TaxBracket[];
+  single?: {
+    standard_deduction: number;
+    brackets: TaxBracket[];
+  };
+  married?: {
+    standard_deduction: number;
+    brackets: TaxBracket[];
+  };
+}
+
+interface PayrollTaxConfig {
+  social_security?: {
+    rate: number;
+    wage_base: number;
+  };
+  medicare?: {
+    rate: number;
+    additional_rate: number;
+    additional_threshold: number;
+    additional_threshold_married?: number;
+  };
+  labor_insurance?: {
+    rate: number;
+    description?: string;
+  };
+  health_insurance?: {
+    rate: number;
+    annual_cap: number;
+    annual_cap_married?: number;
+    description?: string;
+  };
+}
+
+interface TaxInfoData {
+  federal: TaxConfig;
+  payroll_taxes: PayrollTaxConfig;
+  states: { [key: string]: TaxConfig };
+}
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -302,39 +353,13 @@ const FireCalculator: React.FC = () => {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [stopAtFire, setStopAtFire] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [taxInfo, setTaxInfo] = useState<{
-    federal?: {
-      standard_deduction?: number;
-      brackets?: Array<{min: number; max: number | null; rate: number}>;
-      single?: {
-        standard_deduction?: number;
-        brackets?: Array<{min: number; max: number | null; rate: number}>;
-      };
-      married?: {
-        standard_deduction?: number;
-        brackets?: Array<{min: number; max: number | null; rate: number}>;
-      };
-    };
-    states?: Record<string, {
-      standard_deduction?: number;
-      brackets?: Array<{min: number; max: number | null; rate: number}>;
-      single?: {
-        standard_deduction?: number;
-        brackets?: Array<{min: number; max: number | null; rate: number}>;
-      };
-      married?: {
-        standard_deduction?: number;
-        brackets?: Array<{min: number; max: number | null; rate: number}>;
-      };
-    }>;
-    payroll_taxes?: {
-      social_security?: {rate: number; wage_base: number};
-      medicare?: {rate: number; additional_rate: number; additional_threshold: number};
-      labor_insurance?: {rate: number};
-      health_insurance?: {rate: number; annual_cap: number; annual_cap_married?: number};
-    };
-  } | null>(null);
+  const [taxInfo, setTaxInfo] = useState<TaxInfoData | null>(null);
   const [infoExpanded, setInfoExpanded] = useState(false);
+  
+  // Tax info dialog state
+  const [taxInfoDialogOpen, setTaxInfoDialogOpen] = useState(false);
+  const [dialogTaxType, setDialogTaxType] = useState<'federal' | 'fica' | 'state'>('federal');
+  const [dialogStateCode, setDialogStateCode] = useState<string>('');
 
   useEffect(() => {
     if (enableProfile) {
@@ -348,7 +373,7 @@ const FireCalculator: React.FC = () => {
         const response = await fetch(`${API_BASE_URL}/api/tax-info/${inputs.country}`);
         if (response.ok) {
           const data = await response.json();
-          setTaxInfo(data);
+          setTaxInfo(data as TaxInfoData);
         }
       } catch (error) {
         console.error('Error fetching tax info:', error);
@@ -731,216 +756,130 @@ const FireCalculator: React.FC = () => {
                       ) : null}
                     </Typography>
 
-                    {taxInfo && (
-                      <>
-                        <Typography variant="h6" sx={{ mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
-                          {inputs.country === 'US' ? 'Federal Tax' : 'Income Tax'}
+                    {/* Tax information links */}
+                    <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4 }, flexWrap: 'wrap', mb: 2 }}>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          <Link 
+                            component="button"
+                            variant="body2"
+                            onClick={() => {
+                              setDialogTaxType('federal');
+                              setDialogStateCode('');
+                              setTaxInfoDialogOpen(true);
+                            }}
+                            sx={{ 
+                              cursor: 'pointer', 
+                              textDecoration: 'none',
+                              color: 'primary.light',
+                              fontWeight: 500,
+                              '&:hover': {
+                                color: 'red',
+                                textDecoration: 'underline'
+                              },
+                              '&:focus': {
+                                outline: 'none'
+                              }
+                            }}
+                          >
+                            {inputs.country === 'US' ? 'Federal Tax' : 'Income Tax'}
+                          </Link>
                         </Typography>
-                        {taxInfo.federal && (
-                          <Box sx={{ mb: 2 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              <strong>Standard Deduction:</strong>
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-                              Single: {inputs.country === 'US' ? '$' : 'NT$'}{(taxInfo.federal.single?.standard_deduction || taxInfo.federal.standard_deduction || 0).toLocaleString()}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-                              Married: {inputs.country === 'US' ? '$' : 'NT$'}{(taxInfo.federal.married?.standard_deduction || taxInfo.federal.standard_deduction || 0).toLocaleString()}
-                            </Typography>
-                          </Box>
-                        )}
-                        <TableContainer sx={{ mb: 3 }}>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell><strong>Income Range (Single)</strong></TableCell>
-                                <TableCell><strong>Income Range (Married)</strong></TableCell>
-                                <TableCell align="right"><strong>Tax Rate</strong></TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {(() => {
-                                const singleBrackets = taxInfo.federal?.single?.brackets || taxInfo.federal?.brackets || [];
-                                const marriedBrackets = taxInfo.federal?.married?.brackets || taxInfo.federal?.brackets || [];
-                                const maxLength = Math.max(singleBrackets.length, marriedBrackets.length);
-                                
-                                return Array.from({ length: maxLength }, (_, index) => {
-                                  const singleBracket = singleBrackets[index];
-                                  const marriedBracket = marriedBrackets[index];
-                                  
-                                  return (
-                                    <TableRow key={index}>
-                                      <TableCell>
-                                        {singleBracket ? 
-                                          `${inputs.country === 'US' ? '$' : 'NT$'}${singleBracket.min.toLocaleString()} - ${singleBracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${singleBracket.max.toLocaleString()}` : '∞'}` : 
-                                          '-'
-                                        }
-                                      </TableCell>
-                                      <TableCell>
-                                        {marriedBracket ? 
-                                          `${inputs.country === 'US' ? '$' : 'NT$'}${marriedBracket.min.toLocaleString()} - ${marriedBracket.max ? `${inputs.country === 'US' ? '$' : 'NT$'}${marriedBracket.max.toLocaleString()}` : '∞'}` : 
-                                          '-'
-                                        }
-                                      </TableCell>
-                                      <TableCell align="right">
-                                        {singleBracket?.rate || marriedBracket?.rate ? 
-                                          `${((singleBracket?.rate || marriedBracket?.rate || 0) * 100).toFixed(1)}%` : 
-                                          '-'
-                                        }
-                                      </TableCell>
-                                    </TableRow>
-                                  );
-                                });
-                              })()}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-
-                        {inputs.country === 'US' && inputs.state && taxInfo.states?.[inputs.state] && (
-                          <>
-                            <Typography variant="h6" sx={{ mt: 3, mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
+                      </Box>
+                      
+                      {inputs.country === 'US' && (
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            <Link 
+                              component="button"
+                              variant="body2"
+                              onClick={() => {
+                                setDialogTaxType('fica');
+                                setDialogStateCode('');
+                                setTaxInfoDialogOpen(true);
+                              }}
+                              sx={{ 
+                                cursor: 'pointer', 
+                                textDecoration: 'none',
+                                color: 'primary.light',
+                                fontWeight: 500,
+                                '&:hover': {
+                                  color: 'red',
+                                  textDecoration: 'underline'
+                                },
+                                '&:focus': {
+                                  outline: 'none'
+                                }
+                              }}
+                            >
+                              FICA Tax (Payroll)
+                            </Link>
+                          </Typography>
+                        </Box>
+                      )}
+                      
+                      {inputs.country === 'US' && inputs.state && (
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            <Link 
+                              component="button"
+                              variant="body2"
+                              onClick={() => {
+                                setDialogTaxType('state');
+                                setDialogStateCode(inputs.state);
+                                setTaxInfoDialogOpen(true);
+                              }}
+                              sx={{ 
+                                cursor: 'pointer', 
+                                textDecoration: 'none',
+                                color: 'primary.light',
+                                fontWeight: 500,
+                                '&:hover': {
+                                  color: 'red',
+                                  textDecoration: 'underline'
+                                },
+                                '&:focus': {
+                                  outline: 'none'
+                                }
+                              }}
+                            >
                               {inputs.state} State Tax
-                            </Typography>
-                            <Box sx={{ mb: 2 }}>
-                              <Typography variant="body2" color="text.secondary">
-                                <strong>Standard Deduction:</strong>
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-                                Single: ${(taxInfo.states[inputs.state].single?.standard_deduction || taxInfo.states[inputs.state].standard_deduction || 0).toLocaleString()}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-                                Married: ${(taxInfo.states[inputs.state].married?.standard_deduction || taxInfo.states[inputs.state].standard_deduction || 0).toLocaleString()}
-                              </Typography>
-                            </Box>
-                            {taxInfo.states?.[inputs.state]?.brackets && taxInfo.states[inputs.state]?.brackets && taxInfo.states[inputs.state]!.brackets!.length > 0 ? (
-                              <TableContainer sx={{ mb: 3 }}>
-                                <Table size="small">
-                                  <TableHead>
-                                    <TableRow>
-                                      <TableCell><strong>Income Range (Single)</strong></TableCell>
-                                      <TableCell><strong>Income Range (Married)</strong></TableCell>
-                                      <TableCell align="right"><strong>Tax Rate</strong></TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {(() => {
-                                      const singleBrackets = taxInfo.states[inputs.state]?.single?.brackets || taxInfo.states[inputs.state]?.brackets || [];
-                                      const marriedBrackets = taxInfo.states[inputs.state]?.married?.brackets || taxInfo.states[inputs.state]?.brackets || [];
-                                      const maxLength = Math.max(singleBrackets.length, marriedBrackets.length);
-                                      
-                                      return Array.from({ length: maxLength }, (_, index) => {
-                                        const singleBracket = singleBrackets[index];
-                                        const marriedBracket = marriedBrackets[index];
-                                        
-                                        return (
-                                          <TableRow key={index}>
-                                            <TableCell>
-                                              {singleBracket ? 
-                                                `$${singleBracket.min.toLocaleString()} - ${singleBracket.max ? `$${singleBracket.max.toLocaleString()}` : '∞'}` : 
-                                                '-'
-                                              }
-                                            </TableCell>
-                                            <TableCell>
-                                              {marriedBracket ? 
-                                                `$${marriedBracket.min.toLocaleString()} - ${marriedBracket.max ? `$${marriedBracket.max.toLocaleString()}` : '∞'}` : 
-                                                '-'
-                                              }
-                                            </TableCell>
-                                            <TableCell align="right">
-                                              {singleBracket?.rate || marriedBracket?.rate ? 
-                                                `${((singleBracket?.rate || marriedBracket?.rate || 0) * 100).toFixed(1)}%` : 
-                                                '-'
-                                              }
-                                            </TableCell>
-                                          </TableRow>
-                                        );
-                                      });
-                                    })()}
-                                  </TableBody>
-                                </Table>
-                              </TableContainer>
-                            ) : (
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
-                                No state income tax
-                              </Typography>
-                            )}
-                          </>
-                        )}
-
-                        {inputs.country === 'US' && taxInfo.payroll_taxes && (
-                          <>
-                            <Typography variant="h6" sx={{ mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
-                              Payroll Taxes
-                            </Typography>
-                            <TableContainer>
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell><strong>Type</strong></TableCell>
-                                    <TableCell align="right"><strong>Rate</strong></TableCell>
-                                    <TableCell align="right"><strong>Cap/Notes</strong></TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  <TableRow>
-                                    <TableCell>Social Security</TableCell>
-                                    <TableCell align="right">{((taxInfo.payroll_taxes.social_security?.rate || 0) * 100).toFixed(1)}%</TableCell>
-                                    <TableCell align="right">${taxInfo.payroll_taxes.social_security?.wage_base?.toLocaleString() || 'N/A'} wage base</TableCell>
-                                  </TableRow>
-                                  <TableRow>
-                                    <TableCell>Medicare</TableCell>
-                                    <TableCell align="right">{((taxInfo.payroll_taxes.medicare?.rate || 0) * 100).toFixed(2)}%</TableCell>
-                                    <TableCell align="right">No cap</TableCell>
-                                  </TableRow>
-                                  <TableRow>
-                                    <TableCell>Medicare Additional</TableCell>
-                                    <TableCell align="right">{((taxInfo.payroll_taxes.medicare?.additional_rate || 0) * 100).toFixed(1)}%</TableCell>
-                                    <TableCell align="right">On income over ${taxInfo.payroll_taxes.medicare?.additional_threshold?.toLocaleString() || 'N/A'}</TableCell>
-                                  </TableRow>
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                          </>
-                        )}
-
-                        {inputs.country === 'TW' && taxInfo.payroll_taxes && (
-                          <>
-                            <Typography variant="h6" sx={{ mb: 2, fontSize: '1.05rem', fontWeight: 600 }}>
+                            </Link>
+                          </Typography>
+                        </Box>
+                      )}
+                      
+                      {inputs.country === 'TW' && (
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            <Link 
+                              component="button"
+                              variant="body2"
+                              onClick={() => {
+                                setDialogTaxType('fica');
+                                setDialogStateCode('');
+                                setTaxInfoDialogOpen(true);
+                              }}
+                              sx={{ 
+                                cursor: 'pointer', 
+                                textDecoration: 'none',
+                                color: 'primary.light',
+                                fontWeight: 500,
+                                '&:hover': {
+                                  color: 'red',
+                                  textDecoration: 'underline'
+                                },
+                                '&:focus': {
+                                  outline: 'none'
+                                }
+                              }}
+                            >
                               Payroll Deductions
-                            </Typography>
-                            <TableContainer>
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell><strong>Type</strong></TableCell>
-                                    <TableCell align="right"><strong>Rate</strong></TableCell>
-                                    <TableCell align="right"><strong>Annual Cap</strong></TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  <TableRow>
-                                    <TableCell>Labor Insurance</TableCell>
-                                    <TableCell align="right">{((taxInfo.payroll_taxes.labor_insurance?.rate || 0) * 100).toFixed(1)}%</TableCell>
-                                    <TableCell align="right">No cap</TableCell>
-                                  </TableRow>
-                                  <TableRow>
-                                    <TableCell>Health Insurance</TableCell>
-                                    <TableCell align="right">{((taxInfo.payroll_taxes.health_insurance?.rate || 0) * 100).toFixed(2)}%</TableCell>
-                                    <TableCell align="right">
-                                      NT${
-                                        inputs.filingStatus === 'married' 
-                                          ? (taxInfo.payroll_taxes.health_insurance?.annual_cap_married || taxInfo.payroll_taxes.health_insurance?.annual_cap || 0).toLocaleString()
-                                          : (taxInfo.payroll_taxes.health_insurance?.annual_cap || 0).toLocaleString()
-                                      }
-                                    </TableCell>
-                                  </TableRow>
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                          </>
-                        )}
-                      </>
-                    )}
+                            </Link>
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
                   </Box>
                 </Collapse>
               </Box>
@@ -1618,6 +1557,16 @@ const FireCalculator: React.FC = () => {
             </DialogActions>
           </Dialog>
         </Grid>
+
+        {/* Tax Info Dialog */}
+        <TaxInfoDialog
+          open={taxInfoDialogOpen}
+          onClose={() => setTaxInfoDialogOpen(false)}
+          taxType={dialogTaxType}
+          stateCode={dialogStateCode}
+          taxData={taxInfo}
+          country={inputs.country}
+        />
         
         {/* GitHub Link */}
         <Box sx={{ 

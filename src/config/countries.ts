@@ -85,50 +85,6 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
       { id: 'income-3', startAge: 31, endAge: 40, income: 4000000 }
     ]
   }
-  // Future countries can be easily added here:
-  // 'GB': {
-  //   currency: { symbol: '£', code: 'GBP' },
-  //   defaults: {
-  //     currentAge: 23,
-  //     endAge: 50,
-  //     currentNetWorth: 50000,
-  //     annualReturn: 7,
-  //     inflationRate: 2.5,
-  //     retirementSpending: 60000,
-  //     withdrawalRate: 4,
-  //     country: 'GB',
-  //     state: '',
-  //     preTax401k: 0,  // UK uses different pension systems
-  //     employerMatch: 0,
-  //     filingStatus: 'single'
-  //   },
-  //   spendingDefaults: [
-  //     { id: 'spending-1', startAge: 23, endAge: 50, spending: 60000 }
-  //   ],
-  //   incomeDefaults: [
-  //     { id: 'income-1', startAge: 23, endAge: 25, income: 40000 },
-  //     { id: 'income-2', startAge: 26, endAge: 30, income: 55000 },
-  //     { id: 'income-3', startAge: 31, endAge: 40, income: 75000 }
-  //   ]
-  // },
-  // 'CA': {
-  //   currency: { symbol: 'C$', code: 'CAD' },
-  //   defaults: { /* Canadian defaults */ },
-  //   spendingDefaults: [ /* Canadian spending patterns */ ],
-  //   incomeDefaults: [ /* Canadian income patterns */ ]
-  // },
-  // 'AU': {
-  //   currency: { symbol: 'A$', code: 'AUD' },
-  //   defaults: { /* Australian defaults */ },
-  //   spendingDefaults: [ /* Australian spending patterns */ ],
-  //   incomeDefaults: [ /* Australian income patterns */ ]
-  // },
-  // 'JP': {
-  //   currency: { symbol: '¥', code: 'JPY' },
-  //   defaults: { /* Japanese defaults with yen values */ },
-  //   spendingDefaults: [ /* Japanese spending patterns */ ],
-  //   incomeDefaults: [ /* Japanese income patterns */ ]
-  // }
 };
 
 // Helper functions for easy access to country data

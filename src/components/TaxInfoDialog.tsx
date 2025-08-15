@@ -16,6 +16,7 @@ import {
   Paper,
   Divider
 } from '@mui/material';
+import { getCurrencySymbol } from '../config/countries';
 
 interface TaxBracket {
   min: number;
@@ -37,15 +38,25 @@ interface TaxConfig {
 }
 
 interface PayrollTaxConfig {
-  social_security: {
+  social_security?: {
     rate: number;
     wage_base: number;
   };
-  medicare: {
+  medicare?: {
     rate: number;
     additional_rate: number;
     additional_threshold: number;
     additional_threshold_married?: number;
+  };
+  labor_insurance?: {
+    rate: number;
+    description?: string;
+  };
+  health_insurance?: {
+    rate: number;
+    annual_cap: number;
+    annual_cap_married?: number;
+    description?: string;
   };
 }
 
@@ -61,6 +72,7 @@ interface TaxInfoDialogProps {
   taxType: 'federal' | 'fica' | 'state';
   stateCode?: string;
   taxData: TaxInfoData | null;
+  country?: string;
 }
 
 const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
@@ -68,15 +80,12 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
   onClose,
   taxType,
   stateCode,
-  taxData
+  taxData,
+  country
 }) => {
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+    // Use the exact same currency logic as the FireCalculator
+    return `${getCurrencySymbol(country || 'US')}${Math.round(amount).toLocaleString()}`;
   };
 
   const formatPercentage = (rate: number): string => {
@@ -105,7 +114,11 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
       case 'federal':
         return 'Federal Income Tax';
       case 'fica':
-        return 'FICA Taxes (Social Security & Medicare)';
+        if (country === 'TW') {
+          return 'Payroll Deductions (Labor & Health Insurance)';
+        } else {
+          return 'FICA Taxes (Social Security & Medicare)';
+        }
       case 'state':
         return `${getStateName(stateCode || '')} State Tax`;
       default:
@@ -183,40 +196,90 @@ const TaxInfoDialog: React.FC<TaxInfoDialogProps> = ({
           </Box>
         );
 
-      case 'fica':
-        return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Social Security Tax
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Rate: {formatPercentage(taxData.payroll_taxes.social_security.rate)}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Wage Base: {formatCurrency(taxData.payroll_taxes.social_security.wage_base)}
-            </Typography>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="h6" gutterBottom>
-              Medicare Tax
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Standard Rate: {formatPercentage(taxData.payroll_taxes.medicare.rate)}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Additional Rate: {formatPercentage(taxData.payroll_taxes.medicare.additional_rate)}
-            </Typography>
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Single: On income over {formatCurrency(taxData.payroll_taxes.medicare.additional_threshold)}
+      case 'fica': {
+        if (country === 'US' && taxData.payroll_taxes.social_security && taxData.payroll_taxes.medicare) {
+          // US FICA taxes
+          return (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Social Security Tax
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Married: On income over {formatCurrency(taxData.payroll_taxes.medicare.additional_threshold_married || taxData.payroll_taxes.medicare.additional_threshold)}
+              <Typography variant="body1" gutterBottom>
+                Rate: {formatPercentage(taxData.payroll_taxes.social_security.rate)} (per individual, regardless of filing status)
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Wage Base: {formatCurrency(taxData.payroll_taxes.social_security.wage_base)} (per individual)
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Note: Social Security tax is calculated separately for each individual. For married couples filing jointly, each spouse pays Social Security tax on their own wages up to the wage base limit.
+              </Typography>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Typography variant="h6" gutterBottom>
+                Medicare Tax
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Standard Rate: {formatPercentage(taxData.payroll_taxes.medicare.rate)} (per individual, no wage cap)
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Additional Rate: {formatPercentage(taxData.payroll_taxes.medicare.additional_rate)}
+              </Typography>
+              <Box sx={{ ml: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Single: On income over {formatCurrency(taxData.payroll_taxes.medicare.additional_threshold)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Married Filing Jointly: On combined income over {formatCurrency(taxData.payroll_taxes.medicare.additional_threshold_married || taxData.payroll_taxes.medicare.additional_threshold)}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Note: Unlike Social Security tax, the Medicare additional tax threshold considers combined income for married couples filing jointly.
               </Typography>
             </Box>
-          </Box>
-        );
+          );
+        } else if (country === 'TW' && taxData.payroll_taxes.labor_insurance && taxData.payroll_taxes.health_insurance) {
+          // Taiwan payroll deductions
+          return (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Labor Insurance
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Rate: {formatPercentage(taxData.payroll_taxes.labor_insurance.rate)} (per individual)
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Direct payroll deduction with no annual cap
+              </Typography>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Typography variant="h6" gutterBottom>
+                Health Insurance
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Rate: {formatPercentage(taxData.payroll_taxes.health_insurance.rate)} (per individual)
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Annual Cap:
+              </Typography>
+              <Box sx={{ ml: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Single: {formatCurrency(taxData.payroll_taxes.health_insurance.annual_cap)} per person
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Married: {formatCurrency(taxData.payroll_taxes.health_insurance.annual_cap_married || taxData.payroll_taxes.health_insurance.annual_cap)} combined for both spouses
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Note: Health insurance is calculated per individual but has different annual caps for single vs married filing status.
+              </Typography>
+            </Box>
+          );
+        } else {
+          return <Typography>No payroll tax information available.</Typography>;
+        }
+      }
 
       case 'state': {
         if (!stateCode || !taxData.states[stateCode]) {
