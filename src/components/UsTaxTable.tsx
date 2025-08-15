@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 interface TaxBracket {
   min: number;
@@ -461,12 +462,12 @@ const UsTaxTable: React.FC = () => {
                   <Slider
                     value={parseFloat(partnerIncome.replace(/,/g, '')) || 0}
                     onChange={(_, newValue) => {
-                      const roundedValue = Math.max(0, Math.round(Number(newValue) / 1000) * 1000);
+                      const roundedValue = Math.max(0, Math.round(Number(newValue) / 10000) * 10000);
                       setPartnerIncome(roundedValue.toLocaleString());
                     }}
                     min={0}
                     max={500000}
-                    step={1000}
+                    step={10000}
                     sx={{ mt: 1 }}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(value) => `$${value.toLocaleString()}`}
@@ -480,6 +481,160 @@ const UsTaxTable: React.FC = () => {
                   : 'For married filing jointly: Combined income used for tax brackets, but Social Security tax calculated individually.'
                 }
               </Typography>
+
+              {/* Interactive Income Distribution Pie Chart */}
+              <Box sx={{ mt: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, backgroundColor: 'background.default' }}>
+                <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+                  Income Distribution
+                </Typography>
+                
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, alignItems: 'center' }}>
+                  {/* Pie Chart */}
+                  <Box sx={{ height: 300, width: { xs: '100%', md: 400 }, position: 'relative' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                                                 <Pie
+                           data={[
+                             { 
+                               name: 'Your Income', 
+                               value: parseFloat(income.replace(/,/g, '')) || 0,
+                               color: '#1976d2'
+                             },
+                             { 
+                               name: 'Partner Income', 
+                               value: parseFloat(partnerIncome.replace(/,/g, '')) || 0,
+                               color: '#dc004e'
+                             }
+                           ]}
+                           cx="50%"
+                           cy="50%"
+                           innerRadius={60}
+                           outerRadius={100}
+                           paddingAngle={2}
+                           dataKey="value"
+                         >
+                          {[
+                            { name: 'Your Income', color: '#1976d2' },
+                            { name: 'Partner Income', color: '#dc004e' }
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} stroke="#fff" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']}
+                          labelFormatter={(label) => label}
+                        />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    
+                    {/* Center label showing total */}
+                    <Box sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      textAlign: 'center',
+                      pointerEvents: 'none'
+                    }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Total
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {formatCurrency(getTotalIncome())}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                                     {/* Summary and Instructions */}
+                   <Box sx={{ flex: 1, minWidth: 200 }}>
+                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                       <strong>Use the buttons below</strong> to adjust income distribution while keeping the total constant.
+                     </Typography>
+                    
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{ width: 16, height: 16, backgroundColor: '#1976d2', borderRadius: '50%' }} />
+                        <Typography variant="body2">
+                          Your Income: <strong>{formatCurrency(parseFloat(income.replace(/,/g, '')) || 0)}</strong>
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ({getTotalIncome() > 0 ? ((parseFloat(income.replace(/,/g, '')) || 0) / getTotalIncome() * 100).toFixed(1) : 0}%)
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{ width: 16, height: 16, backgroundColor: '#dc004e', borderRadius: '50%' }} />
+                        <Typography variant="body2">
+                          Partner Income: <strong>{formatCurrency(parseFloat(partnerIncome.replace(/,/g, '')) || 0)}</strong>
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ({getTotalIncome() > 0 ? ((parseFloat(partnerIncome.replace(/,/g, '')) || 0) / getTotalIncome() * 100).toFixed(1) : 0}%)
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                                         <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                         <strong>Adjust Split:</strong>
+                       </Typography>
+                       
+                       {/* Income Split Slider */}
+                       <Box sx={{ mb: 2 }}>
+                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                           Your Income Share
+                         </Typography>
+                         <Slider
+                           value={getTotalIncome() > 0 ? Math.round(((parseFloat(income.replace(/,/g, '')) || 0) / getTotalIncome() * 100) / 5) * 5 : 50}
+                           onChange={(_, newValue) => {
+                             const totalIncome = getTotalIncome();
+                             const yourShare = Number(newValue) / 100;
+                             const newYourIncome = Math.round(totalIncome * yourShare);
+                             const newPartnerIncome = totalIncome - newYourIncome;
+                             setIncome(newYourIncome.toLocaleString());
+                             setPartnerIncome(newPartnerIncome.toLocaleString());
+                           }}
+                           min={5}
+                           max={95}
+                           step={5}
+                           valueLabelDisplay="auto"
+                           valueLabelFormat={(value) => `${value.toFixed(0)}%`}
+                           sx={{ mt: 1 }}
+                         />
+                       </Box>
+
+                       <Typography variant="body2" color="text.secondary">
+                         <strong>Quick Splits:</strong>
+                       </Typography>
+                       <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                         {[
+                           { label: '50/50', yourShare: 0.5 },
+                           { label: '60/40', yourShare: 0.6 },
+                           { label: '70/30', yourShare: 0.7 },
+                           { label: '80/20', yourShare: 0.8 },
+                           { label: '100/0', yourShare: 1.0 }
+                         ].map(split => (
+                           <Button
+                             key={split.label}
+                             size="small"
+                             variant="outlined"
+                             onClick={() => {
+                               const totalIncome = getTotalIncome();
+                               const newYourIncome = Math.round(totalIncome * split.yourShare);
+                               const newPartnerIncome = totalIncome - newYourIncome;
+                               setIncome(newYourIncome.toLocaleString());
+                               setPartnerIncome(newPartnerIncome.toLocaleString());
+                             }}
+                             sx={{ fontSize: '0.75rem', minWidth: 'auto', px: 1 }}
+                           >
+                             {split.label}
+                           </Button>
+                         ))}
+                       </Box>
+                     </Box>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           )}
         </Box>
