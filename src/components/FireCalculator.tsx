@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getCurrencySymbol, getCurrencyCode, getCountryDefaults, isCountrySupported } from '../config/countries';
 import {
   Box,
   TextField,
@@ -156,7 +157,7 @@ const STATES = [
 
 const Grid = MuiGrid as React.ComponentType<Record<string, unknown>>;  // Type assertion to bypass the type error
 
-const NetWorthChart: React.FC<{ data: Omit<ChartData, 'id'>[]; fireAge: number }> = ({ data, fireAge }) => {
+const NetWorthChart: React.FC<{ data: Omit<ChartData, 'id'>[]; fireAge: number; currencySymbol: string }> = ({ data, fireAge, currencySymbol }) => {
   return (
     <>
       <style>
@@ -181,12 +182,12 @@ const NetWorthChart: React.FC<{ data: Omit<ChartData, 'id'>[]; fireAge: number }
           />
           <YAxis
             type="number"
-            tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
+            tickFormatter={(value) => `${currencySymbol}${(value / 1000000).toFixed(1)}M`}
             label={{ value: 'Net Worth', angle: -90, position: 'left' }}
           />
           <Tooltip
             formatter={(value: number, name: string) => {
-              const formattedValue = `$${(value / 1000000).toFixed(2)}M`;
+              const formattedValue = `${currencySymbol}${(value / 1000000).toFixed(2)}M`;
               return [formattedValue, name];
             }}
             labelFormatter={(label) => `Age: ${label}`}
@@ -285,63 +286,14 @@ const FireCalculator: React.FC = () => {
     },
   });
 
-  // Default values for US
-  const US_DEFAULTS = {
-    currentAge: 23,
-    endAge: 50,
-    currentNetWorth: 70000,
-    annualReturn: 8,
-    inflationRate: 3,
-    retirementSpending: 100000,
-    withdrawalRate: 4,
-    country: 'US' as const,
-    state: 'CA',
-    preTax401k: 23000,
-    employerMatch: 5,
-    filingStatus: 'single'
-  };
+  // Get initial defaults for US (default country)
+  const initialDefaults = getCountryDefaults('US');
 
-  // Default values for Taiwan (10x monetary values)
-  const TW_DEFAULTS = {
-    currentAge: 23,
-    endAge: 50,
-    currentNetWorth: 700000,
-    annualReturn: 8,
-    inflationRate: 3,
-    retirementSpending: 1000000,
-    withdrawalRate: 4,
-    country: 'TW' as const,
-    state: '',
-    preTax401k: 0,
-    employerMatch: 0,
-    filingStatus: 'single'
-  };
+  const [inputs, setInputs] = useState<Inputs>(initialDefaults.inputs);
 
-  const US_SPENDING_DEFAULTS = [
-    { id: 'spending-1', startAge: 23, endAge: 50, spending: 100000 }
-  ];
+  const [yearlySpending, setYearlySpending] = useState<YearlyDataItem[]>(initialDefaults.spending);
 
-  const TW_SPENDING_DEFAULTS = [
-    { id: 'spending-1', startAge: 23, endAge: 50, spending: 1000000 }
-  ];
-
-  const US_INCOME_DEFAULTS = [
-    { id: 'income-1', startAge: 23, endAge: 25, income: 230000 },
-    { id: 'income-2', startAge: 26, endAge: 30, income: 300000 },
-    { id: 'income-3', startAge: 31, endAge: 40, income: 400000 }
-  ];
-
-  const TW_INCOME_DEFAULTS = [
-    { id: 'income-1', startAge: 23, endAge: 25, income: 2300000 },
-    { id: 'income-2', startAge: 26, endAge: 30, income: 3000000 },
-    { id: 'income-3', startAge: 31, endAge: 40, income: 4000000 }
-  ];
-
-  const [inputs, setInputs] = useState<Inputs>(US_DEFAULTS);
-
-  const [yearlySpending, setYearlySpending] = useState<YearlyDataItem[]>(US_SPENDING_DEFAULTS);
-
-  const [yearlyIncome, setYearlyIncome] = useState<YearlyDataItem[]>(US_INCOME_DEFAULTS);
+  const [yearlyIncome, setYearlyIncome] = useState<YearlyDataItem[]>(initialDefaults.income);
 
   const [results, setResults] = useState<Results | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -511,18 +463,17 @@ const FireCalculator: React.FC = () => {
   const handleCountryChange = (event: SelectChangeEvent<string>) => {
     const newCountry = event.target.value;
     
-    if (newCountry === 'TW') {
-      // Switch to Taiwan defaults
-      setInputs(TW_DEFAULTS);
-      setYearlySpending(TW_SPENDING_DEFAULTS);
-      setYearlyIncome(TW_INCOME_DEFAULTS);
-    } else if (newCountry === 'US') {
-      // Switch to US defaults
-      setInputs(US_DEFAULTS);
-      setYearlySpending(US_SPENDING_DEFAULTS);
-      setYearlyIncome(US_INCOME_DEFAULTS);
+    // Use the scalable getCountryDefaults helper
+    const countryDefaults = getCountryDefaults(newCountry);
+    
+    if (isCountrySupported(newCountry)) {
+      // Switch to country-specific defaults
+      setInputs(countryDefaults.inputs);
+      setYearlySpending(countryDefaults.spending);
+      setYearlyIncome(countryDefaults.income);
     } else {
-      // For other countries, just update country and clear state
+      // For unsupported countries, just update country and clear state
+      // This allows for future expansion without breaking existing functionality
       setInputs({
         ...inputs,
         country: newCountry,
@@ -1114,7 +1065,7 @@ const FireCalculator: React.FC = () => {
                           onChange={handleMonetaryInputChange('currentNetWorth')}
                           slotProps={{
                             input: {
-                              startAdornment: <InputAdornment position="start">$</InputAdornment>
+                              startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
                             }
                           }}
                         />
@@ -1158,7 +1109,7 @@ const FireCalculator: React.FC = () => {
                           onChange={handleMonetaryInputChange('retirementSpending')}
                           slotProps={{
                             input: {
-                              startAdornment: <InputAdornment position="start">$</InputAdornment>
+                              startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
                             }
                           }}
                         />
@@ -1199,7 +1150,7 @@ const FireCalculator: React.FC = () => {
                           onChange={handleMonetaryInputChange('preTax401k')}
                           slotProps={{
                             input: {
-                              startAdornment: <InputAdornment position="start">$</InputAdornment>
+                              startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
                             }
                           }}
                         />
@@ -1263,7 +1214,7 @@ const FireCalculator: React.FC = () => {
                       }}
                       slotProps={{
                         input: {
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
                         }
                       }}
                     />
@@ -1336,7 +1287,7 @@ const FireCalculator: React.FC = () => {
                       }}
                       slotProps={{
                         input: {
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
                         }
                       }}
                     />
@@ -1403,7 +1354,7 @@ const FireCalculator: React.FC = () => {
                     </Box>
                     <Box sx={{ flex: '1 1 300px' }}>
                       <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                        Required Savings: {results.requiredSavings ? `$${results.requiredSavings.toLocaleString()}` : 'Not Possible'}
+                        Required Savings: {results.requiredSavings ? `${getCurrencySymbol(inputs.country)}${results.requiredSavings.toLocaleString()}` : 'Not Possible'}
                       </Typography>
                     </Box>
                     {results.error && (
@@ -1432,6 +1383,7 @@ const FireCalculator: React.FC = () => {
                           spending: Math.round(results.yearlySpending[index])
                         }))}
                         fireAge={results.fireAge}
+                        currencySymbol={getCurrencySymbol(inputs.country)}
                       />
                     </Box>
                   )}
@@ -1492,16 +1444,16 @@ const FireCalculator: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell align="right">
-                                  ${Math.round(results.yearlyPreTaxIncome[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlyPreTaxIncome[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell align="right">
-                                  ${Math.round(results.yearlyAfterTaxIncome[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlyAfterTaxIncome[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell align="right">
                                   {results.yearlyTaxRates[index].toFixed(1)}%
                                 </TableCell>
                                 <TableCell align="right">
-                                  ${Math.round(results.yearlySpending[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlySpending[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell 
                                   align="right"
@@ -1510,7 +1462,7 @@ const FireCalculator: React.FC = () => {
                                     fontWeight: results.yearlySavings[index] !== 0 ? 'bold' : 'normal'
                                   }}
                                 >
-                                  ${Math.round(results.yearlySavings[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlySavings[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell 
                                   align="right"
@@ -1519,7 +1471,7 @@ const FireCalculator: React.FC = () => {
                                     fontWeight: results.yearlyRealInterest[index] !== 0 ? 'bold' : 'normal'
                                   }}
                                 >
-                                  ${Math.round(results.yearlyRealInterest[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlyRealInterest[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell 
                                   align="right"
@@ -1528,7 +1480,7 @@ const FireCalculator: React.FC = () => {
                                     fontWeight: (results.yearlySavings[index] + results.yearlyRealInterest[index]) !== 0 ? 'bold' : 'normal'
                                   }}
                                 >
-                                  ${Math.round(results.yearlySavings[index] + results.yearlyRealInterest[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.yearlySavings[index] + results.yearlyRealInterest[index]).toLocaleString()}
                                 </TableCell>
                                 <TableCell 
                                   align="right"
@@ -1537,7 +1489,7 @@ const FireCalculator: React.FC = () => {
                                     fontWeight: results.realNetWorth[index] < 0 ? 'bold' : 'normal'
                                   }}
                                 >
-                                  ${Math.round(results.realNetWorth[index]).toLocaleString()}
+                                  {getCurrencySymbol(inputs.country)}{Math.round(results.realNetWorth[index]).toLocaleString()}
                                 </TableCell>
                               </TableRow>
                             ))}
