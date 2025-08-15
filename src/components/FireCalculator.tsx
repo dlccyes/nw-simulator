@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getCurrencySymbol, getCurrencyCode, getCountryDefaults, isCountrySupported } from '../config/countries';
+import { getCurrencySymbol, getCountryDefaults, isCountrySupported } from '../config/countries';
 import {
   Box,
   TextField,
@@ -331,7 +331,7 @@ const FireCalculator: React.FC = () => {
       social_security?: {rate: number; wage_base: number};
       medicare?: {rate: number; additional_rate: number; additional_threshold: number};
       labor_insurance?: {rate: number};
-      health_insurance?: {rate: number; annual_cap: number};
+      health_insurance?: {rate: number; annual_cap: number; annual_cap_married?: number};
     };
   } | null>(null);
   const [infoExpanded, setInfoExpanded] = useState(false);
@@ -726,7 +726,7 @@ const FireCalculator: React.FC = () => {
                       ) : inputs.country === 'TW' ? (
                         <>
                           All calculations include income tax and mandatory payroll deductions (Labor and Health Insurance). 
-                          Tax rates and deductions apply to unmarried, non-disabled employees under 70.
+                          Tax rates and deductions are for {inputs.filingStatus === 'married' ? 'married filing jointly' : 'single filers'}.
                         </>
                       ) : null}
                     </Typography>
@@ -926,7 +926,13 @@ const FireCalculator: React.FC = () => {
                                   <TableRow>
                                     <TableCell>Health Insurance</TableCell>
                                     <TableCell align="right">{((taxInfo.payroll_taxes.health_insurance?.rate || 0) * 100).toFixed(2)}%</TableCell>
-                                    <TableCell align="right">NT${taxInfo.payroll_taxes.health_insurance?.annual_cap?.toLocaleString() || 'N/A'}</TableCell>
+                                    <TableCell align="right">
+                                      NT${
+                                        inputs.filingStatus === 'married' 
+                                          ? (taxInfo.payroll_taxes.health_insurance?.annual_cap_married || taxInfo.payroll_taxes.health_insurance?.annual_cap || 0).toLocaleString()
+                                          : (taxInfo.payroll_taxes.health_insurance?.annual_cap || 0).toLocaleString()
+                                      }
+                                    </TableCell>
                                   </TableRow>
                                 </TableBody>
                               </Table>
@@ -1001,8 +1007,8 @@ const FireCalculator: React.FC = () => {
                       </Grid>
                     )}
 
-                    {/* Row 1.5: Filing Status (US only) */}
-                    {inputs.country === 'US' && (
+                    {/* Row 1.5: Filing Status (US and Taiwan) */}
+                    {(inputs.country === 'US' || inputs.country === 'TW') && (
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <FormControl fullWidth sx={{ minWidth: 220 }}>
