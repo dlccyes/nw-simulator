@@ -23,10 +23,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button
+  Button,
+  ThemeProvider,
+  createTheme,
+  CssBaseline
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
+import DarkModeToggle from './DarkModeToggle';
+import Footer from './Footer';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 interface TaxBracket {
@@ -75,6 +80,28 @@ interface StateComparison {
 type SortField = keyof StateComparison;
 
 const UsTaxTable: React.FC = () => {
+  const [darkMode, setDarkMode] = useState(false);
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      background: {
+        default: darkMode ? '#121212' : '#f5f5f5',
+        paper: darkMode ? '#1e1e1e' : '#ffffff',
+      },
+    },
+    components: {
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            '&:hover': {
+              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
+            },
+          },
+        },
+      },
+    },
+  });
+
   const [income, setIncome] = useState<string>('230,000');
   const [filingStatus, setFilingStatus] = useState<string>('single');
   const [data, setData] = useState<StateComparison[]>([]);
@@ -284,11 +311,13 @@ const UsTaxTable: React.FC = () => {
   };
 
   return (
-    <Box sx={{ 
-      p: { xs: 2, sm: 3, md: 4 },
-      minHeight: '100vh',
-      bgcolor: 'background.default'
-    }}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ 
+        p: { xs: 2, sm: 3, md: 4 },
+        minHeight: '100vh',
+        bgcolor: 'background.default'
+      }}>
       <Typography 
         variant="h3" 
         component="h1" 
@@ -318,6 +347,21 @@ const UsTaxTable: React.FC = () => {
           State Tax Comparison
         </span>
       </Typography>
+
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        gap: 2, 
+        mb: 3,
+        '& .MuiButton-root': {
+          minWidth: 120
+        }
+      }}>
+        <DarkModeToggle 
+          darkMode={darkMode}
+          onToggle={() => setDarkMode(!darkMode)}
+        />
+      </Box>
       
       <Typography 
         variant="body1" 
@@ -1214,13 +1258,6 @@ const UsTaxTable: React.FC = () => {
         </Box>
       )}
 
-      {data.length > 0 && (
-        <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
-          * Calculations are estimates based on 2024 tax brackets and standard deductions. 
-          Actual taxes may vary based on individual circumstances, deductions, and credits.
-        </Typography>
-      )}
-
       <TaxInfoDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
@@ -1229,7 +1266,10 @@ const UsTaxTable: React.FC = () => {
         taxData={taxInfoData}
         country="US"
       />
-    </Box>
+
+      <Footer />
+      </Box>
+    </ThemeProvider>
   );
 };
 

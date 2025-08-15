@@ -37,6 +37,8 @@ import {
 } from '@mui/material';
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
+import DarkModeToggle from './DarkModeToggle';
+import Footer from './Footer';
 
 // Import tax-related types
 interface TaxBracket {
@@ -86,7 +88,7 @@ interface TaxInfoData {
   payroll_taxes: PayrollTaxConfig;
   states: { [key: string]: TaxConfig };
 }
-import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as FolderOpenIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
@@ -647,19 +649,10 @@ const FireCalculator: React.FC = () => {
                 minWidth: 120
               }
             }}>
-              <IconButton 
-                onClick={() => setDarkMode(!darkMode)}
-                color="primary"
-                sx={{ 
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
-              </IconButton>
+              <DarkModeToggle 
+                darkMode={darkMode}
+                onToggle={() => setDarkMode(!darkMode)}
+              />
               {enableProfile && (
                 <>
                   <Button
@@ -1568,32 +1561,7 @@ const FireCalculator: React.FC = () => {
           country={inputs.country}
         />
         
-        {/* GitHub Link */}
-        <Box sx={{ 
-          mt: 6, 
-          pt: 4, 
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          textAlign: 'center'
-        }}>
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            component="a"
-            href="https://github.com/dlccyes/nw-simulator"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              fontFamily: 'monospace',
-              textDecoration: 'none',
-              '&:hover': {
-                textDecoration: 'underline'
-              }
-            }}
-          >
-            GitHub
-          </Typography>
-        </Box>
+        <Footer />
       </Box>
     </ThemeProvider>
   );
