@@ -356,7 +356,7 @@ const FireCalculator: React.FC = () => {
   const [stopAtFire, setStopAtFire] = useState(false);
   const [loading, setLoading] = useState(false);
   const [taxInfo, setTaxInfo] = useState<TaxInfoData | null>(null);
-  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(true);
   
   // Tax info dialog state
   const [taxInfoDialogOpen, setTaxInfoDialogOpen] = useState(false);
