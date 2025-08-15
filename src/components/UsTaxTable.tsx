@@ -96,6 +96,9 @@ const UsTaxTable: React.FC = () => {
   // State filtering
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
+  
+  // Filing type filtering (for compare mode)
+  const [selectedFilingTypes, setSelectedFilingTypes] = useState<string[]>([]);
 
   // All US states for autocomplete
   const allStates = [
@@ -225,9 +228,17 @@ const UsTaxTable: React.FC = () => {
     setSortField(field);
   };
 
-  const filteredData = selectedStates.length > 0 
-    ? data.filter(row => selectedStates.includes(row.stateCode))
-    : data;
+  const filteredData = data.filter(row => {
+    // Filter by selected states
+    const stateMatch = selectedStates.length === 0 || selectedStates.includes(row.stateCode);
+    
+    // Filter by selected filing types (only for compare mode)
+    const filingTypeMatch = filingStatus !== 'compare' || 
+                           selectedFilingTypes.length === 0 || 
+                           selectedFilingTypes.includes(row.filingType || '');
+    
+    return stateMatch && filingTypeMatch;
+  });
 
   const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
@@ -667,6 +678,47 @@ const UsTaxTable: React.FC = () => {
       {data.length > 0 && (
         <Box>
           
+          {/* Filing Type Filter (Compare Mode Only) */}
+          {filingStatus === 'compare' && (
+            <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Filing Status
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant={selectedFilingTypes.includes('single') ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={() => {
+                    if (selectedFilingTypes.includes('single')) {
+                      setSelectedFilingTypes(selectedFilingTypes.filter(type => type !== 'single'));
+                    } else {
+                      setSelectedFilingTypes([...selectedFilingTypes, 'single']);
+                    }
+                  }}
+                  startIcon={<span>🫃</span>}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  Single Filing
+                </Button>
+                <Button
+                  variant={selectedFilingTypes.includes('married') ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={() => {
+                    if (selectedFilingTypes.includes('married')) {
+                      setSelectedFilingTypes(selectedFilingTypes.filter(type => type !== 'married'));
+                    } else {
+                      setSelectedFilingTypes([...selectedFilingTypes, 'married']);
+                    }
+                  }}
+                  startIcon={<span>👩‍❤️‍👩</span>}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  Married Filing Jointly
+                </Button>
+              </Box>
+            </Paper>
+          )}
+
           <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Federal & FICA Taxes
@@ -675,7 +727,8 @@ const UsTaxTable: React.FC = () => {
               // Compare mode: show both single and married side by side
               <Box>
                 {/* Single Filing Row */}
-                <Box sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                {(selectedFilingTypes.length === 0 || selectedFilingTypes.includes('single')) && (
+                  <Box sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                   <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                     Single Filing
             </Typography>
@@ -752,10 +805,12 @@ const UsTaxTable: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
-                </Box>
+                  </Box>
+                )}
 
                 {/* Married Filing Row */}
-                <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                {(selectedFilingTypes.length === 0 || selectedFilingTypes.includes('married')) && (
+                  <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                   <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'secondary.main' }}>
                     Married Filing Jointly
                   </Typography>
@@ -832,7 +887,8 @@ const UsTaxTable: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
-                </Box>
+                  </Box>
+                )}
               </Box>
             ) : (
               // Normal mode: show single result
@@ -912,19 +968,22 @@ const UsTaxTable: React.FC = () => {
             )}
           </Paper>
 
-          {/* Filter states section */}
+          {/* Filter section */}
           <Box sx={{ mt: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                Filter states (optional)
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Tax by State
               </Typography>
-              {selectedStates.length > 0 && (
+              {(selectedStates.length > 0 || selectedFilingTypes.length > 0) && (
                 <Typography variant="body2" color="text.secondary">
                   Showing {filteredData.length} of {data.length} rows
                   <Link
                     component="button"
                     variant="body2"
-                    onClick={() => setSelectedStates([])}
+                    onClick={() => {
+                      setSelectedStates([]);
+                      setSelectedFilingTypes([]);
+                    }}
                     sx={{ 
                       ml: 1,
                       cursor: 'pointer', 
@@ -944,6 +1003,14 @@ const UsTaxTable: React.FC = () => {
                 </Typography>
               )}
             </Box>
+
+
+
+            {/* States Filter */}
+            <Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {filingStatus === 'compare' ? 'States' : 'Filter by States (optional)'}
+              </Typography>
             <Autocomplete
               multiple
               options={allStates}
@@ -1013,6 +1080,7 @@ const UsTaxTable: React.FC = () => {
                 />
               )}
             />
+            </Box>
           </Box>
 
           <Box sx={{ 
