@@ -31,6 +31,7 @@ import {
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
 import DarkModeToggle from './DarkModeToggle';
+import { usePersistentDarkMode } from '../hooks/usePersistentDarkMode';
 import Footer from './Footer';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
@@ -80,7 +81,7 @@ interface StateComparison {
 type SortField = keyof StateComparison;
 
 const UsTaxTable: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = usePersistentDarkMode();
   const theme = createTheme({
     palette: {
       mode: darkMode ? 'dark' : 'light',

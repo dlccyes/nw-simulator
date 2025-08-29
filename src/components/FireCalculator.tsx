@@ -38,6 +38,7 @@ import {
 import CalculateButton from './CalculateButton';
 import TaxInfoDialog from './TaxInfoDialog';
 import DarkModeToggle from './DarkModeToggle';
+import { usePersistentDarkMode } from '../hooks/usePersistentDarkMode';
 import Footer from './Footer';
 
 // Import tax-related types
@@ -317,7 +318,7 @@ const fireAnimation = `
 `;
 
 const FireCalculator: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = usePersistentDarkMode();
   const theme = createTheme({
     palette: {
       mode: darkMode ? 'dark' : 'light',
