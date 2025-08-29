@@ -423,7 +423,13 @@ const UsTaxTable: React.FC = () => {
             <Select
               value={filingStatus}
               label="Filing Status"
-              onChange={(e) => setFilingStatus(e.target.value)}
+              onChange={(e) => {
+                const nextStatus = e.target.value as string;
+                setFilingStatus(nextStatus);
+                // Reset compare-mode specific filters and clear data to prevent stale rows
+                setSelectedFilingTypes([]);
+                setData([]);
+              }}
             >
               <MenuItem value="single">Single</MenuItem>
               <MenuItem value="married">Married Filing Jointly</MenuItem>
@@ -1208,7 +1214,7 @@ const UsTaxTable: React.FC = () => {
                     }
                     
                     return (
-                      <TableRow key={filingStatus === 'compare' ? `${row.stateCode}-${row.filingType}` : row.stateCode} hover>
+                      <TableRow key={`${filingStatus}-${row.stateCode}-${row.filingType || ''}`} hover>
                         <TableCell component="th" scope="row">
                           <Link 
                             component="button"
