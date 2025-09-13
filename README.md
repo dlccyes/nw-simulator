@@ -51,6 +51,15 @@ Run frontend server:
 npm run dev
 ```
 
+### Configuration (Backend)
+
+Environment variables:
+- `PORT` (default: 5000) — Flask port
+- `ENABLE_PROFILES` (default: false) — enable profile save/load endpoints
+- `MONGODB_URI` (default: mongodb://localhost:27017) — Mongo connection
+- `CORS_ORIGINS` (comma-separated) — allowed CORS origins
+- `MAX_CONTENT_LENGTH` (default: 1000000) — request size limit in bytes
+
 ## Development
 
 ### Using Makefile Commands
@@ -94,4 +103,3 @@ python3 -m pytest -v
 ### SPA Deployment
 - **GitHub Pages Compatible**: Includes 404.html redirect for client-side routing
 - **Custom Domain Ready**: Configured for both project sites and custom domains
-

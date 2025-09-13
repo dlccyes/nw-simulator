@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getCurrencySymbol, getCountryDefaults, isCountrySupported } from '../config/countries';
+import { API_BASE_URL, ENABLE_PROFILE } from '../utils/env';
 import {
   Box,
   TextField,
@@ -93,10 +94,8 @@ import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon, FolderOpen as F
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// only enable save/load profile feature when in local
-// TODO: enable in prod once we have a production db
-const enableProfile = API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1');
+// API base and profile feature flag
+const enableProfile = ENABLE_PROFILE;
 
 interface Inputs {
   currentAge: number;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/env';
 import {
   Box,
   TextField,
@@ -64,7 +65,7 @@ interface TaxInfoData {
   states: { [key: string]: TaxConfig };
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Centralized API base URL
 
 interface StateComparison {
   stateCode: string;
