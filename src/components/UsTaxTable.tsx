@@ -1194,9 +1194,8 @@ const UsTaxTable: React.FC = () => {
                 <TableBody>
                   {sortedData.map((row) => {
                     // Add medal emojis to top 3 most taxed states (highest effective rate)
-                    // In compare mode, get top 3 from current filtered data, otherwise use original logic
-                    const dataForRanking = filingStatus === 'compare' ? sortedData : data;
-                    const top3MostTaxedStates = [...dataForRanking]
+                    // Always rank among filtered data to respect state filters
+                    const top3MostTaxedStates = [...sortedData]
                       .sort((a, b) => b.effectiveRate - a.effectiveRate)
                       .slice(0, 3);
                     
