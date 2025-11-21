@@ -12,6 +12,7 @@ from api.tax import (
     calculate_income_tax,
     load_tax_config,
 )
+from api.retirement import calculate_retirement_projection
 from api.db import save_profile, get_profiles, get_profile, delete_profile
 from api.validation import (
     validate_calculate_payload,
@@ -88,6 +89,32 @@ def create_app() -> Flask:
         try:
             result = get_tax_info(country_code.upper())
             return jsonify(result)
+        except Exception:
+            raise
+
+    @app.post('/api/retirement')
+    def retirement():
+        """
+        Calculate retirement projection with detailed account tracking.
+        Expects: { currentAge, retirementAge, endAge, traditionalIRA, rothIRA, 
+                   traditional401k, roth401k, taxableAccounts, annualIncome, 
+                   annualSpending, annualReturn, inflationRate, state, 
+                   filingStatus, socialSecurityClaimAge }
+        Returns: Detailed projection with account balances and withdrawals
+        """
+        data = request.get_json(silent=True) or {}
+        try:
+            # Basic validation
+            required_fields = ['currentAge', 'retirementAge', 'endAge', 'annualSpending', 
+                             'annualReturn', 'inflationRate']
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+            
+            result = calculate_retirement_projection(data)
+            return jsonify(result)
+        except ValueError as ve:
+            return jsonify({'error': str(ve)}), 400
         except Exception:
             raise
 
