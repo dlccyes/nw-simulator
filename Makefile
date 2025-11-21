@@ -1,4 +1,4 @@
-.PHONY: help test test-backend test-frontend build build-clean clean install dev lint
+.PHONY: help test test-backend test-frontend build build-clean clean install dev dev-backend dev-frontend dev-all lint
 
 # Default target
 help:
@@ -10,7 +10,10 @@ help:
 	@echo "  make build-clean   - Build for production and clean up artifacts"
 	@echo "  make clean         - Clean up build artifacts and cache"
 	@echo "  make install       - Install dependencies"
-	@echo "  make dev           - Start development server"
+	@echo "  make dev           - Start both backend and frontend development servers"
+	@echo "  make dev-backend   - Start backend development server only"
+	@echo "  make dev-frontend  - Start frontend development server only"
+	@echo "  make dev-all       - Start both backend and frontend development servers"
 	@echo "  make lint          - Run linting"
 
 # Test targets
@@ -49,9 +52,26 @@ install:
 	@echo "📦 Installing dependencies..."
 	npm install
 
-dev:
-	@echo "🚀 Starting development server..."
+dev-backend:
+	@echo "🚀 Starting backend development server..."
+	cd backend && python3 app.py
+
+dev-frontend:
+	@echo "🚀 Starting frontend development server..."
 	npm run dev
+
+dev-all:
+	@echo "🚀 Starting both backend and frontend development servers..."
+	@echo "📡 Backend will run on http://localhost:5000"
+	@echo "🌐 Frontend will run on http://localhost:5173"
+	@echo ""
+	@echo "Press Ctrl+C to stop both servers"
+	@trap 'kill 0' EXIT; \
+	cd backend && python3 app.py & \
+	npm run dev & \
+	wait
+
+dev: dev-all
 
 lint:
 	@echo "🔍 Running linter..."
