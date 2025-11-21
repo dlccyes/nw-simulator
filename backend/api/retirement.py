@@ -67,6 +67,10 @@ def estimate_aime_from_income(annual_income, years_worked=35):
     Estimate Average Indexed Monthly Earnings from current annual income.
     This is a simplified estimation assuming consistent income.
     
+    Note: The years_worked parameter is included for API compatibility and future
+    enhancements but currently assumes full 35-year career for simplification.
+    In a more sophisticated model, this would weight earnings by years worked.
+    
     Args:
         annual_income: Current annual income
         years_worked: Number of years worked (default 35 for full benefit)
@@ -80,7 +84,8 @@ def estimate_aime_from_income(annual_income, years_worked=35):
     # Calculate average monthly earnings
     monthly_income = capped_income / 12
     
-    # For simplification, assume consistent earnings (in reality, indexing is complex)
+    # For simplification, assume consistent earnings over full career (in reality, indexing is complex)
+    # Future enhancement: scale benefit based on years_worked / 35
     return monthly_income
 
 
@@ -311,12 +316,13 @@ def calculate_retirement_withdrawal(
     state_config = get_state_config(state, 'US', filing_status)
     
     # Estimate effective tax rate on traditional withdrawals
-    # This is simplified - in reality, we'd need to calculate precisely
-    estimated_federal_rate = 0.22  # Approximate marginal rate
-    estimated_state_rate = 0.05    # Approximate state rate
+    # These are conservative estimates for typical retirement income levels
+    # In reality, we'd need to calculate precisely based on exact withdrawal amounts
+    ESTIMATED_FEDERAL_MARGINAL_RATE = 0.22  # Typical marginal rate for middle-income retirees
+    ESTIMATED_STATE_MARGINAL_RATE = 0.05     # Average state marginal rate
     
-    if not state_treatment['retirement_account_taxable']:
-        estimated_state_rate = 0
+    estimated_federal_rate = ESTIMATED_FEDERAL_MARGINAL_RATE
+    estimated_state_rate = ESTIMATED_STATE_MARGINAL_RATE if state_treatment['retirement_account_taxable'] else 0
     
     estimated_tax_rate = estimated_federal_rate + estimated_state_rate
     
