@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import { CssBaseline, Container, ThemeProvider, createTheme, AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import FireCalculator from './components/FireCalculator';
 import UsTaxTable from './components/UsTaxTable';
+import RetirementSimulator from './components/RetirementSimulator';
 
 const theme = createTheme({
   palette: {
@@ -49,6 +50,21 @@ const Navigation: React.FC = () => {
           <Button 
             color="inherit" 
             component={Link} 
+            to="/retirement"
+            variant={location.pathname === '/retirement' ? 'outlined' : 'text'}
+            sx={{
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+              },
+              borderColor: location.pathname === '/retirement' ? '#fff' : 'transparent',
+            }}
+          >
+            Retirement Simulator
+          </Button>
+          <Button 
+            color="inherit" 
+            component={Link} 
             to="/us-tax"
             variant={location.pathname === '/us-tax' ? 'outlined' : 'text'}
             sx={{
@@ -78,6 +94,7 @@ const App: React.FC = () => {
           <Container maxWidth="lg" sx={{ mt: 3, flex: 1 }}>
             <Routes>
               <Route path="/" element={<FireCalculator />} />
+              <Route path="/retirement" element={<RetirementSimulator />} />
               <Route path="/us-tax" element={<UsTaxTable />} />
             </Routes>
           </Container>

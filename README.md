@@ -1,6 +1,6 @@
-# FIRE Calculator + US Tax Comparison
+# FIRE Calculator + Retirement Simulator + US Tax Comparison
 
-A comprehensive financial planning tool featuring a FIRE (Financial Independence, Retire Early) calculator with net worth projections and a US state tax comparison tool. Supports US and Taiwan with accurate tax calculations, retirement accounts, and payroll deductions.
+A comprehensive financial planning tool featuring a FIRE (Financial Independence, Retire Early) calculator, detailed retirement simulator, and US state tax comparison tool. Supports US and Taiwan with accurate tax calculations, retirement accounts, and payroll deductions.
 
 **🌐 Website: [https://nw.approximator.net/](https://nw.approximator.net/)**
 
@@ -16,6 +16,14 @@ A comprehensive financial planning tool featuring a FIRE (Financial Independence
 - 🎯 **Scenarios**: Stop at FIRE vs continue working options
 - 🌓 **Dark Mode**: Toggle between light and dark themes
 - 💾 **Profile Management**: Save and load calculation profiles (local development)
+
+### 🏖️ Retirement Simulator
+- 💰 **Account Tracking**: Separate tracking for Traditional IRA, Roth IRA, Traditional 401k, Roth 401k, and taxable accounts
+- 🏦 **Social Security**: Benefit calculations based on income with age adjustment (62-70)
+- 📊 **Smart Withdrawals**: Optimal withdrawal strategy considering tax implications
+- 🗺️ **State Tax Treatment**: State-specific retirement income taxation rules
+- 📈 **Visual Projections**: Interactive charts showing account balances, withdrawals, and taxes over time
+- 🎯 **Detailed Planning**: Year-by-year breakdown of retirement finances
 
 ### 🗺️ US Tax Comparison
 - 📊 **State-by-State Analysis**: Compare effective tax rates across all 50 US states
