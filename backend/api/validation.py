@@ -80,6 +80,8 @@ def validate_calculate_payload(data: Dict[str, Any]) -> None:
     # Optional
     if 'stopAtFire' in data:
         _require_bool('stopAtFire', data['stopAtFire'])
+    if 'backdoorRoth' in data:
+        _require_number('backdoorRoth', data['backdoorRoth'], min_value=0)
 
 
 def validate_us_tax_comparison_payload(data: Dict[str, Any]) -> None:

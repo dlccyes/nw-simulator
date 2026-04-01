@@ -110,7 +110,7 @@ def calculate_tax_for_bracket(income, brackets):
     return tax
 
 
-def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US', filing_status='single'):
+def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US', filing_status='single', backdoor_roth=0):
     """
     Calculate income tax for the calculator.
 
@@ -121,6 +121,7 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         employer_match: Employer match rate (decimal)
         country_code: Two-letter country code
         filing_status: Filing status ('single' or 'married')
+        backdoor_roth: Backdoor Roth contribution amount (modeled as reducing taxable income)
 
     Returns:
         (total_available_income, effective_tax_rate, tax_breakdown)
@@ -141,8 +142,9 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
     federal_standard_deduction = federal_config.get('standard_deduction', 0)
     state_standard_deduction = state_config.get('standard_deduction', 0)
 
-    federal_taxable_income = max(0, income - pre_tax_401k - federal_standard_deduction)
-    state_taxable_income = max(0, income - pre_tax_401k - state_standard_deduction)
+    retirement_deduction = pre_tax_401k + backdoor_roth
+    federal_taxable_income = max(0, income - retirement_deduction - federal_standard_deduction)
+    state_taxable_income = max(0, income - retirement_deduction - state_standard_deduction)
 
     # Calculate federal tax
     federal_brackets = federal_config.get('brackets', [])

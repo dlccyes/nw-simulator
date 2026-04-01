@@ -17,6 +17,7 @@ export interface CountryConfig {
     country: string;
     state: string;
     preTax401k: number;
+    backdoorRoth: number;
     employerMatch: number;
     filingStatus: string;
   };
@@ -48,6 +49,7 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
       country: 'US',
       state: 'CA',
       preTax401k: 24500,
+      backdoorRoth: 0,
       employerMatch: 5,
       filingStatus: 'single'
     },
@@ -73,6 +75,7 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
       country: 'TW',
       state: '',
       preTax401k: 0,  // Taiwan doesn't use 401k system
+      backdoorRoth: 0,
       employerMatch: 0,
       filingStatus: 'single'
     },

@@ -116,6 +116,7 @@ Phase 3: Age 46+, $60,000/year (Empty nest)
 
 ### 401(k) Contributions
 - **Pre-tax 401(k)**: Annual contribution amount (reduces taxable income)
+- **Backdoor Roth**: Annual contribution amount (modeled to reduce taxable income while increasing net worth)
 - **Employer Match**: Percentage of salary your employer matches
 - **Tax Benefits**: Contributions reduce current year taxes
 

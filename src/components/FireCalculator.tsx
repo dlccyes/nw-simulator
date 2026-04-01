@@ -108,6 +108,7 @@ interface Inputs {
   country: string;
   state: string;
   preTax401k: number;
+  backdoorRoth: number;
   employerMatch: number;
   filingStatus: string;
 }
@@ -431,6 +432,7 @@ const FireCalculator: React.FC = () => {
         country: config.country || 'US',
         state: config.state,
         preTax401k: config.preTax401k,
+        backdoorRoth: config.backdoorRoth ?? 0,
         employerMatch: config.employerMatch,
         filingStatus: config.filingStatus || 'single'
       });
@@ -569,6 +571,7 @@ const FireCalculator: React.FC = () => {
           ...inputs,
           endAge: inputs.endAge,  // Keep API compatibility
           preTax401k: inputs.country === 'US' ? inputs.preTax401k : 0,
+          backdoorRoth: inputs.country === 'US' ? inputs.backdoorRoth : 0,
           employerMatch: inputs.country === 'US' ? inputs.employerMatch : 0,
           yearlySpending: yearlySpending.map(d => ({
             startAge: d.startAge,
@@ -602,6 +605,13 @@ const FireCalculator: React.FC = () => {
     if (savings > 0) return 'green';
     return 'inherit';
   };
+
+  const usContributionLimit = 72_000;
+  const employerMatchRate = inputs.employerMatch / 100;
+  const usTotalContribution = inputs.country === 'US'
+    ? (inputs.preTax401k * (1 + employerMatchRate)) + inputs.backdoorRoth
+    : 0;
+  const isOverUsContributionLimit = inputs.country === 'US' && usTotalContribution > usContributionLimit;
 
   const getRowBackgroundColor = (savings: number, netWorthGrowth: number, netWorth: number) => {
     if (netWorth < 0) return darkMode ? 'rgba(255, 0, 0, 0.1)' : '#ffebee';  // red when net worth is negative
@@ -1078,8 +1088,21 @@ const FireCalculator: React.FC = () => {
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
                       Retirement Accounts
                     </Typography>
+                    <Typography
+                      variant="body2"
+                      color={isOverUsContributionLimit ? 'error' : 'text.secondary'}
+                      sx={{ mb: 2 }}
+                    >
+                      Total 401(k) Contribution: {getCurrencySymbol(inputs.country)}
+                      {Math.round(usTotalContribution).toLocaleString()}
+                    </Typography>
+                    {isOverUsContributionLimit && (
+                      <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+                        Total 401(k) contribution limit is $72,000.
+                      </Typography>
+                    )}
                     <Grid container spacing={2}>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
                           label="Pre-tax 401(k) Contribution"
@@ -1093,7 +1116,7 @@ const FireCalculator: React.FC = () => {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           sx={{ width: '100%', minWidth: '200px' }}
                           label="Employer Match (%)"
@@ -1102,6 +1125,20 @@ const FireCalculator: React.FC = () => {
                           value={inputs.employerMatch}
                           onChange={handleInputChange}
                           slotProps={{ htmlInput: { min: 0, max: 100 } }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Backdoor Roth Contribution"
+                          name="backdoorRoth"
+                          value={formatMonetaryValue(inputs.backdoorRoth)}
+                          onChange={handleMonetaryInputChange('backdoorRoth')}
+                          slotProps={{
+                            input: {
+                              startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
+                            }
+                          }}
                         />
                       </Grid>
                     </Grid>
@@ -1273,6 +1310,7 @@ const FireCalculator: React.FC = () => {
             <CalculateButton
               onClick={handleCalculate}
               loading={loading}
+              disabled={isOverUsContributionLimit}
               fullWidth
             />
           </Grid>

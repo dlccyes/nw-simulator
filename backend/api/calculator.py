@@ -43,6 +43,7 @@ def calculate_fire_projection(data):
     retirement_spending = data['retirementSpending']
     withdrawal_rate = data['withdrawalRate'] / 100
     pre_tax_401k = data['preTax401k']
+    backdoor_roth = data.get('backdoorRoth', 0)
     employer_match = data['employerMatch'] / 100
     country = data.get('country', 'US')
     state = data.get('state', 'CA')
@@ -77,7 +78,7 @@ def calculate_fire_projection(data):
         )
 
         total_available_income, effective_tax_rate, _ = calculate_income_tax(
-            gross_income, state, pre_tax_401k, employer_match, country, filing_status
+            gross_income, state, pre_tax_401k, employer_match, country, filing_status, backdoor_roth
         )
 
         _, real_interest_earned = calculate_net_worth(
@@ -104,7 +105,7 @@ def calculate_fire_projection(data):
         )
 
         total_available_income, effective_tax_rate, _ = calculate_income_tax(
-            gross_income, state, pre_tax_401k, employer_match, country, filing_status
+            gross_income, state, pre_tax_401k, employer_match, country, filing_status, backdoor_roth
         )
 
         _, real_interest_earned = calculate_net_worth(
