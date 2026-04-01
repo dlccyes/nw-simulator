@@ -44,7 +44,7 @@ Visit [https://nw.approximator.net/](https://nw.approximator.net/) to access bot
 
 ### First Steps
 1. **Select Your Country**: Choose between US or Taiwan for country-specific tax calculations
-2. **Enter Basic Info**: Set your current age, target retirement age, and current net worth
+2. **Enter Basic Info**: Set your current age, target retirement age, and starting net worth
 3. **Configure Income**: Add your income phases with different amounts and age ranges
 4. **Set Spending**: Define your spending patterns throughout different life stages
 5. **Calculate**: Hit the calculate button to see your FIRE projection
@@ -56,7 +56,7 @@ Visit [https://nw.approximator.net/](https://nw.approximator.net/) to access bot
 - **End Age**: The age until which you want to run projections (typically 50-65)
 
 ### Financial Assumptions
-- **Current Net Worth**: Your total assets minus liabilities today
+- **Current Age Starting Net Worth**: Your total assets minus liabilities today
 - **Annual Return**: Expected annual investment return (typically 6-10%)
 - **Inflation Rate**: Expected annual inflation (typically 2-4%)
 

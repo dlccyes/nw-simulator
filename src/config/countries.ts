@@ -38,26 +38,26 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
   'US': {
     currency: { symbol: '$', code: 'USD' },
     defaults: {
-      currentAge: 23,
+      currentAge: 24,
       endAge: 50,
-      currentNetWorth: 70000,
+      currentNetWorth: 85000,
       annualReturn: 8,
       inflationRate: 3,
       retirementSpending: 100000,
       withdrawalRate: 4,
       country: 'US',
       state: 'CA',
-      preTax401k: 23000,
+      preTax401k: 24500,
       employerMatch: 5,
       filingStatus: 'single'
     },
     spendingDefaults: [
-      { id: 'spending-1', startAge: 23, endAge: 50, spending: 100000 }
+      { id: 'spending-1', startAge: 24, endAge: 50, spending: 100000 }
     ],
     incomeDefaults: [
-      { id: 'income-1', startAge: 23, endAge: 25, income: 230000 },
-      { id: 'income-2', startAge: 26, endAge: 30, income: 300000 },
-      { id: 'income-3', startAge: 31, endAge: 40, income: 400000 }
+      { id: 'income-1', startAge: 24, endAge: 27, income: 320000 },
+      { id: 'income-2', startAge: 28, endAge: 34, income: 400000 },
+      { id: 'income-3', startAge: 35, endAge: 40, income: 500000 }
     ]
   },
   'TW': {
