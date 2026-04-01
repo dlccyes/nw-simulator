@@ -21,6 +21,7 @@ import {
   Autocomplete,
   Chip,
   FormControl,
+  FormHelperText,
   InputLabel,
   Select,
   MenuItem,
@@ -85,6 +86,8 @@ type UsTaxComparisonRequest = {
   income: number;
   filing_status: string;
   partner_income?: number;
+  tax_exempt_income?: number;
+  partner_tax_exempt_income?: number;
 };
 
 const UsTaxTable: React.FC = () => {
@@ -111,6 +114,7 @@ const UsTaxTable: React.FC = () => {
   });
 
   const [income, setIncome] = useState<string>('320,000');
+  const [taxExemptIncome, setTaxExemptIncome] = useState<string>('60,000');
   const [filingStatus, setFilingStatus] = useState<string>('single');
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -121,6 +125,7 @@ const UsTaxTable: React.FC = () => {
   // Partner income state
   const [hasPartner, setHasPartner] = useState<boolean>(false);
   const [partnerIncome, setPartnerIncome] = useState<string>('150,000');
+  const [partnerTaxExemptIncome, setPartnerTaxExemptIncome] = useState<string>('60,000');
   
   // Tax info dialog state
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -197,6 +202,16 @@ const UsTaxTable: React.FC = () => {
       return;
     }
 
+    const numericTaxExemptIncome = parseFloat(taxExemptIncome.replace(/,/g, '')) || 0;
+    if (numericTaxExemptIncome < 0) {
+      setError('Please enter a valid tax-exempted income amount (minimum $0)');
+      return;
+    }
+    if (numericTaxExemptIncome > numericIncome) {
+      setError('Tax-exempted income cannot exceed your annual income');
+      return;
+    }
+
     let numericPartnerIncome = 0;
     if (hasPartner) {
       numericPartnerIncome = parseFloat(partnerIncome.replace(/,/g, ''));
@@ -205,6 +220,17 @@ const UsTaxTable: React.FC = () => {
         return;
       }
     }
+    const numericPartnerTaxExemptIncome = hasPartner
+      ? (parseFloat(partnerTaxExemptIncome.replace(/,/g, '')) || 0)
+      : 0;
+    if (numericPartnerTaxExemptIncome < 0) {
+      setError('Please enter a valid partner tax-exempted income amount (minimum $0)');
+      return;
+    }
+    if (hasPartner && numericPartnerTaxExemptIncome > numericPartnerIncome) {
+      setError('Partner tax-exempted income cannot exceed partner annual income');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -212,11 +238,13 @@ const UsTaxTable: React.FC = () => {
     try {
       const requestData: UsTaxComparisonRequest = {
         income: numericIncome,
-        filing_status: filingStatus
+        filing_status: filingStatus,
+        tax_exempt_income: numericTaxExemptIncome
       };
       
       if (hasPartner) {
         requestData.partner_income = numericPartnerIncome;
+        requestData.partner_tax_exempt_income = numericPartnerTaxExemptIncome;
       }
 
       const response = await axios.post(`${API_BASE_URL}/api/us-tax-comparison`, requestData);
@@ -228,7 +256,7 @@ const UsTaxTable: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [income, filingStatus, hasPartner, partnerIncome]);
+  }, [income, taxExemptIncome, filingStatus, hasPartner, partnerIncome, partnerTaxExemptIncome]);
 
   useEffect(() => {
     if (income && parseFloat(income) > 0) {
@@ -421,10 +449,27 @@ const UsTaxTable: React.FC = () => {
                 setIncome(formattedValue);
               }
             }}
+            helperText=" "
             InputProps={{
               startAdornment: <InputAdornment position="start">$</InputAdornment>,
             }}
             sx={{ minWidth: { xs: '100%', sm: 200 } }}
+          />
+          <TextField
+            label="Included tax-exempted income"
+            value={taxExemptIncome}
+            onChange={(e) => {
+              const value = e.target.value.replace(/,/g, '');
+              if (value === '' || /^\d+$/.test(value)) {
+                const formattedValue = value === '' ? '' : parseInt(value).toLocaleString();
+                setTaxExemptIncome(formattedValue);
+              }
+            }}
+            helperText="e.g. 401k, IRA"
+            InputProps={{
+              startAdornment: <InputAdornment position="start">$</InputAdornment>,
+            }}
+            sx={{ minWidth: { xs: '100%', sm: 240 } }}
           />
           <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }}>
             <InputLabel>Filing Status</InputLabel>
@@ -443,11 +488,14 @@ const UsTaxTable: React.FC = () => {
               <MenuItem value="married">Married Filing Jointly</MenuItem>
               <MenuItem value="compare">Compare Both</MenuItem>
             </Select>
+            <FormHelperText>&nbsp;</FormHelperText>
           </FormControl>
-          <CalculateButton 
-            type="submit"
-            loading={loading}
-          />
+          <Box sx={{ pb: '23px' }}>
+            <CalculateButton 
+              type="submit"
+              loading={loading}
+            />
+          </Box>
         </Box>
         
         <Box sx={{ px: { xs: 1, sm: 2 } }}>
@@ -474,6 +522,7 @@ const UsTaxTable: React.FC = () => {
               onClick={() => {
                 setHasPartner(true);
                 setPartnerIncome(income); // Set partner income to match current income
+                setPartnerTaxExemptIncome(taxExemptIncome);
               }}
                   sx={{ 
                 borderStyle: 'dashed',
@@ -531,10 +580,27 @@ const UsTaxTable: React.FC = () => {
                       setPartnerIncome(formattedValue);
                     }
                   }}
+                  helperText=" "
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
                   sx={{ minWidth: { xs: '100%', sm: 200 } }}
+                />
+                <TextField
+                  label="Included partner tax-exempted income"
+                  value={partnerTaxExemptIncome}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || /^\d+$/.test(value)) {
+                      const formattedValue = value === '' ? '' : parseInt(value).toLocaleString();
+                      setPartnerTaxExemptIncome(formattedValue);
+                    }
+                  }}
+                  helperText="e.g. 401k, IRA"
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  }}
+                  sx={{ minWidth: { xs: '100%', sm: 260 } }}
                 />
                 
                 <Box sx={{ px: { xs: 1, sm: 2 }, flex: 1 }}>

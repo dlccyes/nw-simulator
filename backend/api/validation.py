@@ -96,6 +96,11 @@ def validate_us_tax_comparison_payload(data: Dict[str, Any]) -> None:
     if 'partner_income' in data:
         _require_number('partner_income', data['partner_income'], min_value=0)
 
+    if 'tax_exempt_income' in data:
+        _require_number('tax_exempt_income', data['tax_exempt_income'], min_value=0)
+    if 'partner_tax_exempt_income' in data:
+        _require_number('partner_tax_exempt_income', data['partner_tax_exempt_income'], min_value=0)
+
 
 def validate_tax_payload(data: Dict[str, Any]) -> None:
     for f in ['income', 'state']:

@@ -158,6 +158,8 @@ def create_app() -> Flask:
             income = data.get('income', 0)
             partner_income = data.get('partner_income', 0)
             filing_status = data.get('filing_status', 'single')
+            tax_exempt_income = data.get('tax_exempt_income', 0)
+            partner_tax_exempt_income = data.get('partner_tax_exempt_income', 0)
 
             if income <= 0:
                 return jsonify({'error': 'Income must be greater than 0'}), 400
@@ -172,8 +174,8 @@ def create_app() -> Flask:
                     # Single
                     total_income = income + partner_income if partner_income > 0 else income
                     if partner_income > 0:
-                        _, _, t1 = calculate_income_tax(income, state_code, 0, 0, 'US', 'single')
-                        _, _, t2 = calculate_income_tax(partner_income, state_code, 0, 0, 'US', 'single')
+                        _, _, t1 = calculate_income_tax(income, state_code, tax_exempt_income, 0, 'US', 'single')
+                        _, _, t2 = calculate_income_tax(partner_income, state_code, partner_tax_exempt_income, 0, 'US', 'single')
                         single_breakdown = {
                             'afterTaxIncome': t1['afterTaxIncome'] + t2['afterTaxIncome'],
                             'totalTax': t1['totalTax'] + t2['totalTax'],
@@ -186,12 +188,13 @@ def create_app() -> Flask:
                         single_effective_rate = (single_breakdown['totalTax'] / total_income) * 100
                     else:
                         _, single_effective_rate, single_breakdown = calculate_income_tax(
-                            income, state_code, 0, 0, 'US', 'single'
+                            income, state_code, tax_exempt_income, 0, 'US', 'single'
                         )
 
                     # Married
                     if partner_income > 0:
-                        _, _, combined = calculate_income_tax(total_income, state_code, 0, 0, 'US', 'married')
+                        combined_exempt = tax_exempt_income + partner_tax_exempt_income
+                        _, _, combined = calculate_income_tax(total_income, state_code, combined_exempt, 0, 'US', 'married')
                         _, _, s1 = calculate_income_tax(income, state_code, 0, 0, 'US', 'single')
                         _, _, s2 = calculate_income_tax(partner_income, state_code, 0, 0, 'US', 'single')
                         married_breakdown = {
@@ -243,8 +246,8 @@ def create_app() -> Flask:
                 if partner_income > 0:
                     total_income = income + partner_income
                     if filing_status == 'single':
-                        _, _, t1 = calculate_income_tax(income, state_code, 0, 0, 'US', 'single')
-                        _, _, t2 = calculate_income_tax(partner_income, state_code, 0, 0, 'US', 'single')
+                        _, _, t1 = calculate_income_tax(income, state_code, tax_exempt_income, 0, 'US', 'single')
+                        _, _, t2 = calculate_income_tax(partner_income, state_code, partner_tax_exempt_income, 0, 'US', 'single')
                         combined = {
                             'afterTaxIncome': t1['afterTaxIncome'] + t2['afterTaxIncome'],
                             'federalTax': t1['federalTax'] + t2['federalTax'],
@@ -261,7 +264,8 @@ def create_app() -> Flask:
                         effective_tax_rate = (combined['totalTax'] / total_income) * 100
                         tax_breakdown = combined
                     else:
-                        _, _, combined_base = calculate_income_tax(total_income, state_code, 0, 0, 'US', 'married')
+                        combined_exempt = tax_exempt_income + partner_tax_exempt_income
+                        _, _, combined_base = calculate_income_tax(total_income, state_code, combined_exempt, 0, 'US', 'married')
                         _, _, s1 = calculate_income_tax(income, state_code, 0, 0, 'US', 'single')
                         _, _, s2 = calculate_income_tax(partner_income, state_code, 0, 0, 'US', 'single')
                         combined = {
@@ -281,7 +285,7 @@ def create_app() -> Flask:
                         tax_breakdown = combined
                 else:
                     _, effective_tax_rate, tax_breakdown = calculate_income_tax(
-                        income, state_code, 0, 0, 'US', filing_status
+                        income, state_code, tax_exempt_income, 0, 'US', filing_status
                     )
 
                 state_name = get_state_name(state_code)

@@ -34,6 +34,10 @@ describe('UsTaxTable', () => {
     await waitFor(() => {
       expect(screen.getByText(/California/)).toBeInTheDocument();
     });
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect.stringMatching(/\/api\/us-tax-comparison$/),
+      expect.objectContaining({ tax_exempt_income: 60000 })
+    );
   });
 
   it('ranks emojis based on filtered states, not all states', async () => {
