@@ -49,7 +49,7 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
       country: 'US',
       state: 'CA',
       preTax401k: 24500,
-      backdoorRoth: 0,
+      backdoorRoth: 30000,
       employerMatch: 5,
       filingStatus: 'single'
     },
