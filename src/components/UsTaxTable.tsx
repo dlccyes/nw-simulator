@@ -81,6 +81,12 @@ interface StateComparison {
 
 type SortField = keyof StateComparison;
 
+type UsTaxComparisonRequest = {
+  income: number;
+  filing_status: string;
+  partner_income?: number;
+};
+
 const UsTaxTable: React.FC = () => {
   const [darkMode, setDarkMode] = usePersistentDarkMode();
   const theme = createTheme({
@@ -104,7 +110,7 @@ const UsTaxTable: React.FC = () => {
     },
   });
 
-  const [income, setIncome] = useState<string>('230,000');
+  const [income, setIncome] = useState<string>('320,000');
   const [filingStatus, setFilingStatus] = useState<string>('single');
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -204,7 +210,7 @@ const UsTaxTable: React.FC = () => {
     setError('');
 
     try {
-      const requestData: any = {
+      const requestData: UsTaxComparisonRequest = {
         income: numericIncome,
         filing_status: filingStatus
       };
@@ -594,7 +600,7 @@ const UsTaxTable: React.FC = () => {
                           ))}
                         </Pie>
                         <Tooltip 
-                          formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']}
+                          formatter={(value: number | string) => [`$${Number(value).toLocaleString()}`, '']}
                           labelFormatter={(label) => label}
                         />
                         <Legend />
