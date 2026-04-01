@@ -997,7 +997,7 @@ const FireCalculator: React.FC = () => {
                       <Grid item xs={12}>
                         <TextField
                           fullWidth
-                          label="Current Net Worth"
+                          label="Current Age Starting Net Worth"
                           name="currentNetWorth"
                           value={formatMonetaryValue(inputs.currentNetWorth)}
                           onChange={handleMonetaryInputChange('currentNetWorth')}

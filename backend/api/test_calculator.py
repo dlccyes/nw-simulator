@@ -185,7 +185,7 @@ class TestCalculator(unittest.TestCase):
 
     @parameterized.expand([
         # (current_net_worth, previous_real_balance, real_return_rate, year_index, expected_balance_min, expected_interest_min)
-        ("initial_year", 100000, 0, 0.07, 0, 100000, 100000),
+        ("initial_year", 100000, 0, 0.07, 0, 107000, 7000),
         ("subsequent_year", 100000, 100000, 0.07, 1, 107000, 7000),
         ("negative_return", 100000, 100000, -0.05, 1, 95000, -5000),
         ("zero_return", 100000, 100000, 0, 1, 100000, 0),
@@ -296,20 +296,22 @@ class TestCalculator(unittest.TestCase):
             self.assertAlmostEqual(result['nominalNetWorth'][i], expected_nominal, delta=0.01)
 
             # Check real interest calculation
-            if i > 0:
-                expected_real_interest = result['realNetWorth'][i-1] * real_return_rate
-                self.assertAlmostEqual(result['yearlyRealInterest'][i], expected_real_interest, delta=0.01)
+            start_balance = data['currentNetWorth'] if i == 0 else result['realNetWorth'][i - 1]
+            expected_real_interest = start_balance * real_return_rate
+            self.assertAlmostEqual(result['yearlyRealInterest'][i], expected_real_interest, delta=0.01)
 
             # Check savings calculation
             expected_savings = result['yearlyAfterTaxIncome'][i] - result['yearlySpending'][i]
             self.assertAlmostEqual(result['yearlySavings'][i], expected_savings, delta=0.01)
 
             # Check net worth progression
-            if i > 0:
-                expected_net_worth = (result['realNetWorth'][i-1] +
-                                    result['yearlySavings'][i] +
-                                    result['yearlyRealInterest'][i])
-                self.assertAlmostEqual(result['realNetWorth'][i], expected_net_worth, delta=0.01)
+            start_balance_for_year = data['currentNetWorth'] if i == 0 else result['realNetWorth'][i - 1]
+            expected_net_worth = (
+                start_balance_for_year +
+                result['yearlySavings'][i] +
+                result['yearlyRealInterest'][i]
+            )
+            self.assertAlmostEqual(result['realNetWorth'][i], expected_net_worth, delta=0.01)
 
         # Verify FIRE age calculations
         if should_be_possible:

@@ -16,12 +16,21 @@ def calculate_yearly_data(year, yearly_income, yearly_spending, stop_at_fire,
 
 
 def calculate_net_worth(current_net_worth, previous_real_balance, real_return_rate, i):
-    if i == 0:
-        return current_net_worth, current_net_worth
+    """
+    Calculate end-of-period balance and interest.
 
-    real_interest_earned = previous_real_balance * real_return_rate
-    real_balance = previous_real_balance + real_interest_earned
-    return real_balance, real_interest_earned
+    Net worth in this API is defined as the **ending** net worth for the given age/year.
+    That means each row in the results table represents:
+
+      start_balance + real_interest_earned + savings
+
+    This helper returns the interest earned on the start_balance and the balance after
+    applying only interest (savings are applied by the caller for clarity).
+    """
+    start_balance = current_net_worth if i == 0 else previous_real_balance
+    real_interest_earned = start_balance * real_return_rate
+    balance_after_interest = start_balance + real_interest_earned
+    return balance_after_interest, real_interest_earned
 
 
 def calculate_fire_projection(data):
@@ -80,8 +89,9 @@ def calculate_fire_projection(data):
 
         savings = total_available_income - spending
 
-        # Update arrays
-        arrays['real_net_worth'][i] = current_net_worth if i == 0 else arrays['real_net_worth'][i-1] + savings + real_interest_earned
+        # Update arrays (end-of-age net worth)
+        start_balance = current_net_worth if i == 0 else arrays['real_net_worth'][i - 1]
+        arrays['real_net_worth'][i] = start_balance + savings + real_interest_earned
 
         # Check if we've reached FIRE
         if fire_age is None and arrays['real_net_worth'][i] >= required_savings:
@@ -106,15 +116,15 @@ def calculate_fire_projection(data):
 
         savings = total_available_income - spending
 
-        # Update arrays
-        arrays['real_net_worth'][i] = (current_net_worth if i == 0 else
-                                       arrays['real_net_worth'][i-1] + savings + real_interest_earned)
+        # Update arrays (end-of-age net worth)
+        start_balance = current_net_worth if i == 0 else arrays['real_net_worth'][i - 1]
+        arrays['real_net_worth'][i] = start_balance + savings + real_interest_earned
         arrays['yearly_pre_tax_income'][i] = gross_income
         arrays['yearly_after_tax_income'][i] = total_available_income
         arrays['yearly_spending_amounts'][i] = spending
         arrays['yearly_tax_rates'][i] = effective_tax_rate
         arrays['yearly_savings'][i] = savings
-        arrays['yearly_real_interest'][i] = real_interest_earned if i > 0 else 0
+        arrays['yearly_real_interest'][i] = real_interest_earned
 
     # Calculate nominal values from real values
     nominal_net_worth = [real * ((1 + inflation_rate) ** i) for i, real in enumerate(arrays['real_net_worth'])]

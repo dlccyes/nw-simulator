@@ -33,7 +33,7 @@ def create_app() -> Flask:
 
     cors_origins = os.getenv(
         'CORS_ORIGINS',
-        'http://localhost:5173,https://nw.derricklin.net,https://fire.derricklin.net,https://nw.approximator.net',
+        'http://localhost:5173,http://localhost:5174,https://nw.derricklin.net,https://fire.derricklin.net,https://nw.approximator.net',
     ).split(',')
     CORS(app, origins=[o.strip() for o in cors_origins if o.strip()], max_age=3600)
 
