@@ -108,7 +108,6 @@ interface Inputs {
   country: string;
   state: string;
   preTax401k: number;
-  backdoorRoth: number;
   employerMatch: number;
   filingStatus: string;
 }
@@ -432,7 +431,6 @@ const FireCalculator: React.FC = () => {
         country: config.country || 'US',
         state: config.state,
         preTax401k: config.preTax401k,
-        backdoorRoth: config.backdoorRoth ?? 0,
         employerMatch: config.employerMatch,
         filingStatus: config.filingStatus || 'single'
       });
@@ -571,7 +569,6 @@ const FireCalculator: React.FC = () => {
           ...inputs,
           endAge: inputs.endAge,  // Keep API compatibility
           preTax401k: inputs.country === 'US' ? inputs.preTax401k : 0,
-          backdoorRoth: inputs.country === 'US' ? inputs.backdoorRoth : 0,
           employerMatch: inputs.country === 'US' ? inputs.employerMatch : 0,
           yearlySpending: yearlySpending.map(d => ({
             startAge: d.startAge,
@@ -609,7 +606,7 @@ const FireCalculator: React.FC = () => {
   const usContributionLimit = 72_000;
   const employerMatchRate = inputs.employerMatch / 100;
   const usTotalContribution = inputs.country === 'US'
-    ? (inputs.preTax401k * (1 + employerMatchRate)) + inputs.backdoorRoth
+    ? (inputs.preTax401k * (1 + employerMatchRate))
     : 0;
   const isOverUsContributionLimit = inputs.country === 'US' && usTotalContribution > usContributionLimit;
 
@@ -1125,20 +1122,6 @@ const FireCalculator: React.FC = () => {
                           value={inputs.employerMatch}
                           onChange={handleInputChange}
                           slotProps={{ htmlInput: { min: 0, max: 100 } }}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          label="Backdoor Roth Contribution"
-                          name="backdoorRoth"
-                          value={formatMonetaryValue(inputs.backdoorRoth)}
-                          onChange={handleMonetaryInputChange('backdoorRoth')}
-                          slotProps={{
-                            input: {
-                              startAdornment: <InputAdornment position="start">{getCurrencySymbol(inputs.country)}</InputAdornment>
-                            }
-                          }}
                         />
                       </Grid>
                     </Grid>

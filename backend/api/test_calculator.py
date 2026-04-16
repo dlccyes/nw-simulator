@@ -212,7 +212,6 @@ class TestCalculator(unittest.TestCase):
             'withdrawalRate': 4,
             'preTax401k': 0.1,
             'employerMatch': 6,
-            'backdoorRoth': 10,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],
@@ -229,7 +228,6 @@ class TestCalculator(unittest.TestCase):
             'withdrawalRate': 10,  # Unrealistic withdrawal rate
             'preTax401k': 0.1,
             'employerMatch': 6,
-            'backdoorRoth': 10,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],
@@ -246,7 +244,6 @@ class TestCalculator(unittest.TestCase):
             'withdrawalRate': 4,
             'preTax401k': 0.15,
             'employerMatch': 8,
-            'backdoorRoth': 15,
             'state': 'TX',
             'stopAtFire': True,
             'yearlyIncome': [{'startAge': 25, 'endAge': 40, 'amount': 200000}],  # Higher income
@@ -263,7 +260,6 @@ class TestCalculator(unittest.TestCase):
             'withdrawalRate': 4,
             'preTax401k': 0.1,
             'employerMatch': 6,
-            'backdoorRoth': 10,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],
