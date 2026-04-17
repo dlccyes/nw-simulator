@@ -114,7 +114,7 @@ const UsTaxTable: React.FC = () => {
   });
 
   const [income, setIncome] = useState<string>('320,000');
-  const [taxExemptIncome, setTaxExemptIncome] = useState<string>('60,000');
+  const [taxExemptIncome, setTaxExemptIncome] = useState<string>('24,500');
   const [filingStatus, setFilingStatus] = useState<string>('single');
   const [data, setData] = useState<StateComparison[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -125,7 +125,7 @@ const UsTaxTable: React.FC = () => {
   // Partner income state
   const [hasPartner, setHasPartner] = useState<boolean>(false);
   const [partnerIncome, setPartnerIncome] = useState<string>('150,000');
-  const [partnerTaxExemptIncome, setPartnerTaxExemptIncome] = useState<string>('60,000');
+  const [partnerTaxExemptIncome, setPartnerTaxExemptIncome] = useState<string>('24,500');
   
   // Tax info dialog state
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -465,7 +465,7 @@ const UsTaxTable: React.FC = () => {
                 setTaxExemptIncome(formattedValue);
               }
             }}
-            helperText="e.g. 401k, IRA"
+            helperText="e.g. pre-tax 401k, traditional IRA"
             InputProps={{
               startAdornment: <InputAdornment position="start">$</InputAdornment>,
             }}
@@ -596,7 +596,7 @@ const UsTaxTable: React.FC = () => {
                       setPartnerTaxExemptIncome(formattedValue);
                     }
                   }}
-                  helperText="e.g. 401k, IRA"
+                  helperText="e.g. pre-tax 401k, traditional IRA"
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
