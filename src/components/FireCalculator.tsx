@@ -603,12 +603,12 @@ const FireCalculator: React.FC = () => {
     return 'inherit';
   };
 
-  const usContributionLimit = 72_000;
+  const usPreTax401kLimit = 24_500;
   const employerMatchRate = inputs.employerMatch / 100;
-  const usTotalContribution = inputs.country === 'US'
-    ? (inputs.preTax401k * (1 + employerMatchRate))
+  const usEmployerMatchAmount = inputs.country === 'US'
+    ? (inputs.preTax401k * employerMatchRate)
     : 0;
-  const isOverUsContributionLimit = inputs.country === 'US' && usTotalContribution > usContributionLimit;
+  const isOverUsPreTax401kLimit = inputs.country === 'US' && inputs.preTax401k > usPreTax401kLimit;
 
   const getRowBackgroundColor = (savings: number, netWorthGrowth: number, netWorth: number) => {
     if (netWorth < 0) return darkMode ? 'rgba(255, 0, 0, 0.1)' : '#ffebee';  // red when net worth is negative
@@ -1087,15 +1087,15 @@ const FireCalculator: React.FC = () => {
                     </Typography>
                     <Typography
                       variant="body2"
-                      color={isOverUsContributionLimit ? 'error' : 'text.secondary'}
+                      color={isOverUsPreTax401kLimit ? 'error' : 'text.secondary'}
                       sx={{ mb: 2 }}
                     >
-                      Total 401(k) Contribution: {getCurrencySymbol(inputs.country)}
-                      {Math.round(usTotalContribution).toLocaleString()}
+                      Employer Match: {getCurrencySymbol(inputs.country)}
+                      {Math.round(usEmployerMatchAmount).toLocaleString()}
                     </Typography>
-                    {isOverUsContributionLimit && (
+                    {isOverUsPreTax401kLimit && (
                       <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-                        Total 401(k) contribution limit is $72,000.
+                        Pre-tax 401(k) contribution limit is $24,500.
                       </Typography>
                     )}
                     <Grid container spacing={2}>
@@ -1116,7 +1116,7 @@ const FireCalculator: React.FC = () => {
                       <Grid item xs={12} sm={6}>
                         <TextField
                           sx={{ width: '100%', minWidth: '200px' }}
-                          label="Employer Match (%)"
+                          label="Employer Match (% of Contribution)"
                           name="employerMatch"
                           type="number"
                           value={inputs.employerMatch}
@@ -1293,7 +1293,7 @@ const FireCalculator: React.FC = () => {
             <CalculateButton
               onClick={handleCalculate}
               loading={loading}
-              disabled={isOverUsContributionLimit}
+              disabled={isOverUsPreTax401kLimit}
               fullWidth
             />
           </Grid>

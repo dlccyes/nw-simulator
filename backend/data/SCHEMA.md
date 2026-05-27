@@ -125,7 +125,7 @@ New tax types can be added to the `payroll_taxes` section without breaking exist
 
 ## API Changes
 
-The tax calculation functions now accept an optional `country_code` parameter:
+The tax calculation functions accept a pre-tax contribution amount and an employer match rate. Employer match is calculated as a percentage of the pre-tax contribution:
 ```python
 calculate_income_tax(income, state, pre_tax_401k, employer_match, country_code='US')
 ```
@@ -151,4 +151,4 @@ Both labor and health insurance are direct payroll deductions, similar to US Soc
 4. **Forward Compatible**: New tax types and countries can be added without breaking changes
 5. **Clean Schema**: Simple structure with country code as filename, no redundant metadata
 6. **Organized Structure**: All tax files in dedicated `tax-rates` directory
-7. **Flexible Structure**: Accommodates different tax systems (federal only, state taxes, different payroll tax structures) 
+7. **Flexible Structure**: Accommodates different tax systems (federal only, state taxes, different payroll tax structures)

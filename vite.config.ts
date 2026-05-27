@@ -1,25 +1,40 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-const baseConfig: any = {
-  plugins: [react()],
-}
-
-// Attach vitest config without breaking TS when vitest types are absent
-baseConfig.test = {
-  environment: 'jsdom',
-  setupFiles: './src/setupTests.ts',
-  globals: true,
-  css: true,
-  pool: 'threads',
-  maxThreads: 1,
-  minThreads: 1,
+type TestConfig = {
+  environment: string
+  setupFiles: string
+  globals: boolean
+  css: boolean
+  pool: string
   poolOptions: {
     threads: {
-      singleThread: true,
+      singleThread: boolean
+    }
+  }
+}
+
+type AppConfig = UserConfig & {
+  test: TestConfig
+}
+
+// https://vite.dev/config/
+const config: AppConfig = {
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.ts',
+    globals: true,
+    css: true,
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
     },
   },
 }
 
-export default defineConfig(baseConfig)
+export default defineConfig(config)

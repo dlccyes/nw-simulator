@@ -64,8 +64,8 @@ def test_calculate_endpoint_success(client):
         'inflationRate': 2,
         'retirementSpending': 40000,
         'withdrawalRate': 4,
-        'preTax401k': 0.1,
-        'employerMatch': 6,
+        'preTax401k': 10000,
+        'employerMatch': 50,
         'country': 'US',
         'state': 'CA',
         'filingStatus': 'single',
@@ -89,8 +89,8 @@ def test_calculate_endpoint_missing_field(client):
         'inflationRate': 2,
         'retirementSpending': 40000,
         'withdrawalRate': 4,
-        'preTax401k': 0.1,
-        'employerMatch': 6,
+        'preTax401k': 10000,
+        'employerMatch': 50,
         'country': 'US',
         'state': 'CA',
         'filingStatus': 'single',
@@ -102,4 +102,3 @@ def test_calculate_endpoint_missing_field(client):
     assert resp.status_code == 400
     data = resp.get_json()
     assert 'error' in data
-

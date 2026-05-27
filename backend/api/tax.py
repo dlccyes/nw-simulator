@@ -118,13 +118,13 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
         income: Gross income
         state: State/region code (only used for US)
         pre_tax_401k: Pre-tax retirement contributions
-        employer_match: Employer match rate (decimal)
+        employer_match: Employer match rate as a decimal percentage of pre-tax contributions
         country_code: Two-letter country code
         filing_status: Filing status ('single' or 'married')
 
     Returns:
         (total_available_income, effective_tax_rate, tax_breakdown)
-        where total_available_income = after_tax_income + employer_match
+        where total_available_income = after_tax_income + employer_match_amount
     """
     if income <= 0:
         return 0, 0, {}
@@ -134,8 +134,8 @@ def calculate_income_tax(income, state, pre_tax_401k, employer_match, country_co
     payroll_config = get_payroll_config(country_code)
     state_config = get_state_config(state, country_code, filing_status)
 
-    # Calculate employer match amount (employer_match is already a decimal, e.g., 0.05 for 5%)
-    employer_match_amount = income * employer_match
+    # Employer match is modeled as a percentage of the employee's pre-tax contribution.
+    employer_match_amount = pre_tax_401k * employer_match
 
     # Calculate taxable income after deductions
     federal_standard_deduction = federal_config.get('standard_deduction', 0)

@@ -28,6 +28,28 @@ def test_validate_calculate_payload_ok():
     validate_calculate_payload(payload)  # should not raise
 
 
+def test_validate_calculate_payload_rejects_us_401k_limit_excess():
+    payload = {
+        'currentAge': 30,
+        'endAge': 31,
+        'currentNetWorth': 0,
+        'annualReturn': 7,
+        'inflationRate': 2,
+        'retirementSpending': 10000,
+        'withdrawalRate': 4,
+        'preTax401k': 24501,
+        'employerMatch': 50,
+        'country': 'US',
+        'state': 'CA',
+        'filingStatus': 'single',
+        'yearlyIncome': [{'startAge': 30, 'endAge': 31, 'amount': 100000}],
+        'yearlySpending': [{'startAge': 30, 'endAge': 31, 'amount': 50000}],
+        'stopAtFire': False,
+    }
+    with pytest.raises(ValueError, match='preTax401k'):
+        validate_calculate_payload(payload)
+
+
 @pytest.mark.parametrize('missing', [
     'currentAge', 'endAge', 'currentNetWorth', 'annualReturn', 'inflationRate',
     'retirementSpending', 'withdrawalRate', 'preTax401k', 'employerMatch',
@@ -76,4 +98,3 @@ def test_validate_tax_payload_ok():
 def test_validate_tax_payload_invalid():
     with pytest.raises(ValueError):
         validate_tax_payload({'income': 100000})  # missing state
-

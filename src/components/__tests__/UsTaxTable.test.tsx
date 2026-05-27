@@ -1,10 +1,11 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import UsTaxTable from '../UsTaxTable';
 import axios from 'axios';
+import type { Mock } from 'vitest';
 
 vi.mock('axios');
 
-const mockedAxios = axios as unknown as { post: any; get: any };
+const mockedAxios = axios as unknown as { post: Mock; get: Mock };
 
 describe('UsTaxTable', () => {
   beforeEach(() => {
@@ -36,7 +37,7 @@ describe('UsTaxTable', () => {
     });
     expect(mockedAxios.post).toHaveBeenCalledWith(
       expect.stringMatching(/\/api\/us-tax-comparison$/),
-      expect.objectContaining({ tax_exempt_income: 60000 })
+      expect.objectContaining({ tax_exempt_income: 24500 })
     );
   });
 

@@ -8,7 +8,7 @@ function getInitialDarkMode(): boolean {
     if (stored !== null) {
       return stored === 'true';
     }
-  } catch (_err) {
+  } catch {
     // ignore and fall back to media query
   }
   if (typeof window !== 'undefined' && window.matchMedia) {
@@ -23,7 +23,7 @@ export function usePersistentDarkMode(): [boolean, (next: boolean) => void] {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, String(darkMode));
-    } catch (_err) {
+    } catch {
       // ignore storage write errors (e.g., private mode)
     }
   }, [darkMode]);
@@ -39,4 +39,4 @@ export function usePersistentDarkMode(): [boolean, (next: boolean) => void] {
   }, []);
 
   return [darkMode, setDarkMode];
-} 
+}

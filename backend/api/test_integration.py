@@ -22,7 +22,7 @@ class TestIntegration(unittest.TestCase):
                     "country": "US",
                     "state": "CA",
                     "preTax401k": 23000,
-                    "employerMatch": 5,
+                    "employerMatch": 50,
                     "yearlySpending": [{"startAge": 23, "endAge": 50, "amount": 100000}],
                     "yearlyIncome": [
                         {"startAge": 23, "endAge": 25, "amount": 230000},
@@ -32,7 +32,7 @@ class TestIntegration(unittest.TestCase):
                     "stopAtFire": True
                 },
                 "expected_response": {
-                    "fireAge": 36,
+                    "fireAge": 37,
                     "requiredSavings": 2500000.0
                 }
             },
@@ -76,7 +76,7 @@ class TestIntegration(unittest.TestCase):
                     "country": "US",
                     "state": "CA",
                     "preTax401k": 23000,
-                    "employerMatch": 5,
+                    "employerMatch": 50,
                     "yearlySpending": [{"startAge": 23, "endAge": 50, "amount": 100000}],
                     "yearlyIncome": [
                         {"startAge": 23, "endAge": 25, "amount": 230000},
@@ -86,7 +86,7 @@ class TestIntegration(unittest.TestCase):
                     "stopAtFire": False
                 },
                 "expected_response": {
-                    "fireAge": 36,
+                    "fireAge": 37,
                     "requiredSavings": 2500000.0
                 }
             }
@@ -154,7 +154,7 @@ class TestIntegration(unittest.TestCase):
         self.compare_response(actual_response, scenario["expected_response"], scenario["request"])
 
         # Additional validation specific to this scenario
-        self.assertEqual(actual_response['fireAge'], 36, "FIRE age should be 36")
+        self.assertEqual(actual_response['fireAge'], 37, "FIRE age should be 37")
         self.assertAlmostEqual(actual_response['requiredSavings'], 2500000.0, delta=0.01)
 
         # Verify the calculation makes logical sense
@@ -214,11 +214,11 @@ class TestIntegration(unittest.TestCase):
         self.compare_response(actual_response, scenario["expected_response"], scenario["request"])
 
         # Additional validation specific to this scenario
-        self.assertEqual(actual_response['fireAge'], 36, "FIRE age should be 36")
+        self.assertEqual(actual_response['fireAge'], 37, "FIRE age should be 37")
         self.assertAlmostEqual(actual_response['requiredSavings'], 2500000.0, delta=0.01)
 
         # Verify continuing work after FIRE - key difference from stopAtFire=true
-        fire_age_index = actual_response['years'].index(36)
+        fire_age_index = actual_response['years'].index(37)
 
         # Should continue earning income until age 40 (end of income range)
         self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index], 400000,
@@ -226,10 +226,8 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index + 1], 400000,
                         "Should continue earning after FIRE age")
         self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index + 3], 400000,
-                        "Should continue earning until income range ends")
-        self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index + 4], 400000,
                         "Should continue earning at age 40 (end of range)")
-        self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index + 5], 0,
+        self.assertEqual(actual_response['yearlyPreTaxIncome'][fire_age_index + 4], 0,
                         "Income should stop at age 41 (end of range)")
 
         # Verify final net worth is higher than stopAtFire=true scenario
@@ -248,7 +246,7 @@ class TestIntegration(unittest.TestCase):
         print(f"Final Real Net Worth: ${actual_response['realNetWorth'][-1]:,.0f}")
         print(f"Years to FIRE: {actual_response['fireAge'] - scenario['request']['currentAge']}")
         print(f"Continues working: {actual_response['yearlyPreTaxIncome'][fire_age_index + 1] > 0}")
-        print(f"Extra years of income: {fire_age_index + 4 - fire_age_index} years")
+        print(f"Extra years of income: {fire_age_index + 3 - fire_age_index} years")
 
     def add_test_scenario(self, name, description, request, expected_response):
         """Helper method to add new test scenarios programmatically."""

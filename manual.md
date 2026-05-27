@@ -117,7 +117,7 @@ Phase 3: Age 46+, $60,000/year (Empty nest)
 ### 401(k) Contributions
 - **Pre-tax 401(k)**: Annual contribution amount (reduces taxable income)
 - **Backdoor Roth**: Annual contribution amount (modeled to reduce taxable income while increasing net worth)
-- **Employer Match**: Percentage of salary your employer matches
+- **Employer Match**: Percentage of your pre-tax 401(k) contribution your employer matches
 - **Tax Benefits**: Contributions reduce current year taxes
 
 ### How It Works
@@ -129,12 +129,12 @@ Phase 3: Age 46+, $60,000/year (Empty nest)
 ```
 Salary: $100,000
 401(k) Contribution: $20,000
-Employer Match: 5%
+Employer Match: 50%
 
 Result:
 - Taxable Income: $80,000 (reduced by $20,000)
-- Employer Match: $5,000 (5% of $100,000)
-- Total Retirement Savings: $25,000/year
+- Employer Match: $10,000 (50% of $20,000)
+- Total Retirement Savings: $30,000/year
 ```
 
 ## Country-Specific Features
@@ -411,4 +411,4 @@ A: No, it only includes federal and state taxes. Local taxes vary significantly 
 
 ---
 
-**Remember**: This calculator provides estimates for planning purposes. Consult financial professionals for personalized advice. 
+**Remember**: This calculator provides estimates for planning purposes. Consult financial professionals for personalized advice.

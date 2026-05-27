@@ -48,7 +48,7 @@ export const COUNTRY_CONFIG: Record<string, CountryConfig> = {
       country: 'US',
       state: 'CA',
       preTax401k: 24500,
-      employerMatch: 5,
+      employerMatch: 50,
       filingStatus: 'single'
     },
     spendingDefaults: [

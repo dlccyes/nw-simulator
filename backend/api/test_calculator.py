@@ -64,14 +64,14 @@ class TestCalculator(unittest.TestCase):
 
     @parameterized.expand([
         # (gross_income, state, pre_tax_401k, employer_match, expected_after_tax_min, expected_tax_rate_max)
-        ("normal_income", 100000, 'CA', 0.1, 0.06, 50000, 50),
-        ("zero_income", 0, 'CA', 0.1, 0.06, 0, 0),
-        ("high_income", 500000, 'CA', 0.1, 0.06, 200000, 60),
-        ("no_401k", 100000, 'CA', 0, 0.06, 40000, 60),
-        ("no_match", 100000, 'CA', 0.1, 0, 45000, 55),
-        ("texas_no_state_tax", 100000, 'TX', 0.1, 0.06, 55000, 45),
-        # New test case for $230,000 income with 5% match
-        ("230k_income_5pct_match", 230000, 'CA', 23000, 0.05, 172000, 33),
+        ("normal_income", 100000, 'CA', 10000, 0.5, 75000, 50),
+        ("zero_income", 0, 'CA', 10000, 0.5, 0, 0),
+        ("high_income", 500000, 'CA', 24500, 0.5, 300000, 60),
+        ("no_401k", 100000, 'CA', 0, 0.5, 60000, 60),
+        ("no_match", 100000, 'CA', 10000, 0, 70000, 55),
+        ("texas_no_state_tax", 100000, 'TX', 10000, 0.5, 80000, 45),
+        # $230,000 income with a 50% match on a $23,000 contribution
+        ("230k_income_50pct_match", 230000, 'CA', 23000, 0.5, 172000, 33),
     ])
     def test_calculate_income_tax(self, name, gross_income, state, pre_tax_401k,
                                 employer_match, expected_after_tax_min,
@@ -83,18 +83,18 @@ class TestCalculator(unittest.TestCase):
         self.assertLessEqual(tax_rate, expected_tax_rate_max)
 
     def test_230k_income_detailed(self):
-        """Detailed test for $230,000 income with 5% employer match"""
+        """Detailed test for $230,000 income with a 50% employer match"""
         gross_income = 230000
         state = 'CA'
         pre_tax_401k = 23000
-        employer_match = 0.05
+        employer_match = 0.5
 
         after_tax, tax_rate, tax_breakdown = calculate_income_tax(
             gross_income, state, pre_tax_401k, employer_match
         )
 
         # Expected values based on actual calculation with correct tax brackets
-        expected_employer_match = gross_income * employer_match  # $11,500
+        expected_employer_match = pre_tax_401k * employer_match  # $11,500
 
         # Use the actual calculated values from the tax function
         expected_federal_tax = tax_breakdown['federalTax']
@@ -136,7 +136,7 @@ class TestCalculator(unittest.TestCase):
         gross_income = 100000
         state = 'CA'
         pre_tax_401k = 23000
-        employer_match = 0.05
+        employer_match = 0.5
 
         # Calculate tax with 401k contribution
         after_tax_with_401k, _, tax_breakdown_with_401k = calculate_income_tax(
@@ -165,8 +165,8 @@ class TestCalculator(unittest.TestCase):
         self.assertLess(tax_breakdown_with_401k['totalTax'], tax_breakdown_without_401k['totalTax'])
 
         # Verify that after-tax income is higher with 401k (excluding employer match)
-        after_tax_with_401k_no_match = after_tax_with_401k - (gross_income * employer_match)
-        after_tax_without_401k_no_match = after_tax_without_401k - (gross_income * employer_match)
+        after_tax_with_401k_no_match = after_tax_with_401k - (pre_tax_401k * employer_match)
+        after_tax_without_401k_no_match = after_tax_without_401k
         self.assertGreater(after_tax_with_401k_no_match, after_tax_without_401k_no_match)
 
         # Verify that the tax savings are reasonable
@@ -210,8 +210,8 @@ class TestCalculator(unittest.TestCase):
             'inflationRate': 2,
             'retirementSpending': 40000,
             'withdrawalRate': 4,
-            'preTax401k': 0.1,
-            'employerMatch': 6,
+            'preTax401k': 10000,
+            'employerMatch': 50,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],
@@ -226,8 +226,8 @@ class TestCalculator(unittest.TestCase):
             'inflationRate': 2,
             'retirementSpending': 40000,
             'withdrawalRate': 10,  # Unrealistic withdrawal rate
-            'preTax401k': 0.1,
-            'employerMatch': 6,
+            'preTax401k': 10000,
+            'employerMatch': 50,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],
@@ -242,8 +242,8 @@ class TestCalculator(unittest.TestCase):
             'inflationRate': 2,
             'retirementSpending': 30000,
             'withdrawalRate': 4,
-            'preTax401k': 0.15,
-            'employerMatch': 8,
+            'preTax401k': 15000,
+            'employerMatch': 50,
             'state': 'TX',
             'stopAtFire': True,
             'yearlyIncome': [{'startAge': 25, 'endAge': 40, 'amount': 200000}],  # Higher income
@@ -258,8 +258,8 @@ class TestCalculator(unittest.TestCase):
             'inflationRate': 5,         # High inflation
             'retirementSpending': 40000,
             'withdrawalRate': 4,
-            'preTax401k': 0.1,
-            'employerMatch': 6,
+            'preTax401k': 10000,
+            'employerMatch': 50,
             'state': 'CA',
             'stopAtFire': False,
             'yearlyIncome': [{'startAge': 30, 'endAge': 65, 'amount': 100000}],

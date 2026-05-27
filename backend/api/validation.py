@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 ALLOWED_COUNTRIES = {"US", "TW"}
 ALLOWED_FILING_STATUSES = {"single", "married", "compare"}
+US_PRE_TAX_401K_LIMIT = 24_500
 
 
 def _require_number(name: str, value: Any, *, min_value: Optional[float] = None) -> None:
@@ -68,6 +69,8 @@ def validate_calculate_payload(data: Dict[str, Any]) -> None:
     # state required for US
     if data['country'] == 'US':
         _require_str('state', data['state'])
+        if data['preTax401k'] > US_PRE_TAX_401K_LIMIT:
+            raise ValueError(f"preTax401k must be <= {US_PRE_TAX_401K_LIMIT}")
 
     filing = data['filingStatus']
     _require_str('filingStatus', filing)
